@@ -1,0 +1,30 @@
+{
+  "name": "sas_egp_v8tov7",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShenzhenYAO/sas_egp_v8tov7.git"
+  },
+  "keywords": [
+    "SAS",
+    "EGP",
+    "enterprise",
+    "guide",
+    "project",
+    "files",
+    "convert",
+    "conversion",
+    "versions"
+  ],
+  "author": "Shenzhen Yao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ShenzhenYAO/sas_egp_v8tov7/issues"
+  },
+  "homepage": "https://github.com/ShenzhenYAO/sas_egp_v8tov7#readme"
+}
