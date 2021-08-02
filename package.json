@@ -26,5 +26,10 @@
   "bugs": {
     "url": "https://github.com/ShenzhenYAO/sas_egp_v8tov7/issues"
   },
-  "homepage": "https://github.com/ShenzhenYAO/sas_egp_v8tov7#readme"
+  "homepage": "https://github.com/ShenzhenYAO/sas_egp_v8tov7#readme",
+  "dependencies": {
+    "adm-zip": "^0.5.5",
+    "jquery": "^3.3.1",
+    "jsdom": "^16.7.0"
+  }
 }
