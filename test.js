@@ -5,10 +5,8 @@ const jsdom = require("jsdom");
 const { window } = new jsdom.JSDOM(`...`);
 let $ = require("jquery")(window);
 
-
 (async () => {
 
-
-
+    
 })()
 

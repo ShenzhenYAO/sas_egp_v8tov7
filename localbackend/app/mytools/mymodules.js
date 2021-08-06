@@ -511,7 +511,6 @@ module.exports = {
     /** 2. get textContent, and innerHTML */
     // console.log(theDOM.textContent)
     // console.log(theDOM.innerHTML)
-
     /**
      * **************************************************************
      * get data of a DOM element
@@ -565,7 +564,7 @@ module.exports = {
                     // console.log("theDOM.childElementCount", theDOM.childElementCount)
                     // console.log("theDOM.children", theDOM.children.length)
                     // if (theDOM.childElementCount > 0) {
-                    if (theDOM.children && theDOM.children.length >0) {
+                    if (theDOM.children && theDOM.children.length > 0) {
                         // console.log("theDOM.children",  theDOM.children)
                         let theDOM_children = theDOM.children
                         // console.log('children eles==========')
@@ -997,6 +996,9 @@ module.exports = {
             return result
 
         }, // convertimgsrc
+
+    /*******following are new functions only added in this mymodules.js**************************************** */
+
     saveLocalTxtFile:
         async function saveLocalTxtFile(thetxtstr, targettxtfile, encoding) {
             encoding = encoding || 'utf-8' // by default using utf-8
@@ -1009,25 +1011,114 @@ module.exports = {
     // get the textContent of the top level of the dom (not including inner text of its children)
     getTopTextContent:
         //function to remove it's children
-    function getTopTextContent(theDom){
+        function getTopTextContent(theDom) {
 
-        // make a copy of theDom (theDom_copy), and work on theDom_copy
-        let jsdom = require("jsdom");
-        let { window } = new jsdom.JSDOM(`...`);
-        let $ = require("jquery")(window);
-        // get the innerHTML of theDOM
-        let DOMOuterHTML = theDom.outerHTML
-        let theDom_copy = $(DOMOuterHTML)[0]
+            // make a copy of theDom (theDom_copy), and work on theDom_copy
+            let jsdom = require("jsdom");
+            let { window } = new jsdom.JSDOM(`...`);
+            let $ = require("jquery")(window);
+            // get the innerHTML of theDOM
+            let DOMOuterHTML = theDom.outerHTML
+            let theDom_copy = $(DOMOuterHTML)[0]
 
-        // Note: do not work on theDom directly. Once the children nodes are deleted from theDom, it'll affect theDom object outside of the current function
-        //       As a result, children nodes of theDom object outside the current function will also be removed
-        // the idea is to remove all children of theDom_copy, so that the theDom only contains textContent of itself
-        for(let i = theDom_copy.children.length-1; i>=0 ; i--){
-            theDom_copy.children[i].remove()
-        }
-        let toptext = theDom_copy.textContent
-        // console.log(toptext)
-        return toptext
+            // Note: do not work on theDom directly. Once the children nodes are deleted from theDom, it'll affect theDom object outside of the current function
+            //       As a result, children nodes of theDom object outside the current function will also be removed
+            // the idea is to remove all children of theDom_copy, so that the theDom only contains textContent of itself
+            for (let i = theDom_copy.children.length - 1; i >= 0; i--) {
+                theDom_copy.children[i].remove()
+            }
+            let toptext = theDom_copy.textContent
+            // console.log(toptext)
+            return toptext
+        },
+
+
+    /* by default, jsdom change tagnames to uppercase, attr names to lowercase. 
+    the tagnames in uppercase is ok for SAS to read (as long as the tag /tag are consistently in uppercase)
+    however, SAS does not recognize attr names if the case form is changed (e.g., from EGVision to egvision)
+    the following is to test how to keep the original case form of tagnames and attr names 
+
+    Here are the ideas:
+    the tagname (TAG1) in the original tag is like '<TaG1 ', so we can match '<' + tagname.toUpperCase()+ ' '
+        to the original str to find the tagname in original case form
+    (note, do not try to match the trailing tag like </tAg3>. in the given case, such trailing tag does not exist)
+*/
+
+    // let caseConvertedTagName = 'TAG1'
+    // let originalTagName = getOriginalTagName(thestr, caseConvertedTagName)
+    // console.log(caseConvertedTagName, "==>", originalTagName)
+    getOriginalTagName:
+        function getOriginalTagName(xmlstr, caseConvertedTagName) {
+            let searchStr = '<' + caseConvertedTagName.toUpperCase() + ' '
+            // search for the start position of the searchStr in the orignal html/xml str
+            let startpos = xmlstr.toUpperCase().indexOf(searchStr)
+            let originalName = caseConvertedTagName
+            // search again if startpos=-1 (it could be that the tag is <SubmitableElement>)
+            // in that case, search for '<SubmitableElement ' returns nothing
+            // the following is to try again by search the tag like <SubmitableElement>
+            if (startpos === -1) { 
+                searchStr = '<' + caseConvertedTagName.toUpperCase() + '>'
+                startpos = xmlstr.toUpperCase().indexOf(searchStr)
+            }
+            if (startpos !== -1) {
+                // from the original html/xml string, get the segment between startpos+1 and caseConvertedName.length()
+                originalName = xmlstr.substr(startpos + 1, caseConvertedTagName.length)
+            }
+            // console.log('startpos=', startpos, 'orignalName=', originalName)
+            return originalName
+        },
+
+    // let caseConvertedAttrName = 'egvision'
+    // let originalAttrName = getOriginalAttrName(thestr, caseConvertedAttrName)
+    // console.log(caseConvertedAttrName, "==>", originalAttrName)
+    getOriginalAttrName:
+        function getOriginalAttrName(xmlstr, caseConvertedAttrName) {
+            let searchStr = ' ' + caseConvertedAttrName.toUpperCase() + '='
+            // console.log('searchStr=', searchStr)
+            // search for the start position of the searchStr in the orignal html/xml str
+            let startpos = xmlstr.toUpperCase().indexOf(searchStr)
+            // console.log('startpos=', startpos)
+            // from the original html/xml string, get the segment between startpos+1 and caseConvertedName.length()
+            let originalName = caseConvertedAttrName
+            if (startpos !== -1) {
+                originalName = xmlstr.substr(startpos + 1, caseConvertedAttrName.length)
+            }
+            // console.log('startpos=', startpos, 'orignalName=', originalName)
+            return originalName
+        }, 
+    getOriginalCase_of_TagAttrNames:
+    // to recover the tagnames and attr names in the original text
+    // the JSDOM normalizes the html of the DOM. Thus, the tagnames and attr names
+    // after runing the funciton DOM2JSON, the innerHTML of the node is normalized, the tagNames are in uppercases, and the attr names in lowercases
+    // As the innerHTML of a DOM object (DOM.innerHTML) created by JSDOM is already normalized, there is no way to recover the original case form of tagnames and attr names from DOM.innerHTML
+    // the following is to recover the original case form of tagNames and attr names using the original xmlstr
+    // note: it only recovers the .tagName and attr names in .attrs:[...] of elements theJSON (coverted by DOM2JSON). It cannot recover the .innerHTML property of the elements in theJSON
+    function getOriginalCase_of_TagAttrNames(xmlstr, theJSON){
+        let theJSON_originalCaseForm = []
+        theJSON.forEach(d=>{
+            d.tagName = this.getOriginalTagName(xmlstr, d.tagName)
+            if (d.attrs && d.attrs.length >0){
+                d.attrs.forEach(e=>{
+                    // console.log(e)
+                    // e is like {"egversion": "8.1"} in which 'egversion' is the key
+                    //get the keyname of e 
+                    let thekey = Object.keys(e)[0]
+                    // console.log(thekey)
+                    let thekey_originalcaseform = this.getOriginalAttrName(xmlstr, thekey)
+                    // console.log(thekey_originalcaseform)
+                    // replace thekey with thekey_originalcaseform. Indeed create a new element e[thekey_originalcaseform] and delete the element e[thekey]
+                    e[thekey_originalcaseform]=e[thekey]
+                    delete e[thekey]
+                })
+            }
+            // if d has children, do recursion for the the children
+            if (d.children && d.children.length > 0){
+                d.children = this.getOriginalCase_of_TagAttrNames(xmlstr, d.children)
+            }
+            theJSON_originalCaseForm.push(d)
+        })
+        return theJSON_originalCaseForm
     }
+
 
 } // module.export
