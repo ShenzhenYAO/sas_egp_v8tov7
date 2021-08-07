@@ -221,7 +221,7 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
     let theEGTreeNode_of_theEGTreeNode = addChildNode(theEGTreeNode, childnode)
 
     /*3.1f1 Within .ProjectTreeView.EGTreeNode.EGTreeNode, add:
-        .NodeType.text = “NODETYPE_PROGRAMFOLDER”
+        .NodeType.text = "NODETYPE_PROGRAMFOLDER"
      */
     childnode = {}
     childnode.tagName = "NodeType"
@@ -234,7 +234,7 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
     addChildNode(theEGTreeNode_of_theEGTreeNode, childnode)
 
     /*3.1f2 Within .ProjectTreeView.EGTreeNode.EGTreeNode, add:
-    .Expanded.text = “True”    
+    .Expanded.text = "True"    
      */
     childnode = {}
     childnode.tagName = "Expanded"
@@ -248,7 +248,7 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
 
 
     /*3.1f3 Within .ProjectTreeView.EGTreeNode.EGTreeNode, add:
-        .Label.text=”Programs”
+        .Label.text="Programs"
          */
     childnode = {}
     childnode.tagName = "Label"
@@ -262,10 +262,10 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
 
     /* 3.1g Within .ProjectTreeView.EGTreeNode.EGTreeNode, add containers .EGTreeNode, each for a task
        3.1h Within these .ProjectTreeView.EGTreeNode.EGTreeNode.EGTreeNode, add:
-        .NodeType.text = “NODETYPE_ELEMENT”
-        .ElementID.text = “CodeTask-fZbshWji7axVxlCT”, i.e., the ID of the task
-        .Expanded.text = “False”
-        .Label.text=”Program”, i.e., the label of the program (corresponding to the labels in the ProjectCollection.Elements.Element with .attr(“Type”)=” SAS.EG.ProjectElements.CodeTask” .Element.Label.text()
+        .NodeType.text = "NODETYPE_ELEMENT"
+        .ElementID.text = "CodeTask-fZbshWji7axVxlCT", i.e., the ID of the task
+        .Expanded.text = "False"
+        .Label.text="Program", i.e., the label of the program (corresponding to the labels in the ProjectCollection.Elements.Element with .attr("Type")=" SAS.EG.ProjectElements.CodeTask" .Element.Label.text()
     */
     // console.log(theTaskElementNodes)
     /****all tasks are in the obj theTaskElementNodes */
@@ -300,7 +300,7 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
             let theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode = addChildNode(theEGTreeNode_of_theEGTreeNode, childnode)
 
             /*3.1h1 Within these .ProjectTreeView.EGTreeNode.EGTreeNode.EGTreeNode, add:
-            .NodeType.text = “NODETYPE_ELEMENT”
+            .NodeType.text = "NODETYPE_ELEMENT"
             */
             childnode = {}
             childnode.tagName = "NodeType"
@@ -313,9 +313,9 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
             addChildNode(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode, childnode)
 
             /*3.1h2 Within these .ProjectTreeView.EGTreeNode.EGTreeNode.EGTreeNode, add:
-            .ElementID.text = “CodeTask-fZbshWji7axVxlCT”, i.e., the ID of the task
-            .Expanded.text = “False”
-            .Label.text=”Program”, i.e., the label of the program (corresponding to the labels in the ProjectCollection.Elements.Element with .attr(“Type”)=” SAS.EG.ProjectElements.CodeTask” .Element.Label.text()
+            .ElementID.text = "CodeTask-fZbshWji7axVxlCT", i.e., the ID of the task
+            .Expanded.text = "False"
+            .Label.text="Program", i.e., the label of the program (corresponding to the labels in the ProjectCollection.Elements.Element with .attr("Type")=" SAS.EG.ProjectElements.CodeTask" .Element.Label.text()
              */
             childnode = {}
             childnode.tagName = "ElementID"
@@ -329,8 +329,8 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
 
 
             /*3.1h3 Within these .ProjectTreeView.EGTreeNode.EGTreeNode.EGTreeNode, add:
-            .Expanded.text = “False”
-            .Label.text=”Program”, i.e., the label of the program (corresponding to the labels in the ProjectCollection.Elements.Element with .attr(“Type”)=” SAS.EG.ProjectElements.CodeTask” .Element.Label.text()
+            .Expanded.text = "False"
+            .Label.text="Program", i.e., the label of the program (corresponding to the labels in the ProjectCollection.Elements.Element with .attr("Type")=" SAS.EG.ProjectElements.CodeTask" .Element.Label.text()
              */
             childnode = {}
             childnode.tagName = "Expanded"
@@ -343,7 +343,7 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
             addChildNode(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode, childnode)
 
             /*3.1h4 Within these .ProjectTreeView.EGTreeNode.EGTreeNode.EGTreeNode, add:
-            .Label.text=”Program”, i.e., the label of the program (corresponding to the labels in the ProjectCollection.Elements.Element with .attr(“Type”)=” SAS.EG.ProjectElements.CodeTask” .Element.Label.text()
+            .Label.text="Program", i.e., the label of the program (corresponding to the labels in the ProjectCollection.Elements.Element with .attr("Type")=" SAS.EG.ProjectElements.CodeTask" .Element.Label.text()
              */
             childnode = {}
             childnode.tagName = "Label"
@@ -355,14 +355,126 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
             childnode.children = []
             addChildNode(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode, childnode)
 
-            console.log(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode)
+            // console.log(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode)
 
         })
-    }
-    
+    } // if (theTaskElementNodes && theTaskElementNodes.length > 0)
+
     // console.log(theEGTreeNode_of_theEGTreeNode.children[theEGTreeNode_of_theEGTreeNode.children.length - 1])
 
+    /*
+        3.2 Within ProjectCollection.External_Objects, create a new container 
+        .ProcessFlowView. (This is also to make task icons visible in the main area)
+    */
+    childnode = {}
+    childnode.tagName = "ProcessFlowView"
+    childnode.attrs = []
+    childnode.uuid = mymodules.generateUUID()
+    childnode.parentuuid = theExternal_ObjectsNode.uuid
+    childnode.TopTextContent = ""
+    childnode.innerHTML = ""
+    childnode.children = []
+    let theProcessFlowViewNode = addChildNode(theExternal_ObjectsNode, childnode)
 
+    /* 3.2a copy the contents within .ProcessFlowControlManager.ProcessFlowControlState to .ProcessFlowView */
+    let theProcessFlowControlManagerNode = getFirstChildNodeByTagName(theExternal_ObjectsNode, "ProcessFlowControlManager")
+    let theProcessFlowControlStateNode_of_theProcessFlowControlManagerNode = getFirstChildNodeByTagName(theProcessFlowControlManagerNode, "ProcessFlowControlState")
+    theProcessFlowViewNode.children = theProcessFlowControlStateNode_of_theProcessFlowControlManagerNode.children
+    // change the children's parentuuid to theProcessFlowViewNode.uuid
+    theProcessFlowViewNode.children.forEach(d => {
+        d.parentuuid = theProcessFlowViewNode.uuid
+    })
+    // console.log(theProcessFlowViewNode.children[0])
+
+    /* 3.2b delete the containers .ProcessFlowControlManager, and anything within it 
+        indeed, push the theExternal_ObjectsNode.children to theExternal_ObjectsNode.__children 
+        if the child's tagName is not "ProcessFlowControlManager",
+        next, overwrite .children with .__children
+        finally, delete .__children
+    */
+    theExternal_ObjectsNode.children.forEach(d => {
+        theExternal_ObjectsNode.__children = []
+        if (d.tagName !== 'ProcessFlowControlManager') {
+            theExternal_ObjectsNode.__children.push(d)
+        }
+    })
+    theExternal_ObjectsNode.children = theExternal_ObjectsNode.__children
+    delete theExternal_ObjectsNode.__children
+
+    /* 3.2c Within ProjectCollection.External_Objects.ProcessFlowView, 
+        rename the tag name of the element .GraphicObjects to .Graphics
+    */
+    let theGraphicObjectsNode = getFirstChildNodeByTagName(theProcessFlowViewNode, "GraphicObjects")
+    theGraphicObjectsNode.tagName = "Graphics"
+    // console.log(theGraphicObjectsNode)
+
+    /* 3.2d Within ProjectCollection.External_Objects.ProcessFlowView, add a container "Containers"
+    */
+    childnode = {}
+    childnode.tagName = "Containers"
+    childnode.attrs = []
+    childnode.uuid = mymodules.generateUUID()
+    childnode.parentuuid = theProcessFlowViewNode.uuid
+    childnode.TopTextContent = ""
+    childnode.innerHTML = ""
+    childnode.children = []
+    let theContainersNode_of_theProcessFlowViewNode = addChildNode(theProcessFlowViewNode, childnode)
+
+    /* 3.2e Within ProjectCollection.External_Objects.ProcessFlowView. Containers, Add a tag .Properties */
+    childnode = {}
+    childnode.tagName = "Properties"
+    childnode.attrs = []
+    childnode.uuid = mymodules.generateUUID()
+    childnode.parentuuid = theContainersNode_of_theProcessFlowViewNode.uuid
+    childnode.TopTextContent = ""
+    childnode.innerHTML = ""
+    childnode.children = []
+    let thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode = addChildNode(theContainersNode_of_theProcessFlowViewNode, childnode)
+    // console.log(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode)
+
+    /* 3.2f1 Within ProjectCollection.External_Objects.ProcessFlowView. Containers.Properties, add the following:
+     .ID.Text = "ProcessFlowContainer-FOavG6ypkQ7cUnal", i.e., the process flow ID in ProjectCollection.Elements. Element.Attr("Type", "SAS.EG.ProjectElements.PFD").Element[0].ID.Text()
+    */
+    childnode = {}
+    childnode.tagName = "ID"
+    childnode.attrs = []
+    childnode.uuid = mymodules.generateUUID()
+    childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
+    childnode.TopTextContent = theProjectProcessFlowID
+    childnode.innerHTML = ""
+    childnode.children = []
+    addChildNode(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode, childnode)
+
+    /* 3.2f2 Within ProjectCollection.External_Objects.ProcessFlowView. Containers.Properties, add the following:
+        .BackgroundColor.Text="Default"
+    */
+    childnode = {}
+    childnode.tagName = "BackgroundColor"
+    childnode.attrs = []
+    childnode.uuid = mymodules.generateUUID()
+    childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
+    childnode.TopTextContent = "Default"
+    childnode.innerHTML = ""
+    childnode.children = []
+    addChildNode(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode, childnode)
+
+
+    /* 3.2f3 Within ProjectCollection.External_Objects.ProcessFlowView. Containers.Properties, add the following:
+    .Align = "AlignTop" 
+    */
+    childnode = {}
+    childnode.tagName = "Align"
+    childnode.attrs = []
+    childnode.uuid = mymodules.generateUUID()
+    childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
+    childnode.TopTextContent = "AlignTop"
+    childnode.innerHTML = ""
+    childnode.children = []
+    addChildNode(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode, childnode)
+
+    // save the modified JSON!
+    let themodifiedjsonfile ="./data/out/test_modified_for_v7.json";
+    await mymodules.saveJSON(theJSON, themodifiedjsonfile)
 
 })()
 
