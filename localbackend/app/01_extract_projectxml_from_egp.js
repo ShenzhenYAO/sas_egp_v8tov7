@@ -8,6 +8,7 @@ const AdmZip = require('adm-zip');
 
 // sepcify the path and name of the zip file
 const theEGP = "data/in/samplev8.egp";
+// const theEGP = "data/in/AnEGPFileMadeByV71.egp";
 
 // sepcify the file to be extracted from the egp (project.xml in this case)
 const thesrcfile = "project.xml";
