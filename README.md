@@ -1,12 +1,16 @@
 Remaining issues:
 
-1. Link is now show in PFD
-2. shortcut is not show in PFD
-
+1. Link is not shown in PFD
+2. shortcut is not shown in PFD
 compare the diff between converted and real v7
 
+3. memory heap out issue
 if heap out of memory, simply enlarge size:
  node --max-old-space-size=50000 localbackend/app/01_extract_projectxml_from_egp.js
+
+For a real egp (the ones with 50+ programs), step 02 (converting xml to json requires to enlarge the old space size to 1000000 !).
+Also, the step is very slow. May need to work around by adding elements in DOMs instead of converting to JSON objects.
+
 
  Note:
 1. jsdom has errors when handling the xml tag <table>A</table>. Magically, it'll turn the script to <table></table>A. It seems that the tag name 'table' has special meanings to jsdom. The work around is to rename the tagname 'table' to whatever else (e.g., <table123></table123>)
