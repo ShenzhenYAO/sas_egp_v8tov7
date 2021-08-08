@@ -10,7 +10,7 @@ var $ = require("jquery")(window);
 
 // specify the source xml file
 // const thesrcxml = 'data/out/text.xml';
-const thesrcxml = 'data/out/test_project.xml';
+const thesrcxml = 'data/out/01_test_project_v8_extracted_from_egp.xml';
 // read the source file into a string
 
 (async () => {
@@ -33,13 +33,27 @@ const thesrcxml = 'data/out/test_project.xml';
     // As the innerHTML of a DOM object (DOM.innerHTML) created by JSDOM is already normalized, there is no way to recover the original case form of tagnames and attr names from DOM.innerHTML
     // the following is to recover the original case form of tagNames and attr names using the original xmlstr
     // note: it only recovers the .tagName and attr names in .attrs:[...] of elements theJSON (coverted by DOM2JSON). It cannot recover the .innerHTML property of the elements in theJSON
-    theJSON_originalCaseForm = mymodules.getOriginalCase_of_TagAttrNames(xmlbodytext, theJSON)
+    let theJSON_originalCaseForm = mymodules.getOriginalCase_of_TagAttrNames(xmlbodytext, theJSON)
 
-
+    //In step 01, the tagName 'Table' was changed to 'Table123' to work around for jsdom error
+    //Now, recover the tagName to 'Table'
+    let theJSON_originalCaseForm_Tag_Table123_renamed =renameTagName_Table123_to_Table(theJSON_originalCaseForm)
+    function renameTagName_Table123_to_Table (thejsonobj){
+        thejsonobj.forEach(d=>{
+            if (d.tagName === "Table123"){
+                d.tagName = "Table"
+            }
+            if (d.children && d.children.length >0){
+                d.children = renameTagName_Table123_to_Table(d.children)
+            }
+        })
+        return thejsonobj
+    } // function renameTagName_Table123_to_Table (theJSON_originalCaseForm)
 
      // save it to a json file. Its all blank, the stringify failed, why?
      // it turn out that I pushed arrays tmp=[] instead of objects tmp={}, which is the source of the problem!
-    let thejsonfile ="./data/out/test_projectxml2json.json";
-    await mymodules.saveJSON(theJSON_originalCaseForm, thejsonfile)
+    let thejsonfile ="./data/out/02_test_projectxml2json_v8.json";
+    await mymodules.saveJSON(theJSON_originalCaseForm_Tag_Table123_renamed, thejsonfile)
+    // await mymodules.saveJSON(theJSON_originalCaseForm, thejsonfile)
 
 })()

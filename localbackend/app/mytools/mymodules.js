@@ -1012,12 +1012,12 @@ module.exports = {
     getTopTextContent:
         //function to remove it's children
         function getTopTextContent(theDom) {
-
+            
             // make a copy of theDom (theDom_copy), and work on theDom_copy
             let jsdom = require("jsdom");
             let { window } = new jsdom.JSDOM(`...`);
             let $ = require("jquery")(window);
-            // get the innerHTML of theDOM
+            // get the outerHTML of theDOM
             let DOMOuterHTML = theDom.outerHTML
             let theDom_copy = $(DOMOuterHTML)[0]
 
@@ -1027,6 +1027,7 @@ module.exports = {
             for (let i = theDom_copy.children.length - 1; i >= 0; i--) {
                 theDom_copy.children[i].remove()
             }
+
             let toptext = theDom_copy.textContent
             // console.log(toptext)
             return toptext

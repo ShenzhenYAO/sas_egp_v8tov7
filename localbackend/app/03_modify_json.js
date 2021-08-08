@@ -3,7 +3,7 @@ contents that are compatible to SAS EG v7*/
 
 // load custom modules
 const mymodules = require('../../localbackend/app/mytools/mymodules');
-const thejsonfile = 'data/out/test_projectxml2json.json';
+const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
 (async () => {
     let thejsonstr = await mymodules.readtxt(thejsonfile)
     // console.log(thejsonstr)
@@ -65,22 +65,14 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
     // then find the first grandchildnode of 'thechildnode' with a tagname of GraphDeviceOverride ('thegrandchildnode')
     // change the text of the thegrandchildnode from 'Default' to 'Png'
     theTaskElementNodes.forEach(d => {
-        tagName = 'SubmitableElement'
-        let theChildNode_tag_SubmitableElement = getFirstChildNodeByTagName(d, tagName)
-        // console.log(theChildNode_tag_SubmitableElement.tagName)
-        if (theChildNode_tag_SubmitableElement && theChildNode_tag_SubmitableElement.children && theChildNode_tag_SubmitableElement.children.length > 0) {
-            // console.log(theChildNode_tag_SubmitableElement.tagName)
-            theChildNode_tag_SubmitableElement.children.forEach(e => {
-                // console.log(e.tagName)
-                tagName = 'GraphDeviceOverride'
-                if (e.tagName === tagName) {
-                    // console.log(e['TopTextContent'])
-                    if (e['TopTextContent'] === 'DEFAULT') {
-                        e['TopTextContent'] = 'Png'
-                    }
-                }
-            }) // theChildNode_tag_SubmitableElement.children.forEach
-        }// if
+        let tagName = 'SubmitableElement'
+        let theChildNode_tag_SubmitableElementNode = getFirstChildNodeByTagName(d, tagName)
+        // console.log(theChildNode_tag_SubmitableElementNode.tagName)
+        // in theChildNode_tag_SubmitableElementNode, find the Element with the tagName "GraphDeviceOverride"
+        let theGraphDeviceOverrideNode_of_theChildNode_tag_SubmitableElementNode = getFirstChildNodeByTagName(theChildNode_tag_SubmitableElementNode, "GraphDeviceOverride")
+        if (theGraphDeviceOverrideNode_of_theChildNode_tag_SubmitableElementNode.TopTextContent === 'Default') {
+            theGraphDeviceOverrideNode_of_theChildNode_tag_SubmitableElementNode.TopTextContent = 'Png'
+        }
     }) //theTaskElementNodes.forEach(d=>{
 
     /*3.1a-b Within ProjectCollection.External_Objects, insert a part at the beginning with the following contents: 
@@ -473,10 +465,12 @@ const thejsonfile = 'data/out/test_projectxml2json.json';
     addChildNode(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode, childnode)
 
     // save the modified JSON!
-    let themodifiedjsonfile ="./data/out/test_modified_for_v7.json";
+    let themodifiedjsonfile = "./data/out/03_test_modified_for_v7.json";
     await mymodules.saveJSON(theJSON, themodifiedjsonfile)
 
 })()
+
+
 
 // add a child node (insertPosition can be "first" or "last")
 function addChildNode(parentnode, childnode, insertPosition) {
