@@ -7,7 +7,7 @@ const mymodules =require('../../localbackend/app/mytools/mymodules');
 const AdmZip = require('adm-zip');
 
 // sepcify the path and name of the zip file
-const theEGP = "data/in/sample1_v8.egp";
+const theEGP = "data/in/sample2_v8.egp";
 // const theEGP = "data/in/AnEGPFileMadeByV71.egp";
 
 // sepcify the file to be extracted from the egp (project.xml in this case)
@@ -50,7 +50,7 @@ const thesrcfile = "project.xml";
      </Parameters>
      the following is to convert  <Parameters /> to <Parameters></Parameters>
      */
-    thexmlstr = convertXHTML_to_OldSchoolHTML(thexmlstr)
+    thexmlstr = convertSelfClosingHTML_to_OldSchoolHTML(thexmlstr)
 
     // save the xmlstr into a text file as ../data/out/
     let thetargetfile = "data/out/01_test_project_v8_extracted_from_egp.xml";
@@ -59,8 +59,7 @@ const thesrcfile = "project.xml";
 
 
 // convert <Parameters /> to <Parameters></Parameters>
-function convertXHTML_to_OldSchoolHTML(str){  
-    // let str = "xxx yyy"
+function convertSelfClosingHTML_to_OldSchoolHTML(str){  
     let matched_arr = str.match(/\<(.*) \/\>/)
     // console.log(matched_arr)
     if (matched_arr && matched_arr.length >0) {
@@ -73,8 +72,8 @@ function convertXHTML_to_OldSchoolHTML(str){
         str = str.replace(xhtmlstr, htmlstr)
         let matched_arr2 = str.match(/\<(.*) \/\>/)
         if (matched_arr && matched_arr.length >0) {
-            str = convertXHTML_to_OldSchoolHTML(str)
+            str = convertSelfClosingHTML_to_OldSchoolHTML(str)
         }
     }
     return str
-} // function convertXHTML_to_OldSchoolHTML(str
+} // function convertSelfClosingHTML_to_OldSchoolHTML(str...

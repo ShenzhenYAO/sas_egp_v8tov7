@@ -1101,7 +1101,7 @@ module.exports = {
         theJSON.forEach(d=>{
             d.tagName = this.getOriginalTagName(xmlstr, d.tagName)
             // also, cleanup the innerHTML, it is useless
-            d.innerHTML=""
+            // d.innerHTML=""
             if (d.attrs && d.attrs.length >0){
                 d.attrs.forEach(e=>{
                     // console.log(e)

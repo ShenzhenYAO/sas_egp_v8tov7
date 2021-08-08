@@ -26,7 +26,7 @@ const thesrcxml = 'data/out/01_test_project_v8_extracted_from_egp.xml';
     // Next, convert xmlbodytext into a json file
     let thexmldom = $(xmlbodytext)
     // let rootuuid = mymodules.generateUUID()
-    let theJSON = mymodules.DOM2JSON(thexmldom, rootuuid)
+    let theJSON = mymodules.DOM2JSON(thexmldom)
     // to recover the tagnames and attr names in the original text
     // the JSDOM normalizes the html of the DOM. Thus, the tagnames and attr names
     // after runing the funciton DOM2JSON, the innerHTML of the node is normalized, the tagNames are in uppercases, and the attr names in lowercases
