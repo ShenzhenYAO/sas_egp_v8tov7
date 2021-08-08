@@ -7,7 +7,7 @@ const mymodules =require('../../localbackend/app/mytools/mymodules');
 const AdmZip = require('adm-zip');
 
 // sepcify the path and name of the zip file
-const theEGP = "data/in/sample3_v8.egp";
+const theEGP = "data/in/sample1_v8.egp";
 // const theEGP = "data/in/AnEGPFileMadeByV71.egp";
 
 // sepcify the file to be extracted from the egp (project.xml in this case)

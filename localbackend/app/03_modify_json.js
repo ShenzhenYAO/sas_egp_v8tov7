@@ -100,10 +100,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     let childnode = {}
     childnode.tagName = "ProjectTreeView"
     childnode.attrs = [{ "EGVersion": "7.1" }, { "UseSubcontainers": "True" }]
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theExternal_ObjectsNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theExternal_ObjectsNode.uuid
     childnode.TopTextContent = ""
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     let theProjectTreeViewNode = addChildNode(theExternal_ObjectsNode, childnode, "first")
     // console.log(theProjectTreeViewNode)
@@ -113,10 +113,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "EGTreeNode"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theProjectTreeViewNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theProjectTreeViewNode.uuid
     childnode.TopTextContent = ""
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     let theEGTreeNode = addChildNode(theProjectTreeViewNode, childnode, "first")
     // console.log(theEGTreeNode)
@@ -127,10 +127,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "NodeType"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theEGTreeNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theEGTreeNode.uuid
     childnode.TopTextContent = "NODETYPE_ELEMENT"
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(theEGTreeNode, childnode, "first")
 
@@ -144,8 +144,8 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "ElementID"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theEGTreeNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theEGTreeNode.uuid
 
     // ************ start getting the process flow id
     // theElementNodes contains all nodes with tagname of 'Element' within ProjectCollection.Elements
@@ -171,7 +171,7 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     // ************ end getting the process flow id
 
     childnode.TopTextContent = theProjectProcessFlowID
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(theEGTreeNode, childnode)
 
@@ -181,10 +181,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "Expanded"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theEGTreeNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theEGTreeNode.uuid
     childnode.TopTextContent = "True"
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(theEGTreeNode, childnode)
 
@@ -194,10 +194,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "Label"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theEGTreeNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theEGTreeNode.uuid
     childnode.TopTextContent = "Process Flow"
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(theEGTreeNode, childnode)
 
@@ -205,10 +205,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "EGTreeNode"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theEGTreeNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theEGTreeNode.uuid
     childnode.TopTextContent = ""
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     let theEGTreeNode_of_theEGTreeNode = addChildNode(theEGTreeNode, childnode)
 
@@ -218,10 +218,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "NodeType"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theEGTreeNode_of_theEGTreeNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theEGTreeNode_of_theEGTreeNode.uuid
     childnode.TopTextContent = "NODETYPE_PROGRAMFOLDER"
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(theEGTreeNode_of_theEGTreeNode, childnode)
 
@@ -231,10 +231,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "Expanded"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theEGTreeNode_of_theEGTreeNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theEGTreeNode_of_theEGTreeNode.uuid
     childnode.TopTextContent = "True"
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(theEGTreeNode_of_theEGTreeNode, childnode)
 
@@ -245,10 +245,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "Label"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theEGTreeNode_of_theEGTreeNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theEGTreeNode_of_theEGTreeNode.uuid
     childnode.TopTextContent = "Programs"
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(theEGTreeNode_of_theEGTreeNode, childnode)
 
@@ -284,10 +284,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
             let childnode = {}
             childnode.tagName = "EGTreeNode"
             childnode.attrs = []
-            childnode.uuid = mymodules.generateUUID()
-            childnode.parentuuid = theEGTreeNode_of_theEGTreeNode.uuid
+            // childnode.uuid = mymodules.generateUUID()
+            // childnode.parentuuid = theEGTreeNode_of_theEGTreeNode.uuid
             childnode.TopTextContent = ""
-            childnode.innerHTML = ""
+            // childnode.innerHTML = ""
             childnode.children = []
             let theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode = addChildNode(theEGTreeNode_of_theEGTreeNode, childnode)
 
@@ -297,10 +297,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
             childnode = {}
             childnode.tagName = "NodeType"
             childnode.attrs = []
-            childnode.uuid = mymodules.generateUUID()
-            childnode.parentuuid = theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode.uuid
+            // childnode.uuid = mymodules.generateUUID()
+            // childnode.parentuuid = theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode.uuid
             childnode.TopTextContent = "NODETYPE_ELEMENT"
-            childnode.innerHTML = ""
+            // childnode.innerHTML = ""
             childnode.children = []
             addChildNode(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode, childnode)
 
@@ -312,10 +312,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
             childnode = {}
             childnode.tagName = "ElementID"
             childnode.attrs = []
-            childnode.uuid = mymodules.generateUUID()
-            childnode.parentuuid = theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode.uuid
+            // childnode.uuid = mymodules.generateUUID()
+            // childnode.parentuuid = theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode.uuid
             childnode.TopTextContent = theTaskElementIDNodeTextContent
-            childnode.innerHTML = ""
+            // childnode.innerHTML = ""
             childnode.children = []
             addChildNode(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode, childnode)
 
@@ -327,10 +327,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
             childnode = {}
             childnode.tagName = "Expanded"
             childnode.attrs = []
-            childnode.uuid = mymodules.generateUUID()
-            childnode.parentuuid = theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode.uuid
+            // childnode.uuid = mymodules.generateUUID()
+            // childnode.parentuuid = theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode.uuid
             childnode.TopTextContent = "False"
-            childnode.innerHTML = ""
+            // childnode.innerHTML = ""
             childnode.children = []
             addChildNode(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode, childnode)
 
@@ -340,10 +340,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
             childnode = {}
             childnode.tagName = "Label"
             childnode.attrs = []
-            childnode.uuid = mymodules.generateUUID()
-            childnode.parentuuid = theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode.uuid
+            // childnode.uuid = mymodules.generateUUID()
+            // childnode.parentuuid = theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode.uuid
             childnode.TopTextContent = theTaskElementLabelTextContent
-            childnode.innerHTML = ""
+            // childnode.innerHTML = ""
             childnode.children = []
             addChildNode(theEGTreeNode_of_theEGTreeNode_of_theEGTreeNode, childnode)
 
@@ -361,10 +361,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "ProcessFlowView"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theExternal_ObjectsNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theExternal_ObjectsNode.uuid
     childnode.TopTextContent = ""
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     let theProcessFlowViewNode = addChildNode(theExternal_ObjectsNode, childnode)
 
@@ -405,10 +405,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "Containers"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theProcessFlowViewNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theProcessFlowViewNode.uuid
     childnode.TopTextContent = ""
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     let theContainersNode_of_theProcessFlowViewNode = addChildNode(theProcessFlowViewNode, childnode)
 
@@ -416,10 +416,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "Properties"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = theContainersNode_of_theProcessFlowViewNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = theContainersNode_of_theProcessFlowViewNode.uuid
     childnode.TopTextContent = ""
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     let thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode = addChildNode(theContainersNode_of_theProcessFlowViewNode, childnode)
     // console.log(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode)
@@ -430,10 +430,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "ID"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
     childnode.TopTextContent = theProjectProcessFlowID
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode, childnode)
 
@@ -443,10 +443,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "BackgroundColor"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
     childnode.TopTextContent = "Default"
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode, childnode)
 
@@ -457,10 +457,10 @@ const thejsonfile = 'data/out/02_test_projectxml2json_v8.json';
     childnode = {}
     childnode.tagName = "Align"
     childnode.attrs = []
-    childnode.uuid = mymodules.generateUUID()
-    childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
+    // childnode.uuid = mymodules.generateUUID()
+    // childnode.parentuuid = thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode.uuid
     childnode.TopTextContent = "AlignTop"
-    childnode.innerHTML = ""
+    // childnode.innerHTML = ""
     childnode.children = []
     addChildNode(thePropertiesNode_of_theContainersNode_of_theProcessFlowViewNode, childnode)
 
@@ -478,13 +478,13 @@ function addChildNode(parentnode, childnode, insertPosition) {
 
     // insert as the first node
     if (insertPosition === "first") {
-        childnode.siblingid = 0
+        // childnode.siblingid = 0
         // insert childnode as the first child of parentnode
         parentnode.__children = [childnode]
         // push the existing childnode.children into .__children
         if (parentnode.children && parentnode.children.length > 0) {
             parentnode.children.forEach(d => {
-                d.siblingid = d.siblingid + 1
+                // d.siblingid = d.siblingid + 1
                 parentnode.__children.push(d)
             })
         }
@@ -495,7 +495,7 @@ function addChildNode(parentnode, childnode, insertPosition) {
 
     // insert as last
     if (insertPosition === "last") {
-        childnode.siblingid = parentnode.children.length
+        // childnode.siblingid = parentnode.children.length
         parentnode.children.push(childnode)
     } //if insert as last
     return childnode

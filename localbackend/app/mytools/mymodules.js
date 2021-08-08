@@ -522,7 +522,7 @@ module.exports = {
             data.tagName = theDOM.tagName
             data.attrs = this.getAttrs(theDOM)
             // data.text = theDOM.textContent
-            data.innerHTML = theDOM.innerHTML
+            // data.innerHTML = theDOM.innerHTML
             data.TopTextContent = this.getTopTextContent(theDOM)
             // console.log(data)
             return data
@@ -535,7 +535,8 @@ module.exports = {
      * **************************************************************
      */
     DOM2JSON:
-        function DOM2JSON(doms, parentuuid) {
+        // function DOM2JSON(doms, parentuuid) {
+            function DOM2JSON(doms ) {    
             let eles = []
             // loop for each sibling element
             let kk = -1 // to have a number to indicate the index of the current DOM within all peer DOMs at the same level
@@ -547,14 +548,14 @@ module.exports = {
                     // console.log(theDOM)
                     let theDOMData = this.getDomData(theDOM)
                     kk = kk + 1
-                    tmp.siblingid = kk
+                    // tmp.siblingid = kk
                     tmp.tagName = theDOMData.tagName
                     tmp.attrs = theDOMData.attrs
-                    tmp.uuid = this.generateUUID()
-                    tmp.parentuuid = parentuuid
+                    // tmp.uuid = this.generateUUID()
+                    // tmp.parentuuid = parentuuid
                     // tmp.text = theDOMData.text                    
                     tmp.TopTextContent = theDOMData.TopTextContent
-                    tmp.innerHTML = theDOMData.innerHTML
+                    // tmp.innerHTML = theDOMData.innerHTML
                     eles.push(tmp)
 
                     tmp.children = []
@@ -568,8 +569,9 @@ module.exports = {
                         // console.log("theDOM.children",  theDOM.children)
                         let theDOM_children = theDOM.children
                         // console.log('children eles==========')
-                        let parentuuid_ofchildren = tmp.uuid // do not call it parentuuid again, will mess up with parentuuid of the current DOM 
-                        let theDOMData_children = this.DOM2JSON(theDOM_children, parentuuid_ofchildren)
+                        // let parentuuid_ofchildren = tmp.uuid // do not call it parentuuid again, will mess up with parentuuid of the current DOM 
+                        // let theDOMData_children = this.DOM2JSON(theDOM_children, parentuuid_ofchildren)
+                        let theDOMData_children = this.DOM2JSON(theDOM_children)
                         // console.log(theDOMData_children)
                         tmp.children = theDOMData_children
                     } // end if
