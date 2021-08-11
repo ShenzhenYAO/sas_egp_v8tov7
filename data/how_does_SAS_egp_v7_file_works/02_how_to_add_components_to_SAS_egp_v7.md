@@ -78,3 +78,45 @@ A link
 ***************
 1. define the link Element:
 - ProjectCollection.Elements.Element[x]
+
+
+***************
+An ODSResult element
+***************
+1. define the link Element:
+- ProjectCollection.Elements.Element[x]
+2. update the ODSResult ID in the Task element that created the data shortcut
+- ProjectCollection.Elements.Element[x].SubmitableElement.JobRecipe.JobRecipe.ODSResultsList
+3. update the graphic of the ODSResult element in process view's graphics:
+- ProjectCollection.External_Objects.ProcessFlowView.Graphics.TaskGraphic[x]
+
+
+***************
+A shortcut to file 
+***************
+1. define the SHORTCUT Element:
+- ProjectCollection.Elements.Element[x]
+2. define the shortcuttofile process tree view:
+- ProjectCollection.External_Objects.ProjectTreeView[x].EGTreeNode[x].EGTreeNode[x]
+3. update the graphic of the SHORTCUT element in process view's graphics:
+- ProjectCollection.External_Objects.ProcessFlowView.Graphics.TaskGraphic[x]
+
+
+***************
+A shortcut to a sas file
+***************
+
+1. define the shortcut to sas as a TASK Element:
+- ProjectCollection.Elements.Element[x]
+
+2. common settings of all tasks in project tree view
+ProjectCollection.External_Objects.ProjectTreeView[x].EGTreeNode[x].EGTreeNode[x]
+
+3. task-specific settings in project tree view
+ProjectCollection.External_Objects.ProjectTreeView[x].EGTreeNode[x].EGTreeNode[x].EGTreeNode[x]
+
+4. show tasks in the tree view panel
+- ProjectCollection.External_Objects.ProcessFlowView[x].Graphics.TaskGraphic[x]
+
+5. setting in external file
+- ProjectCollection.ExternalFileList
