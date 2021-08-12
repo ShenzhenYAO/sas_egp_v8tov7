@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ProjectCollection EGVersion="8.1" Type="SAS.EG.ProjectElements.ElementManager">
+    <Element>
+        <Label>input_egpFileName</Label>
+        <Type>PROJECT</Type>
+        <Container />
+        <ID>input_projectID</ID>
+        <CreatedOn>input_createTimeserialNumber</CreatedOn>
+        <ModifiedOn>input_modifyTimeserialNumber</ModifiedOn>
+        <ModifiedBy>input_userName</ModifiedBy>
+        <ModifiedByEGID>input_userID</ModifiedByEGID>
+        <ModifiedByEGVer>8.1.0.4552</ModifiedByEGVer>
+        <HasSerializationError>False</HasSerializationError>
+        <InputIDs />
+    </Element>
+    <ApplicationOverrides />
+    <MetaDataInfo>
+        <MetaDataProviderName>input_MetaDataProviderName</MetaDataProviderName>
+        <MetaDataHost>input_MetaDataHost</MetaDataHost>
+        <MetaDataPort>input_MetaDataPort</MetaDataPort>
+    </MetaDataInfo>
+    <UseRelativePaths>false</UseRelativePaths>
+    <SubmitToGrid>false</SubmitToGrid>
+    <QueueSubmitsForServer>true</QueueSubmitsForServer>
+    <ActionOnError>StopCurrentBranch</ActionOnError>
+    <ShowProjectLogWarningMessage>true</ShowProjectLogWarningMessage>
+    <RemoveOlderProjectLogItems>false</RemoveOlderProjectLogItems>
+    <ExportProjectLogThenClear>false</ExportProjectLogThenClear>
+    <ProjectLogExportFilename />
+    <ProjectLogExportLocation />
+    <ProjectLogMaxSize>5</ProjectLogMaxSize>
+    <ClearProjectLogOnExit>false</ClearProjectLogOnExit>
+    <DataList>
+        <!-- insert list of data sets, each in a <Data></Data>, by prototype_data_v8 -->
+    </DataList>
+    <ExternalFileList />
+    <InformationMap_List />
+    <DecisionManager>
+        <Decisions />
+    </DecisionManager>
+    <Elements>
+        <!-- insert a list of Process Flow Diagrams (PFD) components-->
+        <!-- insert a list of ShortCutToData components-->
+        <!-- insert a list of CodeTaskcomponents-->
+        <!-- insert a list of shortCutToCodeTask components  -->
+        <!-- insert a list of Log components -->
+        <!-- insert a list of Link components -->
+        <!-- insert a list of lastSubmittedTaskCode components -->
+        <!-- insert a list of odsresult components -->
+        <!-- insert a list of note components -->
+    </Elements>
+    <GitSourceControl GUID=input_GitUID />
+    <Containers>
+        <ID>input_PFContainerID</ID>
+    </Containers>
+    <ExploreDataList />
+    <Parameters>
+        <ParameterCollection />
+    </Parameters>
+    <ProjectLog>
+        <!-- insert a list of projectlog components -->
+    </ProjectLog>
+    <External_Objects>
+        <ProcessFlowControlManager>
+            <!-- insert a list of ProcessFlowControl components -->
+        </ProcessFlowControlManager>
+        <OpenProjectView>
+            <!-- insert a list of TreeItem components -->
+        </OpenProjectView>
+    </External_Objects>
+</ProjectCollection>

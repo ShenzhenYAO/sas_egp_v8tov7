@@ -1,0 +1,28 @@
+<Element Type="SAS.EG.ProjectElements.Note">
+            <Element>
+                <Label>Note</Label>
+                <Type>NOTE</Type>
+                <Container>ProcessFlowContainer-lm2PKGZNRoPGmM7m</Container>
+                <ID>Note-ZkgctIxDLyyJ3hOn</ID>
+                <CreatedOn>637636757565128655</CreatedOn>
+                <ModifiedOn>637636757631449713</ModifiedOn>
+                <ModifiedBy>Shenzhen Yao</ModifiedBy>
+                <ModifiedByEGID>syao</ModifiedByEGID>
+                <ModifiedByEGVer>8.1.0.4552</ModifiedByEGVer>
+                <HasSerializationError>False</HasSerializationError>
+                <InputIDs />
+            </Element>
+            <TextElement>
+                <Text>This is a note</Text>
+                <ReadOnly>False</ReadOnly>
+                <DefExt>.txt</DefExt>
+            </TextElement>
+            <Note>
+                <Parent />
+                <WordWrap>True</WordWrap>
+                <Collapsed>True</Collapsed>
+                <Pinned>False</Pinned>
+                <Width>36</Width>
+                <Height>36</Height>
+            </Note>
+        </Element>

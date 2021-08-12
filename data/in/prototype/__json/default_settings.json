@@ -1,0 +1,13 @@
+{
+    "input_egpFileName": {"value":"myegpv8"},
+    "input_projectID": {"value":"ElementManager-lTnqBhJ7ad5OTy11"},
+    "input_createTimeserialNumber": {"value":"637636756334789223"},
+    "input_modifyTimeserialNumber": {"value":"637636763031422030"},
+    "input_userName": {"value":"Shenzhen Yao"},
+    "input_userID": {"value":"syao"},
+    "input_PFContainerID": {"value":"ProcessFlowContainer-lm2PKGZNRoPGmM7m"},
+    "input_MetaDataProviderName": {"value":"SASApp"},
+    "input_MetaDataHost": {"value":"xxx.xx.xxx.xxx"},
+    "input_MetaDataPort": {"value":"xxxx"},
+    "input_GitUID": {"value":"9JWEnME6zVrlt3Rn"},
+}
