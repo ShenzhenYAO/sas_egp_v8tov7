@@ -100,7 +100,8 @@ A shortcut to file
 - ProjectCollection.External_Objects.ProjectTreeView[x].EGTreeNode[x].EGTreeNode[x]
 3. update the graphic of the SHORTCUT element in process view's graphics:
 - ProjectCollection.External_Objects.ProcessFlowView.Graphics.TaskGraphic[x]
-
+4. setting in external file
+- ProjectCollection.ExternalFileList
 
 ***************
 A shortcut to a sas file

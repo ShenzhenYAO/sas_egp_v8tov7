@@ -1,7 +1,5 @@
 Remaining issues:
 
->>> datalist of the external file xls.xlsx???
-
 1. Link is not shown in PFD
 2. shortcut is not shown in PFD
 compare the diff between converted and real v7
