@@ -47,15 +47,14 @@
         <!-- insert a list of ShortCutToData components (the prototype from __c02_elements_element_02shortcuttodata_v8.xml)-->
         <!-- insert a list of ShortCutToFile components (the prototype from __c03_elements_element_03shortcuttofile_v8.xml)-->        
         <!-- insert a list of CodeTask components (the prototype from __c04_elements_element_04codetask_v8.xml)-->
-        <!-- insert a list of shortCutToCodeTask components (the prototype from .xml) -->        
-        <!-- insert a list of EGTask components (the prototype from .xml) -->        
+        <!-- insert a list of shortCutToCodeTask components (the prototype from __c05_elements_element_05shortcuttocodetask_v8.xml) -->        
+        <!-- insert a list of EGTask components (the prototype from __c06_elements_element_06egtask_v8.xml) -->        
         <!-- Note! no know if the order matters: a Log element for a CodeTask1, followed by a lastSubmittedTaskCode code element for CodeTask1; then a log followed by a lastSubmittedTaskCode code element for CodeTask2... -->
-        <!-- insert a list of Log components (the prototype from .xml) -->        
-        <!-- insert a list of lastSubmittedTaskCode components (the prototype from .xml)-->
-        
-        <!-- insert a list of Link components (the prototype from .xml)-->
-        <!-- insert a list of odsresult components (the prototype from .xml) (odsreult components are ods outputs, can be Element.ODSResult.ResultType of 'SasReport', or 'Excel', etc)-->
-        <!-- insert a list of note components (the prototype from .xml)-->
+        <!-- insert a list of Log components (the prototype from __c07_elements_element_07tasklog_v8.xml) -->        
+        <!-- insert a list of lastSubmittedTaskCode components (the prototype from __c08_elements_element_08lastsubmittedtaskcode_v8.xml)-->        
+        <!-- insert a list of Link components (the prototype from __c09_elements_element_09link_v8.xml)-->        
+        <!-- insert a list of odsresult components (the prototype from __c10_elements_element_10odsresult_v8.xml) (odsreult components are ods outputs, can be Element.ODSResult.ResultType of 'SasReport', or 'Excel', etc)-->
+        <!-- insert a list of note components (the prototype from __c11_elements_element_11note_v8.xml)-->
     </Elements>
     <GitSourceControl GUID="{input__GitUID}"></GitSourceControl>
     <Containers>

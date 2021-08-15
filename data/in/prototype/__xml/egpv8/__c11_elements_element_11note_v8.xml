@@ -1,0 +1,40 @@
+<!-- an element within ProjectCollection.Elements, with the type of Note -->
+<Element Type="SAS.EG.ProjectElements.Note">
+    <Element>
+        <Label>input__elementLabel</Label>
+        <Type>TASK</Type>
+        <Container>input__PFDID</Container>
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs>
+            input__list_InputID
+            <!-- input a list of InputIDs, e.g., CodeTaskIDs, prototyep from ???.xml -->
+        </InputIDs>
+    </Element>
+    <TextElement>
+        <Text>input__Text</Text>
+        <!-- <ReadOnly>False</ReadOnly> -->
+        <ReadOnly>input__ReadOnly</ReadOnly>
+        <!-- <DefExt>.txt</DefExt> -->
+        <DefExt>input__DefExt</DefExt>
+    </TextElement>
+    <Note>
+        <!-- <Parent>PFD-GirXDnE4Mj4CHrI5</Parent> -->
+        <Parent>input__PFDID</Parent>
+        <!-- <WordWrap>True</WordWrap> -->
+        <WordWrap>input__WordWrap</WordWrap>
+        <!-- <Collapsed>True</Collapsed> -->
+        <Collapsed>input__Collapsed</Collapsed>
+        <!-- <Pinned>False</Pinned> -->
+        <Pinned>input__Pinned</Pinned>
+        <!-- <Width>36</Width> -->
+        <Width>input__Width</Width>
+        <!-- <Height>36</Height> -->
+        <Height>input__Height</Height>
+    </Note>
+</Element>

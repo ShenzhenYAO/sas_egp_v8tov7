@@ -1,0 +1,53 @@
+<!-- an element within ProjectCollection.Elements, with the type of ODSResult -->
+<Element Type="SAS.EG.ProjectElements.ODSResult">
+    <Element>
+        <Label>input__elementLabel</Label>
+        <Type>TASK</Type>
+        <Container>input__PFDID</Container>
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs>
+            input__list_InputID
+                                    <!-- input a list of InputIDs, e.g., CodeTaskIDs, prototyep from ???.xml -->
+        </InputIDs>
+    </Element>
+    <ODSResult>
+        <!-- <ResultType>SasReport</ResultType> -->
+        <!-- <ResultType>Excel</ResultType> -->
+        <ResultType>input__ResultType</ResultType>
+        <!-- <Parent>CodeTask-wDRgoncmyplzb1n7</Parent> -->
+        <Parent>input__ParentCodeTaskID</Parent>
+        <Embedded>input__Embedded</Embedded>
+        <!-- <LinkedServer>Local</LinkedServer> -->
+        <LinkedServer>input__LinkedServer</LinkedServer>
+        <!-- <LinkedFilePath>c:\users\z70\desktop\_0003c.xlsx</LinkedFilePath> -->
+        <LinkedFilePath>input__LinkedFilePath</LinkedFilePath>
+        <LineSize>input__LineSize</LineSize>
+        <PageSize>input__PageSize</PageSize>
+        <Portrait>input__Portrait</Portrait>
+        <!-- <Key>EGSR</Key> -->
+        <!-- <Key>c:\users\z70\desktop\_0003c.xlsx</Key> -->
+        <Key>input__Key</Key>
+        <!-- <Stale>false</Stale> -->
+        <Stale>input__Stale</Stale>
+        <OdsTreeNode>
+            <DirectoryID>input__DirectoryID</DirectoryID>
+            <DirectoryName />
+            <DirectoryLabel />
+            <!-- <Destination>XML</Destination> -->
+            <Destination>input__Destination</Destination>
+            <DestinationSubType />
+            <!-- <Anchor>LN00051</Anchor> -->
+            <Anchor>input__Anchor</Anchor>
+            <AnchorLabel />
+            <!-- <AnchorIndex>-1</AnchorIndex> -->
+            <AnchorIndex>input__AnchorIndex</AnchorIndex>
+            <Children />
+        </OdsTreeNode>
+    </ODSResult>
+</Element>
