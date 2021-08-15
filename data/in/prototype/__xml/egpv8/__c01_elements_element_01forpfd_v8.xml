@@ -3,9 +3,9 @@
     <Element>
         <Label>input_PFCLabel</Label>
         <Type>CONTAINER</Type>
-        <Container>ProjectCollection-IfPUp8CIoCFuH3ML</Container>
+        <Container>input_projectCollectionID</Container>
         <!-- <ID>PFD-GirXDnE4Mj4CHrI5</ID> -->
-        <Container>input__PFContainerID</Container>
+        <ID>input__PFContainerID</ID>
         <!-- <CreatedOn>637641110505125505</CreatedOn> -->
         <CreatedOn>input_PFDCreateTimeSerial</CreatedOn>
         <!-- <ModifiedOn>637641895014616482</ModifiedOn> -->
