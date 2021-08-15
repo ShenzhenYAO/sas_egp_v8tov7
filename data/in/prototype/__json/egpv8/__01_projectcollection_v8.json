@@ -1,0 +1,283 @@
+[
+    {
+        "tagName": "ProjectCollection",
+        "attrs": [
+            {
+                "EGVersion": "8.1"
+            },
+            {
+                "Type": "SAS.EG.ProjectElements.ElementManager"
+            }
+        ],
+        "TopTextContent": "",
+        "children": [
+            {
+                "tagName": "Element",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": [
+                    {
+                        "tagName": "Label",
+                        "attrs": [],
+                        "TopTextContent": "input__egpFileName",
+                        "children": []
+                    },
+                    {
+                        "tagName": "Type",
+                        "attrs": [],
+                        "TopTextContent": "PROJECT",
+                        "children": []
+                    },
+                    {
+                        "tagName": "Container",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ID",
+                        "attrs": [],
+                        "TopTextContent": "input__projectID",
+                        "children": []
+                    },
+                    {
+                        "tagName": "CreatedOn",
+                        "attrs": [],
+                        "TopTextContent": "input__projectCreateTimeserialNumber",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ModifiedOn",
+                        "attrs": [],
+                        "TopTextContent": "input__projectModifyTimeserialNumber",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ModifiedBy",
+                        "attrs": [],
+                        "TopTextContent": "input__userName",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ModifiedByEGID",
+                        "attrs": [],
+                        "TopTextContent": "input__userID",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ModifiedByEGVer",
+                        "attrs": [],
+                        "TopTextContent": "8.1.0.4552",
+                        "children": []
+                    },
+                    {
+                        "tagName": "HasSerializationError",
+                        "attrs": [],
+                        "TopTextContent": "False",
+                        "children": []
+                    },
+                    {
+                        "tagName": "InputIDs",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "tagName": "ApplicationOverrides",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "MetaDataInfo",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": [
+                    {
+                        "tagName": "MetaDataProviderName",
+                        "attrs": [],
+                        "TopTextContent": "input__MetaDataProviderName",
+                        "children": []
+                    },
+                    {
+                        "tagName": "MetaDataHost",
+                        "attrs": [],
+                        "TopTextContent": "input__MetaDataHost",
+                        "children": []
+                    },
+                    {
+                        "tagName": "MetaDataPort",
+                        "attrs": [],
+                        "TopTextContent": "input__MetaDataPort",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "tagName": "UseRelativePaths",
+                "attrs": [],
+                "TopTextContent": "false",
+                "children": []
+            },
+            {
+                "tagName": "SubmitToGrid",
+                "attrs": [],
+                "TopTextContent": "false",
+                "children": []
+            },
+            {
+                "tagName": "QueueSubmitsForServer",
+                "attrs": [],
+                "TopTextContent": "true",
+                "children": []
+            },
+            {
+                "tagName": "ActionOnError",
+                "attrs": [],
+                "TopTextContent": "StopCurrentBranch",
+                "children": []
+            },
+            {
+                "tagName": "ShowProjectLogWarningMessage",
+                "attrs": [],
+                "TopTextContent": "true",
+                "children": []
+            },
+            {
+                "tagName": "RemoveOlderProjectLogItems",
+                "attrs": [],
+                "TopTextContent": "false",
+                "children": []
+            },
+            {
+                "tagName": "ExportProjectLogThenClear",
+                "attrs": [],
+                "TopTextContent": "false",
+                "children": []
+            },
+            {
+                "tagName": "ProjectLogExportFilename",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "ProjectLogExportLocation",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "ProjectLogMaxSize",
+                "attrs": [],
+                "TopTextContent": "5",
+                "children": []
+            },
+            {
+                "tagName": "ClearProjectLogOnExit",
+                "attrs": [],
+                "TopTextContent": "false",
+                "children": []
+            },
+            {
+                "tagName": "DataList",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "ExternalFileList",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "InformationMap_List",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "DecisionManager",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": [
+                    {
+                        "tagName": "Decisions",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "tagName": "Elements",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "GitSourceControl",
+                "attrs": [
+                    {
+                        "GUID": "{input__GitUID}"
+                    }
+                ],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "Containers",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "ExploreDataList",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "Parameters",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": [
+                    {
+                        "tagName": "ParameterCollection",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "tagName": "ProjectLog",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": []
+            },
+            {
+                "tagName": "External_Objects",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": [
+                    {
+                        "tagName": "ProcessFlowControlManager",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": []
+                    },
+                    {
+                        "tagName": "OpenProjectView",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+]

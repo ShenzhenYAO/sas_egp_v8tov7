@@ -15,7 +15,7 @@ const thesrcxml = 'data/out/01_test_project_v8_extracted_from_egp.xml';
 
 (async () => {
     let encoding = "utf16le";
-    thesrcxmlstr = await mymodules.readtxt(thesrcxml, encoding);
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxml, encoding);
     // console.log(thesrcxmlstr.substring(1, 100))
 
     // the first line of the project.xml is '<?xml version="1.0" encoding="utf-16"?>' 

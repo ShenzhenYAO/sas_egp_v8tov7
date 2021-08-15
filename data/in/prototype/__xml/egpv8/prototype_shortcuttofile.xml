@@ -1,0 +1,20 @@
+<Element Type="SAS.EG.ProjectElements.ShortCutToFile">
+            <Element>
+                <Label>xls.xlsx</Label>
+                <Type>SHORTCUT</Type>
+                <Container>PFD-GirXDnE4Mj4CHrI5</Container>
+                <ID>ShortCutToFile-frOMCUhUHcJWJKeO</ID>
+                <CreatedOn>637642131165071639</CreatedOn>
+                <ModifiedOn>637642131165071639</ModifiedOn>
+                <ModifiedBy>Z70</ModifiedBy>
+                <ModifiedByEGID>Z70</ModifiedByEGID>
+                <ModifiedByEGVer>7.100.5.0</ModifiedByEGVer>
+                <HasSerializationError>False</HasSerializationError>
+                <InputIDs />
+            </Element>
+            <SHORTCUT>
+                <Parent>ExternalFile-zW4AJ7NDtDv2tGxQ</Parent>
+                <INPUTLIST />
+            </SHORTCUT>
+            <ShortCutToFile />
+        </Element>

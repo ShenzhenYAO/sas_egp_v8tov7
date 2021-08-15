@@ -1,4 +1,4 @@
-    <ProcessFlowControlState>
+<ProcessFlowControlState>
                 <ContainerID>PFD-GirXDnE4Mj4CHrI5</ContainerID>
                 <Zoom>1</Zoom>
                 <ShowGrid>true</ShowGrid>
@@ -158,12 +158,4 @@
                         <Element>ODSResult-MRRcL5RxnQVFIxpf</Element>
                     </TaskGraphic>
                 </GraphicObjects>
-            </ProcessFlowControlState>
-            <ProcessFlowControlState>
-                <ContainerID>PFD-6nSfH71ogEk2upEN</ContainerID>
-                <Zoom>1</Zoom>
-                <ShowGrid>true</ShowGrid>
-                <ShowMargins>false</ShowMargins>
-                <Align>AlignTop</Align>
-                <GraphicObjects />
             </ProcessFlowControlState>

@@ -1,0 +1,58 @@
+<!-- an element with the type of PFContainer within ProjectCollection.Elements -->
+<Element Type="SAS.EG.ProjectElements.ProcessFlowContainer">
+    <Element>
+        <Label>input_PFCLabel</Label>
+        <Type>CONTAINER</Type>
+        <Container>ProjectCollection-IfPUp8CIoCFuH3ML</Container>
+        <!-- <ID>PFD-GirXDnE4Mj4CHrI5</ID> -->
+        <Container>input__PFContainerID</Container>
+        <!-- <CreatedOn>637641110505125505</CreatedOn> -->
+        <CreatedOn>input_PFDCreateTimeSerial</CreatedOn>
+        <!-- <ModifiedOn>637641895014616482</ModifiedOn> -->
+        <ModifiedOn>input_PFDModifyTimeSerial</ModifiedOn>
+        <!-- <ModifiedBy>Z70</ModifiedBy> -->
+        <ModifiedBy>input__userName</ModifiedBy>
+        <!-- <ModifiedByEGID>Z70</ModifiedByEGID> -->
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <!-- <ModifiedByEGVer>7.100.5.6226</ModifiedByEGVer> -->
+        <ModifiedByEGVer>input__PFDModifyEGVer</ModifiedByEGVer>
+        <HasSerializationError>False</HasSerializationError>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs />
+    </Element>
+    <PFD>
+        <!-- insert a list of Process elements with CodeTask IDs (each from __03a1_pfd_process_for_codetask_v8)-->
+        <Process>
+            <Element>
+                <ID>CodeTask-eFeFyI2IrkNJmU7j</ID>
+            </Element>
+            <Dependencies />
+        </Process>
+        <Process>
+            <Element>
+                <ID>CodeTask-cRIArx6TeBFFoe9Z</ID>
+            </Element>
+            <Dependencies>
+                <DepID ResourceDependency="true">CodeTask-eFeFyI2IrkNJmU7j</DepID>
+            </Dependencies>
+        </Process>
+        <Process>
+            <Element>
+                <ID>CodeTask-wDRgoncmyplzb1n7</ID>
+            </Element>
+            <Dependencies>
+                <DepID ResourceDependency="true">CodeTask-cRIArx6TeBFFoe9Z</DepID>
+            </Dependencies>
+        </Process>
+        <Process>
+            <Element>
+                <ID>CodeTask-zuxheXrmOhkcqb2t</ID>
+            </Element>
+            <Dependencies>
+                <DepID ResourceDependency="false">CodeTask-wDRgoncmyplzb1n7</DepID>
+                <DepID ResourceDependency="false">CodeTask-cRIArx6TeBFFoe9Z</DepID>
+                <DepID ResourceDependency="false">CodeTask-eFeFyI2IrkNJmU7j</DepID>
+            </Dependencies>
+        </Process>
+    </PFD>
+</Element>

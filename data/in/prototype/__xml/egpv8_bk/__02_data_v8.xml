@@ -1,0 +1,50 @@
+<Data>
+    <Element>
+        <!-- <Label>A</Label> -->
+        <Label>input__DataLabel</Label>
+        <Type>DATA</Type>
+        <Container />
+        <!-- <ID>Data-p7ReFUW37d1mTMB4</ID> -->
+        <ID>input__DataUID</ID>
+        <CreatedOn>input__DataCreateTimeSerial</CreatedOn>
+        <ModifiedOn>input__DataMOdifyTimeSerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>8.1.0.0</ModifiedByEGVer>
+        <HasSerializationError>False</HasSerializationError>
+        <InputIDs />
+    </Element>
+    <Data>
+        <ShortCutList>
+            <!-- <ShortCutID>ShortCutToData-YSL3vXFOJJQ4rloD</ShortCutID> -->
+            <ShortCutID>input__ShortCutToDataUID</ShortCutID>
+        </ShortCutList>
+        <DataModel>
+            <!-- <Server>Local</Server> -->
+            <Server>input__Server</Server>
+            <!-- <ActiveDataSource>WORKA</ActiveDataSource> -->
+            <ActiveDataSource>input__ActiveDataSource</ActiveDataSource>
+            <!-- <DisplayName>A</DisplayName> -->
+            <DisplayName>input__DisplayName</DisplayName>
+            <!-- <Table>A</Table> -->
+            <Table>input__DataLabel</Table>
+            <RawActiveDataSourceState>
+                <DNA>
+                    <Type>Dataset</Type>
+                    <Name>input__DataLabel</Name>
+                    <Version>1</Version>
+                    <Assembly>SAS.EG.SDS.Model</Assembly>
+                    <Factory>SAS.EG.SDS.Model.Creator</Factory>
+                    <!-- <ParentName>WORK</ParentName> -->
+                    <ParentName>input__LibName</ParentName>
+                    <Server>input__Server</Server>
+                    <Library>input__LibName</Library>
+                </DNA>
+            </RawActiveDataSourceState>
+            <DataSourceState>input__ActiveDataSource</DataSourceState>
+            <TableState>input__DataLabel</TableState>
+            <MemberType>Unknown</MemberType>
+        </DataModel>
+    </Data>
+</Data>
+        

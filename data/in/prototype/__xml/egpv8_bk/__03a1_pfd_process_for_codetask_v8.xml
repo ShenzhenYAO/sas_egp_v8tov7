@@ -1,0 +1,10 @@
+<Process>
+    <Element>
+        <ID>input_CodeTaskID</ID>
+    </Element>
+    <Dependencies>
+        <!-- can be multiple dependencies -->
+        <DepID ResourceDependency="true">input_dep_CodeTaskID</DepID>
+        <DepID ResourceDependency="true">input_dep_CodeTaskID</DepID>
+    </Dependencies>
+</Process>

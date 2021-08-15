@@ -2,17 +2,24 @@
     <Element>
         <Label>Process Flow</Label>
         <Type>CONTAINER</Type>
-        <Container>ElementManager-lTnqBhJ7ad5OTy11</Container>
-        <ID>ProcessFlowContainer-lm2PKGZNRoPGmM7m</ID>
-        <CreatedOn>637636756334809211</CreatedOn>
-        <ModifiedOn>637636762884665546</ModifiedOn>
-        <ModifiedBy>Shenzhen Yao</ModifiedBy>
-        <ModifiedByEGID>syao</ModifiedByEGID>
+        <!-- <Container>ElementManager-lTnqBhJ7ad5OTy11</Container> -->
+        <Container>input__PFContainerID</Container>
+        <!-- <ID>ProcessFlowContainer-lm2PKGZNRoPGmM7m</ID> -->
+        <ID>input__PFDID</ID>
+        <!-- <CreatedOn>637636756334809211</CreatedOn> -->
+        <CreatedOn>input_PFDCreateTimeSerial</CreatedOn>
+        <!-- <ModifiedOn>637636762884665546</ModifiedOn> -->
+        <ModifiedOn>input_PFDModifyTimeSerial</ModifiedOn>
+        <!-- <ModifiedBy>Shenzhen Yao</ModifiedBy> -->
+        <ModifiedBy>input__userName</ModifiedBy>        
+        <!-- <ModifiedByEGID>syao</ModifiedByEGID> -->
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
         <ModifiedByEGVer>8.1.0.4552</ModifiedByEGVer>
         <HasSerializationError>False</HasSerializationError>
         <InputIDs />
     </Element>
     <PFD>
+        <!-- insert a list of Process elements with CodeTask IDs (each from __03a1_pfd_process_for_codetask_v8)-->
         <Process>
             <Element>
                 <ID>CodeTask-xjq1AoRtuimaEV8v</ID>
