@@ -1,9 +1,9 @@
 <!-- an element within ProjectCollection.Elements, with the type of ShortCutToFile -->
 <Element Type="SAS.EG.ProjectElements.ShortCutToFile">
     <Element>
-        <Label>input__ElementLabel</Label>
+        <Label>input__elementLabel</Label>
         <Type>SHORTCUT</Type>
-        <Container>input__projectCollectionID</Container>
+        <Container>input__PFDID</Container>
         <ID>input__elementID</ID>
         <CreatedOn>input__createTimeSerial</CreatedOn>
         <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>

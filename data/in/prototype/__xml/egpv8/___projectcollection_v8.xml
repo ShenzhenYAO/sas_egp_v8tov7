@@ -42,12 +42,12 @@
         <Decisions />
     </DecisionManager>
     <Elements>
-        input_list+Element
+        input__list_Element
         <!-- insert a list of Process Flow Diagrams (PFD) components (the prototype from __c01_elements_element_01forpfd_v8.xml)-->
-        <!-- insert a list of ShortCutToData components (the prototype from .xml)-->
-        <!-- insert a list of ShortCutToFile components (the prototype from .xml)-->
-        
-        <!-- insert a list of CodeTaskcomponents (the prototype from .xml)-->
+        <!-- insert a list of ShortCutToData components (the prototype from __c02_elements_element_02shortcuttodata_v8.xml)-->
+        <!-- insert a list of ShortCutToFile components (the prototype from __c03_elements_element_03shortcuttofile_v8.xml)-->        
+        <!-- insert a list of CodeTask components (the prototype from __c04_elements_element_04codetask_v8.xml)-->
+
         <!-- insert a list of shortCutToCodeTask components (the prototype from .xml) -->
         <!-- insert a list of EGTask components (the prototype from .xml) -->
         <!-- Note! no know if the order matters: a Log element for a CodeTask1, followed by a lastSubmittedTaskCode code element for CodeTask1; then a log followed by a lastSubmittedTaskCode code element for CodeTask2... -->

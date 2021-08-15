@@ -4,7 +4,7 @@
     <Element>
         <Label>input__elementLabel</Label>
         <Type>SHORTCUT</Type>
-        <Container>input__projectCollectionID</Container>
+        <Container>input__PFDID</Container>
         <!-- <ID>PFD-GirXDnE4Mj4CHrI5</ID> -->
         <ID>input__ShortCutToDataID</ID>
         <!-- <CreatedOn>637641972872217243</CreatedOn> -->
