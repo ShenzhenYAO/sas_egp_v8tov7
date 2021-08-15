@@ -5,7 +5,7 @@
         <Label>input__egpFileName</Label>
         <Type>PROJECT</Type>
         <Container />
-        <ID>input__projectID</ID>
+        <ID>input__projectCollectionID</ID>
         <CreatedOn>input__projectCreateTimeserialNumber</CreatedOn>
         <ModifiedOn>input__projectModifyTimeserialNumber</ModifiedOn>
         <ModifiedBy>input__userName</ModifiedBy>
@@ -32,18 +32,20 @@
     <ProjectLogMaxSize>5</ProjectLogMaxSize>
     <ClearProjectLogOnExit>false</ClearProjectLogOnExit>
     <DataList>
-        <!-- insert list of data sets, each in a <Data></Data>, the prototype from __a_datalist_data_v8.xml -->
+        input_list_Data<!-- insert list of data sets, each in a <Data></Data>, the prototype from __a_datalist_data_v8.xml -->
     </DataList>
     <ExternalFileList>
-        <!-- insert list of data sets, each in a <ExternalFile></ExternalFile>, the prototype from __b_ExternalFileList_ExternalFile.xml -->
+        input_list_ExternalFileList<!-- insert list of data sets, each in a <ExternalFile></ExternalFile>, the prototype from __b_ExternalFileList_ExternalFile.xml -->
     </ExternalFileList>
     <InformationMap_List />
     <DecisionManager>
         <Decisions />
     </DecisionManager>
     <Elements>
+        input_list+Element
         <!-- insert a list of Process Flow Diagrams (PFD) components (the prototype from __c01_elements_element_01forpfd_v8.xml)-->
         <!-- insert a list of ShortCutToData components (the prototype from .xml)-->
+        
         <!-- insert a list of ShortCutToFile components (the prototype from .xml)-->
         <!-- insert a list of CodeTaskcomponents (the prototype from .xml)-->
         <!-- insert a list of shortCutToCodeTask components (the prototype from .xml) -->

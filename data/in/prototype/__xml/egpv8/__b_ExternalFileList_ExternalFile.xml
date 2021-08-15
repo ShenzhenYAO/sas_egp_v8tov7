@@ -1,31 +1,32 @@
-
+<!-- an ExternalFile element within ProjectCollection.ExternalFileList -->
 <ExternalFile>
     <Element>
-        <Label>xls.xlsx</Label>
-        <Type>FILE</Type>
+        <Label>input__ExternalFileLabel</Label>
+        <Type>input__ExternalFileType</Type>
         <Container />
-        <ID>ExternalFile-zW4AJ7NDtDv2tGxQ</ID>
-        <CreatedOn>637642131164915416</CreatedOn>
-        <ModifiedOn>637646274633959270</ModifiedOn>
-        <ModifiedBy>Yao, Shenzhen (HQC)</ModifiedBy>
-        <ModifiedByEGID>syao</ModifiedByEGID>
-        <ModifiedByEGVer>8.1.0.4552</ModifiedByEGVer>
-        <HasSerializationError>False</HasSerializationError>
+        <ID>input__ExternalFileID</ID>
+        <CreatedOn>input__ExternalFileCreateTimeSerial</CreatedOn>
+        <ModifiedOn>input__ExternalFileCreateModifySerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
         <InputIDs />
     </Element>
     <ExternalFile>
         <ShortCutList>
-            <ShortCutID>ShortCutToFile-frOMCUhUHcJWJKeO</ShortCutID>
+            input__list_ShortCutID
+            <!-- insert a list of ShortCutIDs (ShortCutToFileIDs), the prototype from __b01_ExternalFileList_ExternalFile_ExternalFile_ShortCutList.xml -->
         </ShortCutList>
-        <FileTypeType>Excel</FileTypeType>
+        <FileTypeType>Input__ExternalFile_FileTypeType</FileTypeType>
         <DNA>
             <DNA>
-                <Type>LocalFile</Type>
-                <Name>xls.xlsx</Name>
-                <Version>1</Version>
+                <Type>Input__ExternalFile_DNAType</Type>
+                <Name>Input__ExternalFile_DNAName</Name>
+                <Version>Input__ExternalFile_DNAVersion</Version>
                 <Assembly />
                 <Factory />
-                <FullPath>C:\Users\Z70\Desktop\xls.xlsx</FullPath>
+                <FullPath>Input__ExternalFile_DNA_FullPath</FullPath>
             </DNA>
         </DNA>
     </ExternalFile>

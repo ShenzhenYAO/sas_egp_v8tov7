@@ -1,4 +1,4 @@
-<!-- an element with the type of PFContainer within ProjectCollection.Elements -->
+<!-- an element within ProjectCollection.Elements, with the type of PFContainer -->
 <Element Type="SAS.EG.ProjectElements.ProcessFlowContainer">
     <Element>
         <Label>input_PFCLabel</Label>
@@ -21,38 +21,7 @@
         <InputIDs />
     </Element>
     <PFD>
+        input_list_Process
         <!-- insert a list of Process elements with CodeTask IDs (each from __c01a_elements_element_01forpfd_pfd_process_v8)-->
-        <Process>
-            <Element>
-                <ID>CodeTask-eFeFyI2IrkNJmU7j</ID>
-            </Element>
-            <Dependencies />
-        </Process>
-        <Process>
-            <Element>
-                <ID>CodeTask-cRIArx6TeBFFoe9Z</ID>
-            </Element>
-            <Dependencies>
-                <DepID ResourceDependency="true">CodeTask-eFeFyI2IrkNJmU7j</DepID>
-            </Dependencies>
-        </Process>
-        <Process>
-            <Element>
-                <ID>CodeTask-wDRgoncmyplzb1n7</ID>
-            </Element>
-            <Dependencies>
-                <DepID ResourceDependency="true">CodeTask-cRIArx6TeBFFoe9Z</DepID>
-            </Dependencies>
-        </Process>
-        <Process>
-            <Element>
-                <ID>CodeTask-zuxheXrmOhkcqb2t</ID>
-            </Element>
-            <Dependencies>
-                <DepID ResourceDependency="false">CodeTask-wDRgoncmyplzb1n7</DepID>
-                <DepID ResourceDependency="false">CodeTask-cRIArx6TeBFFoe9Z</DepID>
-                <DepID ResourceDependency="false">CodeTask-eFeFyI2IrkNJmU7j</DepID>
-            </Dependencies>
-        </Process>
     </PFD>
 </Element>

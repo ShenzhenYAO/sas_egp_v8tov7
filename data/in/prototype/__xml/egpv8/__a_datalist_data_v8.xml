@@ -11,8 +11,8 @@
         <ModifiedOn>input__DataMOdifyTimeSerial</ModifiedOn>
         <ModifiedBy>input__userName</ModifiedBy>
         <ModifiedByEGID>input__userID</ModifiedByEGID>
-        <ModifiedByEGVer>8.1.0.0</ModifiedByEGVer>
-        <HasSerializationError>False</HasSerializationError>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
         <InputIDs />
     </Element>
     <Data>
@@ -33,7 +33,7 @@
                 <DNA>
                     <Type>Dataset</Type>
                     <Name>input__DataLabel</Name>
-                    <Version>1</Version>
+                    <Version>input__DNAVersion</Version>
                     <Assembly>SAS.EG.SDS.Model</Assembly>
                     <Factory>SAS.EG.SDS.Model.Creator</Factory>
                     <!-- <ParentName>WORK</ParentName> -->

@@ -4,6 +4,7 @@
         <ID>input_CodeTaskID</ID>
     </Element>
     <Dependencies>
+        input_list_DepID
         <!-- insert a list of DepID elements from __c01a01_elements_element_01forpfd_pfd_process_dependencies_depid_v8.xlm. The order of the DepID elements are reversly determined by sorting of coordinates of the task graphics (icons) within the PF Container. The sorting is by y coordinates, then by x cooridnates. For example: for the taskshortcut SAS, the first dependency is the ID for pfd1_p3, followed by the ID for copytask, pfd1_p2, and pfd1_p1. The order of the DepID elements changes if the relative position of the graphics within the PD container are changed (in that case the coordinates are changed and SAS EG resort the coordinates to determine the order of the DepID elements) -->
     </Dependencies>
 </Process>
