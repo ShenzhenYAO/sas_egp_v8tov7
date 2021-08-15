@@ -1,0 +1,19 @@
+<!-- a ProcessFlowControlState element within ProjectCollection.External_Objects.ProcessFlowControlManager -->
+<ProcessFlowControlState>
+    <!-- <ContainerID>PFD-GirXDnE4Mj4CHrI5</ContainerID> -->
+    <ContainerID>input__PFDID</ContainerID>
+    <!-- <Zoom>1</Zoom> -->
+    <Zoom>input__Zoom</Zoom>
+    <!-- <ShowGrid>true</ShowGrid> -->
+    <ShowGrid>input__ShowGrid</ShowGrid>
+    <!-- <ShowMargins>false</ShowMargins> -->
+    ShowMargins>input__ShowMargins</ShowMargins>
+<!-- <Align>AlignNone</Align> -->
+<Align>input__Align</Align>
+<GraphicObjects>
+    <!-- insert a list of TaskGraphic elements, the prototype from __f01_external_objects_processflowcontrolmanager_processflowcontrolstate_graphicobjects_taskgraphic_v8.xml -->
+        input__list_TaskGraphic
+        <!-- insert a list of NoteGraphic, the prototype from __f02_external_objects_processflowcontrolmanager_processflowcontrolstate_graphicobjects_notegraphic_v8.xml -->
+        input__list_NoteGraphic
+</GraphicObjects>
+</ProcessFlowControlState>

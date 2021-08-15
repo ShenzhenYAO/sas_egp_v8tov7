@@ -1,0 +1,28 @@
+<!-- a TreeItem element within ProjectCollection.External_Objects.OpenProjectView -->
+<!-- <TreeItem ID="ProjectCollection-IfPUp8CIoCFuH3ML" IsExpanded="true" /> -->
+<!-- <TreeItem ID="ProjectCollection-IfPUp8CIoCFuH3ML" IsExpanded="true" /> -->
+<!-- <TreeItem ID="PFD-GirXDnE4Mj4CHrI5" IsExpanded="true" /> -->
+<!-- <TreeItem ID="ShortCutToFile-frOMCUhUHcJWJKeO" IsExpanded="false" /> -->
+<!-- <TreeItem ID="Note-uddtkLsmPfi5mSY3" IsExpanded="false" /> -->
+<!-- <TreeItem ID="EGTask-jMEojoEY4vOJ6ZPA" IsExpanded="false" /> -->
+<!-- <TreeItem ID="PFD-GirXDnE4Mj4CHrI5-CodeTask" IsExpanded="true" /> -->
+<!-- <TreeItem ID="CodeTask-eFeFyI2IrkNJmU7j" IsExpanded="false" /> -->
+<!-- <TreeItem ID="CodeTask-cRIArx6TeBFFoe9Z" IsExpanded="false" /> -->
+<!-- <TreeItem ID="CodeTask-wDRgoncmyplzb1n7" IsExpanded="false" /> -->
+<!-- <TreeItem ID="CodeTask-zuxheXrmOhkcqb2t" IsExpanded="false" /> -->
+<!-- <TreeItem ID="PFD-6nSfH71ogEk2upEN" IsExpanded="false" /> -->
+
+<!-- The tree items include the project collection, PFD, shortcut to file, Note, EGTask, code task, and short cut to a code file -->
+<!-- Note!!! 
+In SAS EG v8 each time saving the egp, a PFDID as added at the end of the TreeItem ID list. 
+Such IDs are not used, perhaps are a bug of SAS EG 
+In SAS EG v7, each time saving the egp, a new 
+ProjectCollection.External_Objects.ProcessFlowView.Containers.Properties[x] is appended to the 
+.Properties list. The more one save the file, the more these additional properies are appended. 
+These properties (each with a new ID, and settings are background and align) do not seem 
+related to any of other components. The egp file won't be affected when these properties 
+are manually removed.
+[!] These additional properties might be garbage that SAS EG v7 forgot to clean up!
+-->
+<TreeItem ID="{input__elementID}" IsExpanded="{input__IsExpanded}" />
+

@@ -1,0 +1,47 @@
+<!-- a NoteGraphic element within ProjectCollection.External_Objects.ProcessFlowControlManager.ProcessFlowControlState.GraphicObjects -->
+<NoteGraphic>
+    <!--<Type>Note</Type>-->
+    <Type>input__Type</Type>
+    <!--<Id>f1a46bfd-8b76-405b-8342-8e125d65ba55</Id>-->
+    <Id>input__Id</Id>
+    <!--<Pinned>false</Pinned>-->
+    <Pinned>input__Pinned</Pinned>
+    <!--<LineWidth>1</LineWidth>-->
+    <LineWidth>input__LineWidth</LineWidth>
+    <!--<Fill>false</Fill>-->
+    <Fill>input__Fill</Fill>
+    <!--<Collapsed>true</Collapsed>-->
+    <Collapsed>input__Collapsed</Collapsed>
+    <!--<PosX>48</PosX>-->
+    <PosX>input__PosX</PosX>
+    <!--<PosY>312</PosY>-->
+    <PosY>input__PosY</PosY>
+    <!--<WidthCollapsed>36</WidthCollapsed>-->
+    <WidthCollapsed>input__WidthCollapsed</WidthCollapsed>
+    <!--<HeightCollapsed>36</HeightCollapsed>-->
+    <HeightCollapsed>input__HeightCollapsed</HeightCollapsed>
+    <!--<WidthExpanded>150</WidthExpanded>-->
+    <WidthExpanded>input__WidthExpanded</WidthExpanded>
+    <!--<HeightExpanded>150</HeightExpanded>-->
+    <HeightExpanded>input__HeightExpanded</HeightExpanded>
+    <!--<WordWrap>true</WordWrap>-->
+    <WordWrap>input__WordWrap</WordWrap>
+    <!--<Rotation>0</Rotation>-->
+    <Rotation>input__Rotation</Rotation>
+    <!--<Visible>true</Visible>-->
+    <Visible>input__Visible</Visible>
+    <!--<Border>false</Border>-->
+    <Border>input__Border</Border>
+    <!--<AutoSize>true</AutoSize>-->
+    <AutoSize>input__AutoSize</AutoSize>
+    <!--<Removable>true</Removable>-->
+    <Removable>input__Removable</Removable>
+    <!--<Child>false</Child>-->
+    <Child>input__Child</Child>
+    <!--<Selected>false</Selected>-->
+    <Selected>input__Selected</Selected>
+    <!--<Label>Note</Label>-->
+    <Label>input__Label</Label>
+    <!--<Element>Note-uddtkLsmPfi5mSY3</Element>-->
+    <Element>input__Element</Element>
+</NoteGraphic>

@@ -72,7 +72,7 @@
     <External_Objects>
         <ProcessFlowControlManager>
             input__list_PF???
-            <!-- insert a list of ProcessFlowControlState components (the prototype from .xml)-->
+            <!-- insert a list of ProcessFlowControlState components (the prototype from __f_external_objects_processflowcontrolmanager_processflowcontrolstate_v8.xml)-->
         </ProcessFlowControlManager>
         <OpenProjectView>
             input__list_TreeItem
