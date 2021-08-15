@@ -2,16 +2,16 @@
 <?xml version="1.0" encoding="utf-16"?>
 <ProjectCollection EGVersion="8.1" Type="SAS.EG.ProjectElements.ElementManager">
     <Element>
-        <Label>input__egpFileName</Label>
+        <Label>input__elementLabel</Label>
         <Type>PROJECT</Type>
         <Container />
         <ID>input__projectCollectionID</ID>
-        <CreatedOn>input__projectCreateTimeserialNumber</CreatedOn>
-        <ModifiedOn>input__projectModifyTimeserialNumber</ModifiedOn>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
         <ModifiedBy>input__userName</ModifiedBy>
         <ModifiedByEGID>input__userID</ModifiedByEGID>
-        <ModifiedByEGVer>8.1.0.4552</ModifiedByEGVer>
-        <HasSerializationError>False</HasSerializationError>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
         <InputIDs />
     </Element>
     <ApplicationOverrides />
@@ -45,8 +45,8 @@
         input_list+Element
         <!-- insert a list of Process Flow Diagrams (PFD) components (the prototype from __c01_elements_element_01forpfd_v8.xml)-->
         <!-- insert a list of ShortCutToData components (the prototype from .xml)-->
-        
         <!-- insert a list of ShortCutToFile components (the prototype from .xml)-->
+        
         <!-- insert a list of CodeTaskcomponents (the prototype from .xml)-->
         <!-- insert a list of shortCutToCodeTask components (the prototype from .xml) -->
         <!-- insert a list of EGTask components (the prototype from .xml) -->

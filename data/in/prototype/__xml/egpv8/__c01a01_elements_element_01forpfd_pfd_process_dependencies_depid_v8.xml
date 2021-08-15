@@ -2,4 +2,4 @@
 <!-- an DepID element within ProjectCollection.Elements.Element.PFD.Process.Dependencies (specifically for for a ProcessFlow Element) -->
 <!-- <DepID ResourceDependency="true">CodeTask-eFeFyI2IrkNJmU7j</DepID> -->
 <!-- <DepID ResourceDependency="false">CodeTask-cRIArx6TeBFFoe9Z</DepID> -->
-<DepID ResourceDependency="input_ResourceDependency">input_CodeTaskID</DepID>
+<DepID ResourceDependency="input_ResourceDependency">input__CodeTaskID</DepID>

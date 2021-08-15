@@ -2,13 +2,13 @@
 <Data>
     <Element>
         <!-- <Label>A</Label> -->
-        <Label>input__DataLabel</Label>
+        <Label>input__elementLabel</Label>
         <Type>DATA</Type>
         <Container />
         <!-- <ID>Data-iE6Dmbd8xLpOSgU8</ID> -->
-        <ID>input__DataUID</ID>
-        <CreatedOn>input__DataCreateTimeSerial</CreatedOn>
-        <ModifiedOn>input__DataMOdifyTimeSerial</ModifiedOn>
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
         <ModifiedBy>input__userName</ModifiedBy>
         <ModifiedByEGID>input__userID</ModifiedByEGID>
         <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>

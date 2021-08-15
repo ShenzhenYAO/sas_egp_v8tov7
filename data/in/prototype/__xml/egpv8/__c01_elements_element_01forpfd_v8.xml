@@ -1,27 +1,26 @@
 <!-- an element within ProjectCollection.Elements, with the type of PFContainer -->
 <Element Type="SAS.EG.ProjectElements.ProcessFlowContainer">
     <Element>
-        <Label>input_PFCLabel</Label>
+        <Label>input_elementLabel</Label>
         <Type>CONTAINER</Type>
-        <Container>input_projectCollectionID</Container>
+        <Container>input__projectCollectionID</Container>
         <!-- <ID>PFD-GirXDnE4Mj4CHrI5</ID> -->
-        <ID>input__PFContainerID</ID>
+        <ID>input__elementID</ID>
         <!-- <CreatedOn>637641110505125505</CreatedOn> -->
-        <CreatedOn>input_PFDCreateTimeSerial</CreatedOn>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
         <!-- <ModifiedOn>637641895014616482</ModifiedOn> -->
-        <ModifiedOn>input_PFDModifyTimeSerial</ModifiedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
         <!-- <ModifiedBy>Z70</ModifiedBy> -->
         <ModifiedBy>input__userName</ModifiedBy>
         <!-- <ModifiedByEGID>Z70</ModifiedByEGID> -->
         <ModifiedByEGID>input__userID</ModifiedByEGID>
         <!-- <ModifiedByEGVer>7.100.5.6226</ModifiedByEGVer> -->
-        <ModifiedByEGVer>input__PFDModifyEGVer</ModifiedByEGVer>
-        <HasSerializationError>False</HasSerializationError>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
         <HasSerializationError>input__HasSerializationError</HasSerializationError>
         <InputIDs />
     </Element>
     <PFD>
-        input_list_Process
+        input__list_Process
         <!-- insert a list of Process elements with CodeTask IDs (each from __c01a_elements_element_01forpfd_pfd_process_v8)-->
     </PFD>
 </Element>

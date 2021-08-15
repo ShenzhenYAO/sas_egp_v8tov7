@@ -2,21 +2,21 @@
 <!-- an element within ProjectCollection.Elements, with the type of ShortCutToData -->
 <Element Type="SAS.EG.ProjectElements.ShortCutToData">
     <Element>
-        <Label>input_ShortCutToDataLabel</Label>
+        <Label>input__elementLabel</Label>
         <Type>SHORTCUT</Type>
-        <Container>input_projectCollectionID</Container>
+        <Container>input__projectCollectionID</Container>
         <!-- <ID>PFD-GirXDnE4Mj4CHrI5</ID> -->
         <ID>input__ShortCutToDataID</ID>
         <!-- <CreatedOn>637641972872217243</CreatedOn> -->
-        <CreatedOn>input_ShortCutToDataCreateTimeSerial</CreatedOn>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
         <!-- <ModifiedOn>637641972872217243</ModifiedOn> -->
-        <ModifiedOn>input_ShortCutToDataModifyTimeSerial</ModifiedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
         <!-- <ModifiedBy>Z70</ModifiedBy> -->
         <ModifiedBy>input__userName</ModifiedBy>
-        <ModifiedByEGID>Z70</ModifiedByEGID>
+        <!-- <ModifiedByEGID>Z70</ModifiedByEGID> -->
         <ModifiedByEGID>input__userID</ModifiedByEGID>
         <!-- <ModifiedByEGVer>7.100.5.0</ModifiedByEGVer> -->
-        <ModifiedByEGVer>input__ShortCutToDataModifiedEGVer</ModifiedByEGVer>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
         <!-- <HasSerializationError>False</HasSerializationError> -->
         <HasSerializationError>input__HasSerializationError</HasSerializationError>
         <!-- <InputIDs>CodeTask-cRIArx6TeBFFoe9Z</InputIDs> -->
@@ -24,7 +24,7 @@
             <!-- seems that it can be a list of taks IDs, not sure what it looks like if there are multiple task ids -->
             <!-- <InputIDs>CodeTask-cRIArx6TeBFFoe9Z</InputIDs> -->
             input__InputIDs
-        </InputIDs>      
+        </InputIDs>  
     </Element>
     <SHORTCUT>
         <!-- <Parent>Data-iE6Dmbd8xLpOSgU8</Parent> -->

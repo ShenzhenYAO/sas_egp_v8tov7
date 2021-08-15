@@ -1,12 +1,15 @@
 <!-- an ExternalFile element within ProjectCollection.ExternalFileList -->
 <ExternalFile>
     <Element>
-        <Label>input__ExternalFileLabel</Label>
-        <Type>input__ExternalFileType</Type>
+        <!-- <Label>xls.xlsx</Label> -->
+        <Label>input__elementLabel</Label>
+        <!-- <Type>FILE</Type> -->
+        <Type>input__elementType</Type>
         <Container />
-        <ID>input__ExternalFileID</ID>
-        <CreatedOn>input__ExternalFileCreateTimeSerial</CreatedOn>
-        <ModifiedOn>input__ExternalFileCreateModifySerial</ModifiedOn>
+        <!-- <ID>Data-iE6Dmbd8xLpOSgU8</ID> -->
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
         <ModifiedBy>input__userName</ModifiedBy>
         <ModifiedByEGID>input__userID</ModifiedByEGID>
         <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
