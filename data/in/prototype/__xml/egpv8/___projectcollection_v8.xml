@@ -59,7 +59,7 @@
     <GitSourceControl GUID="{input__GitUID}"></GitSourceControl>
     <Containers>
         input__list_PFDID
-        <!-- insert a list of PFD IDs elements (the prototype from .xml)-->
+        <!-- insert a list of PFD IDs elements (the prototype from __d_containers__id.xml)-->
     </Containers>
     <ExploreDataList />
     <Parameters>
@@ -67,7 +67,7 @@
     </Parameters>
     <ProjectLog>
         input__list_LogID
-        <!-- insert a list of projectlog components (the prototype from .xml)-->
+        <!-- insert a list of projectlog components (the prototype from __e_projectlog_element_v8.xml)-->
     </ProjectLog>
     <External_Objects>
         <ProcessFlowControlManager>
