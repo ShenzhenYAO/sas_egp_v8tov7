@@ -32,46 +32,46 @@
     <ProjectLogMaxSize>5</ProjectLogMaxSize>
     <ClearProjectLogOnExit>false</ClearProjectLogOnExit>
     <DataList>
-        <!-- insert list of data sets, each in a <Data></Data>, from __01a_datalist_data_v8.xml -->
+        <!-- insert list of data sets, each in a <Data></Data>, the prototype from __a_datalist_data_v8.xml -->
     </DataList>
     <ExternalFileList>
-        <!-- insert list of data sets, each in a <ExternalFile></ExternalFile>, from .xml -->
+        <!-- insert list of data sets, each in a <ExternalFile></ExternalFile>, the prototype from __b_ExternalFileList_ExternalFile.xml -->
     </ExternalFileList>
     <InformationMap_List />
     <DecisionManager>
         <Decisions />
     </DecisionManager>
     <Elements>
-        <!-- insert a list of Process Flow Diagrams (PFD) components (from __01b_elements_element_01forpfd_v8.xml)-->
-        <!-- insert a list of ShortCutToData components (from .xml)-->
-        <!-- insert a list of ShortCutToFile components (from .xml)-->
-        <!-- insert a list of CodeTaskcomponents (from .xml)-->
-        <!-- insert a list of shortCutToCodeTask components (from .xml) -->
-        <!-- insert a list of EGTask components (from .xml) -->
+        <!-- insert a list of Process Flow Diagrams (PFD) components (the prototype from __c01_elements_element_01forpfd_v8.xml)-->
+        <!-- insert a list of ShortCutToData components (the prototype from .xml)-->
+        <!-- insert a list of ShortCutToFile components (the prototype from .xml)-->
+        <!-- insert a list of CodeTaskcomponents (the prototype from .xml)-->
+        <!-- insert a list of shortCutToCodeTask components (the prototype from .xml) -->
+        <!-- insert a list of EGTask components (the prototype from .xml) -->
         <!-- Note! no know if the order matters: a Log element for a CodeTask1, followed by a lastSubmittedTaskCode code element for CodeTask1; then a log followed by a lastSubmittedTaskCode code element for CodeTask2... -->
-        <!-- insert a list of Log components (from .xml) -->
-        <!-- insert a list of lastSubmittedTaskCode components (from .xml)-->
-        <!-- insert a list of Link components (from .xml)-->
-        <!-- insert a list of odsresult components (from .xml) (odsreult components are ods outputs, can be Element.ODSResult.ResultType of 'SasReport', or 'Excel', etc)-->
-        <!-- insert a list of note components (from .xml)-->
+        <!-- insert a list of Log components (the prototype from .xml) -->
+        <!-- insert a list of lastSubmittedTaskCode components (the prototype from .xml)-->
+        <!-- insert a list of Link components (the prototype from .xml)-->
+        <!-- insert a list of odsresult components (the prototype from .xml) (odsreult components are ods outputs, can be Element.ODSResult.ResultType of 'SasReport', or 'Excel', etc)-->
+        <!-- insert a list of note components (the prototype from .xml)-->
     </Elements>
     <GitSourceControl GUID="{input__GitUID}"></GitSourceControl>
     <Containers>
-        <!-- insert a list of PFD IDs elements (from .xml)-->
+        <!-- insert a list of PFD IDs elements (the prototype from .xml)-->
     </Containers>
     <ExploreDataList />
     <Parameters>
         <ParameterCollection />
     </Parameters>
     <ProjectLog>
-        <!-- insert a list of projectlog components (from .xml)-->
+        <!-- insert a list of projectlog components (the prototype from .xml)-->
     </ProjectLog>
     <External_Objects>
         <ProcessFlowControlManager>
-            <!-- insert a list of ProcessFlowControlState components (from .xml)-->
+            <!-- insert a list of ProcessFlowControlState components (the prototype from .xml)-->
         </ProcessFlowControlManager>
         <OpenProjectView>
-            <!-- insert a list of TreeItem components (from .xml)-->
+            <!-- insert a list of TreeItem components (the prototype from .xml)-->
         </OpenProjectView>
     </External_Objects>
 </ProjectCollection>
