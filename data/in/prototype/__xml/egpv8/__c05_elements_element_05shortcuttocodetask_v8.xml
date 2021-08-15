@@ -1,4 +1,4 @@
-<!-- an element within ProjectCollection.Elements, with the type of CodeTask (not including short cut to SAS code files) -->
+<!-- an element within ProjectCollection.Elements, with the type of CodeTask (for short cut to SAS code files) -->
 <Element Type="SAS.EG.ProjectElements.CodeTask">
     <Element>
         <Label>input__elementLabel</Label>
@@ -72,7 +72,7 @@
         <ExpectedOutputDataList>input__ExpectedOutputDataList</ExpectedOutputDataList >
         <!-- <Parameters /> -->
         <Parameters>input__Parameters</Parameters>
-        <!-- <ExecutionTimeSpan>PT0.3378045S</ExecutionTimeSpan> -->
+        <!-- <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan> -->
         <ExecutionTimeSpan>input__ExecutionTimeSpan</ExecutionTimeSpan>
         <JobRecipe>
             <JobRecipe>
@@ -85,7 +85,7 @@
                 <!-- </OutputDataList> -->
                 <OutputDataList>
                     input__list_OutputDataID
-                    <!-- input a list of OutputDataID, prototype from __c04a_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_outputdatalist_id_v8.xml -->
+                    <!-- input a list of OutputDataID, prototype from __c05a_elements_element_05shortcuttocodetask_submitableelement_jobrecipe_jobrecipe_outputdatalist_id_v8.xml -->
                 </OutputDataList>
                 <!-- <ODSResultsList> -->
                     <!-- <ID>ODSResult-MRRcL5RxnQVFIxpf</ID> -->
@@ -93,7 +93,7 @@
                 <!-- </ODSResultsList> -->
                 <ODSResultsList>
                     input__list_ODSResultID
-                    <!-- input a list of ODSResultID, prototype from __c04b_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_odsresultslist_id_v8.xml -->
+                    <!-- input a list of ODSResultID, prototype from __c05b_elements_element_05shortcuttocodetask_submitableelement_jobrecipe_jobrecipe_odsresultslist_id_v8.xml -->
                 </ODSResultsList>
             </JobRecipe>
         </JobRecipe>

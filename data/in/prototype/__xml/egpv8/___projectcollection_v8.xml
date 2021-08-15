@@ -47,9 +47,9 @@
         <!-- insert a list of ShortCutToData components (the prototype from __c02_elements_element_02shortcuttodata_v8.xml)-->
         <!-- insert a list of ShortCutToFile components (the prototype from __c03_elements_element_03shortcuttofile_v8.xml)-->        
         <!-- insert a list of CodeTask components (the prototype from __c04_elements_element_04codetask_v8.xml)-->
-
-        <!-- insert a list of shortCutToCodeTask components (the prototype from .xml) -->
+        <!-- insert a list of shortCutToCodeTask components (the prototype from .xml) -->        
         <!-- insert a list of EGTask components (the prototype from .xml) -->
+        
         <!-- Note! no know if the order matters: a Log element for a CodeTask1, followed by a lastSubmittedTaskCode code element for CodeTask1; then a log followed by a lastSubmittedTaskCode code element for CodeTask2... -->
         <!-- insert a list of Log components (the prototype from .xml) -->
         <!-- insert a list of lastSubmittedTaskCode components (the prototype from .xml)-->
@@ -59,6 +59,7 @@
     </Elements>
     <GitSourceControl GUID="{input__GitUID}"></GitSourceControl>
     <Containers>
+        input__list_PFDID
         <!-- insert a list of PFD IDs elements (the prototype from .xml)-->
     </Containers>
     <ExploreDataList />
@@ -66,13 +67,16 @@
         <ParameterCollection />
     </Parameters>
     <ProjectLog>
+        input__list_LogID
         <!-- insert a list of projectlog components (the prototype from .xml)-->
     </ProjectLog>
     <External_Objects>
         <ProcessFlowControlManager>
+            input__list_PF???
             <!-- insert a list of ProcessFlowControlState components (the prototype from .xml)-->
         </ProcessFlowControlManager>
         <OpenProjectView>
+            input__list_TreeItem
             <!-- insert a list of TreeItem components (the prototype from .xml)-->
         </OpenProjectView>
     </External_Objects>
