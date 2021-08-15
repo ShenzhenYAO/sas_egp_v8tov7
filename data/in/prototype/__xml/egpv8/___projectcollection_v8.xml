@@ -76,7 +76,7 @@
         </ProcessFlowControlManager>
         <OpenProjectView>
             input__list_TreeItem
-            <!-- insert a list of TreeItem components (the prototype from .xml)-->
+            <!-- insert a list of TreeItem components (the prototype from __f02_external_objects_02openprojectview_treeitem_v8.xml)-->
         </OpenProjectView>
     </External_Objects>
 </ProjectCollection>
