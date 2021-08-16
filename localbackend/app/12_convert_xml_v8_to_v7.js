@@ -181,11 +181,29 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
     // console.log(NonTaskComponents_arr.length)
 
 
+    // *** create an Empty External_Objects and append to the v7 obj
+    let External_Objects_dom_obj = $("<External_Objects></External_Objects>")
+    External_Objects_dom_obj.attr("EGVersion", "7.1")
+    External_Objects_dom_obj.attr("Type", "SAS.EG.ProjectElements.ProjectCollection")
 
+    // *** append the External_Objects_dom_obj to the v7 obj
+    jquery_dom_obj_v7.append(External_Objects_dom_obj)
 
+    // *** within External_Objects_dom_obj, add a tag ProjectTreeView
+    let ProjectTreeView_dom_obj  = $("<ProjectTreeView></ProjectTreeView>")
+    jquery_dom_obj_v7.append(ProjectTreeView_dom_obj)
+    // wired, this time, the xml of ProjectTreeView_dom_obj was not removed after appending
+    // console.log(ProjectTreeView_dom_obj.parent().prop("outerHTML"))
 
+    // *** within External_Objects_dom_obj, add a tag ProcessFlowView
+    let ProcessFlowView_dom_obj = $("<ProcessFlowView></ProcessFlowView>")
+    jquery_dom_obj_v7.append(ProcessFlowView_dom_obj)
+    // console.log(ProcessFlowView_dom_obj.prop("outerHTML"))
 
-
+    // *** within External_Objects_dom_obj, add a tag MainFrom
+    let MainFrom_dom_obj = $("<MainFrom><ActiveData></ActiveData></MainFrom>")
+    jquery_dom_obj_v7.append(MainFrom_dom_obj)
+    // console.log(MainFrom_dom_obj.prop("outerHTML"))
 
     // console.log(jquery_dom_obj_v7.prop("outerHTML"))
 
