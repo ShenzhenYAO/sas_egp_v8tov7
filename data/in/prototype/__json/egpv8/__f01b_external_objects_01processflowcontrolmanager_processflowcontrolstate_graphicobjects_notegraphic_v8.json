@@ -1,0 +1,141 @@
+[
+    {
+        "tagName": "NoteGraphic",
+        "attrs": [],
+        "TopTextContent": "",
+        "children": [
+            {
+                "tagName": "Type",
+                "attrs": [],
+                "TopTextContent": "input__Type",
+                "children": []
+            },
+            {
+                "tagName": "Id",
+                "attrs": [],
+                "TopTextContent": "input__Id",
+                "children": []
+            },
+            {
+                "tagName": "Pinned",
+                "attrs": [],
+                "TopTextContent": "input__Pinned",
+                "children": []
+            },
+            {
+                "tagName": "LineWidth",
+                "attrs": [],
+                "TopTextContent": "input__LineWidth",
+                "children": []
+            },
+            {
+                "tagName": "Fill",
+                "attrs": [],
+                "TopTextContent": "input__Fill",
+                "children": []
+            },
+            {
+                "tagName": "Collapsed",
+                "attrs": [],
+                "TopTextContent": "input__Collapsed",
+                "children": []
+            },
+            {
+                "tagName": "PosX",
+                "attrs": [],
+                "TopTextContent": "input__PosX",
+                "children": []
+            },
+            {
+                "tagName": "PosY",
+                "attrs": [],
+                "TopTextContent": "input__PosY",
+                "children": []
+            },
+            {
+                "tagName": "WidthCollapsed",
+                "attrs": [],
+                "TopTextContent": "input__WidthCollapsed",
+                "children": []
+            },
+            {
+                "tagName": "HeightCollapsed",
+                "attrs": [],
+                "TopTextContent": "input__HeightCollapsed",
+                "children": []
+            },
+            {
+                "tagName": "WidthExpanded",
+                "attrs": [],
+                "TopTextContent": "input__WidthExpanded",
+                "children": []
+            },
+            {
+                "tagName": "HeightExpanded",
+                "attrs": [],
+                "TopTextContent": "input__HeightExpanded",
+                "children": []
+            },
+            {
+                "tagName": "WordWrap",
+                "attrs": [],
+                "TopTextContent": "input__WordWrap",
+                "children": []
+            },
+            {
+                "tagName": "Rotation",
+                "attrs": [],
+                "TopTextContent": "input__Rotation",
+                "children": []
+            },
+            {
+                "tagName": "Visible",
+                "attrs": [],
+                "TopTextContent": "input__Visible",
+                "children": []
+            },
+            {
+                "tagName": "Border",
+                "attrs": [],
+                "TopTextContent": "input__Border",
+                "children": []
+            },
+            {
+                "tagName": "AutoSize",
+                "attrs": [],
+                "TopTextContent": "input__AutoSize",
+                "children": []
+            },
+            {
+                "tagName": "Removable",
+                "attrs": [],
+                "TopTextContent": "input__Removable",
+                "children": []
+            },
+            {
+                "tagName": "Child",
+                "attrs": [],
+                "TopTextContent": "input__Child",
+                "children": []
+            },
+            {
+                "tagName": "Selected",
+                "attrs": [],
+                "TopTextContent": "input__Selected",
+                "children": []
+            },
+            {
+                "tagName": "Label",
+                "attrs": [],
+                "TopTextContent": "input__Label",
+                "children": []
+            },
+            {
+                "tagName": "Element",
+                "attrs": [],
+                "TopTextContent": "input__Element",
+                "children": []
+            }
+        ]
+    }
+]

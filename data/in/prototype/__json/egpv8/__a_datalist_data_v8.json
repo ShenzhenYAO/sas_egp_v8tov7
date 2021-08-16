@@ -1,0 +1,213 @@
+[
+    {
+        "tagName": "Data",
+        "attrs": [],
+        "TopTextContent": "",
+        "children": [
+            {
+                "tagName": "Element",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": [
+                    {
+                        "tagName": "Label",
+                        "attrs": [],
+                        "TopTextContent": "input__elementLabel",
+                        "children": []
+                    },
+                    {
+                        "tagName": "Type",
+                        "attrs": [],
+                        "TopTextContent": "DATA",
+                        "children": []
+                    },
+                    {
+                        "tagName": "Container",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ID",
+                        "attrs": [],
+                        "TopTextContent": "input__elementID",
+                        "children": []
+                    },
+                    {
+                        "tagName": "CreatedOn",
+                        "attrs": [],
+                        "TopTextContent": "input__createTimeSerial",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ModifiedOn",
+                        "attrs": [],
+                        "TopTextContent": "input__modifiedTimeSerial",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ModifiedBy",
+                        "attrs": [],
+                        "TopTextContent": "input__userName",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ModifiedByEGID",
+                        "attrs": [],
+                        "TopTextContent": "input__userID",
+                        "children": []
+                    },
+                    {
+                        "tagName": "ModifiedByEGVer",
+                        "attrs": [],
+                        "TopTextContent": "input__ModifiedByEGVer",
+                        "children": []
+                    },
+                    {
+                        "tagName": "HasSerializationError",
+                        "attrs": [],
+                        "TopTextContent": "input__HasSerializationError",
+                        "children": []
+                    },
+                    {
+                        "tagName": "InputIDs",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "tagName": "Data",
+                "attrs": [],
+                "TopTextContent": "",
+                "children": [
+                    {
+                        "tagName": "ShortCutList",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": [
+                            {
+                                "tagName": "ShortCutID",
+                                "attrs": [],
+                                "TopTextContent": "input__ShortCutToDataUID",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "tagName": "DataModel",
+                        "attrs": [],
+                        "TopTextContent": "",
+                        "children": [
+                            {
+                                "tagName": "Server",
+                                "attrs": [],
+                                "TopTextContent": "input__Server",
+                                "children": []
+                            },
+                            {
+                                "tagName": "ActiveDataSource",
+                                "attrs": [],
+                                "TopTextContent": "input__ActiveDataSource",
+                                "children": []
+                            },
+                            {
+                                "tagName": "DisplayName",
+                                "attrs": [],
+                                "TopTextContent": "input__DisplayName",
+                                "children": []
+                            },
+                            {
+                                "tagName": "Table",
+                                "attrs": [],
+                                "TopTextContent": "input__DataLabel",
+                                "children": []
+                            },
+                            {
+                                "tagName": "RawActiveDataSourceState",
+                                "attrs": [],
+                                "TopTextContent": "",
+                                "children": [
+                                    {
+                                        "tagName": "DNA",
+                                        "attrs": [],
+                                        "TopTextContent": "",
+                                        "children": [
+                                            {
+                                                "tagName": "Type",
+                                                "attrs": [],
+                                                "TopTextContent": "Dataset",
+                                                "children": []
+                                            },
+                                            {
+                                                "tagName": "Name",
+                                                "attrs": [],
+                                                "TopTextContent": "input__DataLabel",
+                                                "children": []
+                                            },
+                                            {
+                                                "tagName": "Version",
+                                                "attrs": [],
+                                                "TopTextContent": "input__DNAVersion",
+                                                "children": []
+                                            },
+                                            {
+                                                "tagName": "Assembly",
+                                                "attrs": [],
+                                                "TopTextContent": "SAS.EG.SDS.Model",
+                                                "children": []
+                                            },
+                                            {
+                                                "tagName": "Factory",
+                                                "attrs": [],
+                                                "TopTextContent": "SAS.EG.SDS.Model.Creator",
+                                                "children": []
+                                            },
+                                            {
+                                                "tagName": "ParentName",
+                                                "attrs": [],
+                                                "TopTextContent": "input__LibName",
+                                                "children": []
+                                            },
+                                            {
+                                                "tagName": "Server",
+                                                "attrs": [],
+                                                "TopTextContent": "input__Server",
+                                                "children": []
+                                            },
+                                            {
+                                                "tagName": "Library",
+                                                "attrs": [],
+                                                "TopTextContent": "input__LibName",
+                                                "children": []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "tagName": "DataSourceState",
+                                "attrs": [],
+                                "TopTextContent": "input__ActiveDataSource",
+                                "children": []
+                            },
+                            {
+                                "tagName": "TableState",
+                                "attrs": [],
+                                "TopTextContent": "input__DataLabel",
+                                "children": []
+                            },
+                            {
+                                "tagName": "MemberType",
+                                "attrs": [],
+                                "TopTextContent": "input_MemberType",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

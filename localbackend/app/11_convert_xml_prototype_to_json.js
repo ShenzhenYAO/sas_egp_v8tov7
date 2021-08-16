@@ -11,79 +11,111 @@ const jsdom = require("jsdom");
 const { window } = new jsdom.JSDOM(`...`);
 var $ = require("jquery")(window);
 
-// specify the source xml file
-// define the name (same for the src xml and the target json)
-const thefilename =  '__01a_datalist_data_v8';
-// const thesrcxml = 'data/out/text.xml';
-const thesrcxml = 'data/in/prototype/__xml/egpv8/'+thefilename+'.xml';
-// path of the target json file
-const thejsonfile = 'data/in/prototype/__json/egpv8/'+thefilename+'.json';
+const srcfolder = 'data/in/prototype/__xml/egpv8/';
+const targetfolder = 'data/in/prototype/__json/egpv8/';
 
 (async () => {
-    // let encoding = "utf16le";
-    let encoding = "utf-8";
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxml, encoding);
-    // console.log(thesrcxmlstr.substring(1, 100))
 
-    let thesrcxmlstr_normalized_1 = normalize_ampersand_code(thesrcxmlstr)
+    // get all xml files from the srcfolder
+    let xmlfiles = await getfilenames_from_a_folder(srcfolder)
+    let xmlfiles_noextname = []
+    xmlfiles.forEach(d => {
+        let xmlfilename_no_extension = d.substring(0, d.lastIndexOf('.xml'))
+        xmlfiles_noextname.push(xmlfilename_no_extension)
+    }) // xmlfiles.forEach
 
-    // jsdom does not handle the tag <Table>A</Table> well
-    // In that case, it alters the html to '<Table></Table>A' !
-    // The following is to rename the tag <Table> to <Table123> to work around
-    let thesrcxmlstr_rename_table_table123 = rename_tag_named_table(thesrcxmlstr_normalized_1)
+    // for each xml file, convert the xml to a json
+    xmlfiles_noextname.forEach(async function (d)  {
+        // determine the file name (with path) of the src xml and target json file 
+        let thesrcxml = srcfolder + d + '.xml';
+        let thejsonfile = targetfolder + d + '.json';
 
-    // the xhtml self-colsing tags like <Parameters /> must be converted to <Parameters></Parameters>
-    // because the JSDOM does not read <Parameters /> well, it'll mess up the nested structure!
-    /**
-      e.g., the structure is like
-     <Parameters />
-     <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan>
+        // let encoding = "utf16le";
+        let encoding = "utf-8";
+        let thesrcxmlstr = await mymodules.readtxt(thesrcxml, encoding);
+        // console.log(thesrcxmlstr.substring(1, 100))
 
-     JSDOM wrongly treat it as 
-     <Parameters>
-        <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan>
-     </Parameters>
-     the following is to convert  <Parameters /> to <Parameters></Parameters>
-     */
-    let thesrcxmlstr_normalized_2 = convertSelfClosingHTML_to_OldSchoolHTML(thesrcxmlstr_rename_table_table123)
-    // console.log(thesrcxmlstr_normalized_2)
+        let thesrcxmlstr_normalized_1 = normalize_ampersand_code(thesrcxmlstr)
 
-    // remove the comments (code within <!--  and -->)
-    let thesrcxmlstr_removecomments = removecomments(thesrcxmlstr_normalized_2)
-    // console.log(thesrcxmlstr_removecomments)
+        // jsdom does not handle the tag <Table>A</Table> well
+        // In that case, it alters the html to '<Table></Table>A' !
+        // The following is to rename the tag <Table> to <Table123> to work around
+        let thesrcxmlstr_rename_table_table123 = rename_tag_named_table(thesrcxmlstr_normalized_1)
 
-    // Next, convert xmlbodytext into a json file
-    let thexmldom = $(thesrcxmlstr_removecomments)
-    // let rootuuid = mymodules.generateUUID()
-    let theJSON = mymodules.DOM2JSON(thexmldom)
-    // to recover the tagnames and attr names in the original text
-    // the JSDOM normalizes the html of the DOM. Thus, the tagnames and attr names
-    // after runing the funciton DOM2JSON, the innerHTML of the node is normalized, the tagNames are in uppercases, and the attr names in lowercases
-    // As the innerHTML of a DOM object (DOM.innerHTML) created by JSDOM is already normalized, there is no way to recover the original case form of tagnames and attr names from DOM.innerHTML
-    // the following is to recover the original case form of tagNames and attr names using the original xmlstr
-    // note: it only recovers the .tagName and attr names in .attrs:[...] of elements theJSON (coverted by DOM2JSON). It cannot recover the .innerHTML property of the elements in theJSON
-    let theJSON_originalCaseForm = mymodules.getOriginalCase_of_TagAttrNames(thesrcxmlstr_removecomments, theJSON)
+        // the xhtml self-colsing tags like <Parameters /> must be converted to <Parameters></Parameters>
+        // because the JSDOM does not read <Parameters /> well, it'll mess up the nested structure!
+        /**
+          e.g., the structure is like
+         <Parameters />
+         <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan>
+    
+         JSDOM wrongly treat it as 
+         <Parameters>
+            <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan>
+         </Parameters>
+         the following is to convert  <Parameters /> to <Parameters></Parameters>
+         */
+        let thesrcxmlstr_normalized_2 = convertSelfClosingHTML_to_OldSchoolHTML(thesrcxmlstr_rename_table_table123)
+        // console.log(thesrcxmlstr_normalized_2)
 
-    //In step 01, the tagName 'Table' was changed to 'Table123' to work around for jsdom error
-    //Now, recover the tagName to 'Table'
-    let theJSON_originalCaseForm_Tag_Table123_renamed = renameTagName_Table123_to_Table(theJSON_originalCaseForm)
+        // remove the comments (code within <!--  and -->)
+        let thesrcxmlstr_removecomments = removecomments(thesrcxmlstr_normalized_2)
+        // console.log(thesrcxmlstr_removecomments)
 
-    // // recursively remove leading and trailing white spaces and line breakers
-    let theJSON_trimSpaceLinkBreaker = trimTopTextContentWhiteSpaceOfJSON(theJSON_originalCaseForm_Tag_Table123_renamed)
+        // Next, convert xmlbodytext into a json file
+        let thexmldom = $(thesrcxmlstr_removecomments)
+        // let rootuuid = mymodules.generateUUID()
+        let theJSON = mymodules.DOM2JSON(thexmldom)
+        // to recover the tagnames and attr names in the original text
+        // the JSDOM normalizes the html of the DOM. Thus, the tagnames and attr names
+        // after runing the funciton DOM2JSON, the innerHTML of the node is normalized, the tagNames are in uppercases, and the attr names in lowercases
+        // As the innerHTML of a DOM object (DOM.innerHTML) created by JSDOM is already normalized, there is no way to recover the original case form of tagnames and attr names from DOM.innerHTML
+        // the following is to recover the original case form of tagNames and attr names using the original xmlstr
+        // note: it only recovers the .tagName and attr names in .attrs:[...] of elements theJSON (coverted by DOM2JSON). It cannot recover the .innerHTML property of the elements in theJSON
+        let theJSON_originalCaseForm = mymodules.getOriginalCase_of_TagAttrNames(thesrcxmlstr_removecomments, theJSON)
 
-    // save it to a json file. Its all blank, the stringify failed, why?
-    // console.log(theJSON_originalCaseForm_Tag_Table123_renamed)
-    await mymodules.saveJSON(theJSON_trimSpaceLinkBreaker, thejsonfile)
+        //In step 01, the tagName 'Table' was changed to 'Table123' to work around for jsdom error
+        //Now, recover the tagName to 'Table'
+        let theJSON_originalCaseForm_Tag_Table123_renamed = renameTagName_Table123_to_Table(theJSON_originalCaseForm)
+
+        // // recursively remove leading and trailing white spaces and line breakers
+        let theJSON_trimSpaceLinkBreaker = trimTopTextContentWhiteSpaceOfJSON(theJSON_originalCaseForm_Tag_Table123_renamed)
+
+        // save it to a json file. Its all blank, the stringify failed, why?
+        // console.log(theJSON_originalCaseForm_Tag_Table123_renamed)
+        await mymodules.saveJSON(theJSON_trimSpaceLinkBreaker, thejsonfile)
+
+    }) // xmlfiles_noextname.forEach
 
 })()
 
+// get an array of file names from a folder
+async function getfilenames_from_a_folder(thefolder) {
+    let fs = require('fs');
+    // get all files within the src folder
+    let newpromise = new Promise(
+        // then new promise is to define a resolved value
+        (resolve) => {
+            fs.readdir(thefolder, (err, files) => {
+                resolve(files)
+            });
+        }//resolve
+    ) // new promise1;
+    // create thestage
+    const resolved = await newpromise.then(d => {
+        // console.log(d)
+        return d
+    });
+    return resolved
+} // async function getfiles_from_a_folder
+
 // // recursively remove leading and trailing white spaces and line breakers
-function trimTopTextContentWhiteSpaceOfJSON(srcJSON){
+function trimTopTextContentWhiteSpaceOfJSON(srcJSON) {
     if (srcJSON && srcJSON.length > 0) {
-        srcJSON.forEach(d=>{
-            d.TopTextContent=trimSpacesLineBreakers(d.TopTextContent)
-            if (d.children && d.children.length>0){
-                d.children = trimTopTextContentWhiteSpaceOfJSON(d.children) 
+        srcJSON.forEach(d => {
+            d.TopTextContent = trimSpacesLineBreakers(d.TopTextContent)
+            if (d.children && d.children.length > 0) {
+                d.children = trimTopTextContentWhiteSpaceOfJSON(d.children)
             }
         }) // srcJSON.forEach
     } // if (srcJSON && srcJSON.length > 0)
@@ -91,16 +123,16 @@ function trimTopTextContentWhiteSpaceOfJSON(srcJSON){
 } // function trimTopTextContentWhiteSpaceOfJSON
 
 // recursively remove leading and trailing white spaces and line breakers
-function trimSpacesLineBreakers (thestr){
+function trimSpacesLineBreakers(thestr) {
     // remove the leading and trailing whitespace 
     thestr = thestr.trim()
     // remove the leading and trailing line breakers
     thestr = thestr.trim("\n")
     // if the first/ast char is " " or "\n", do recursion
-    if (thestr.substr(0,1) ==="\n" || thestr.substr(0,1) ===" "
-        || thestr.substr(thestr.length-1,1) ==="\n" || thestr.substr(thestr.length-1,1) ===" "
-        ){
-        thestr = trimSpacesLineBreakers (thestr)
+    if (thestr.substr(0, 1) === "\n" || thestr.substr(0, 1) === " "
+        || thestr.substr(thestr.length - 1, 1) === "\n" || thestr.substr(thestr.length - 1, 1) === " "
+    ) {
+        thestr = trimSpacesLineBreakers(thestr)
     }
     return thestr
 } //function trimSpacesLineBreakers

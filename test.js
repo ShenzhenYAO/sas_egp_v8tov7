@@ -5,16 +5,13 @@ const jsdom = require("jsdom");
 const { window } = new jsdom.JSDOM(`...`);
 var $ = require("jquery")(window);
 
+const srcfolder = 'data/in/prototype/__xml/egpv8/';
+
 (async () => {
-
-    let xmlbodytext = "<DataModel><Tablel>A</Tablel></DataModel>"
-
-    let thexmldom = $(xmlbodytext)
-    let rootuuid = mymodules.generateUUID()
-    let theJSON = mymodules.DOM2JSON(thexmldom, rootuuid)
-    console.log(theJSON)
-
+    
 })()
+
+
 
 
 

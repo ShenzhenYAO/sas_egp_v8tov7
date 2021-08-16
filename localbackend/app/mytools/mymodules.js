@@ -56,9 +56,9 @@ module.exports = {
     ,
     saveJSON:
         async function saveJSON(thetxtjson, targetjsonfile) {
-            var thetxtjosnstr = JSON.stringify(thetxtjson)
+            let thetxtjosnstr = JSON.stringify(thetxtjson)
             // save it as a js at local
-            var fs = require('fs');
+            let fs = require('fs');
             // use writeFileSync instead of writeFile to avoid async problems
             fs.writeFileSync(targetjsonfile, thetxtjosnstr, function (err) {
                 if (err) {
