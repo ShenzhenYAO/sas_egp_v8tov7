@@ -1,5 +1,51 @@
 <!-- an EGTreeNode in ProjectCollection.External_Objects.ProjectTreeView (the EGTreeNode is for a process flow) -->
-<!-- Note !!! such EGTreeNode is unique for v7, no such tag in v8.
+<!-- Note !!! such EGTreeNode is unique for v7, no such tag in v8.-->
+<!-- When converting from v8 to v7:
+    1. In ProjectCollection.Elements find elements
+        ProjectCollection.Elements.Element and push each into an array (nontask array) if the type is 
+        	SAS.EG.ProjectElements.PFD
+
+    2. keep three fields for each element in the array
+        { 
+            ID: the element id from ProjectCollection.Elements.Element.Element.ID,
+            Label: the element label from ProjectCollection.Elements.Element.Element.Label,
+            Type: the attribute type of the ProjectCollection.Elements.Element.Element
+        }
+
+    The array is like: 
+       [{ 
+            ID: PFD-GirXDnE4Mj4CHrI5,
+            Label: pfd1,
+            Type: SAS.EG.ProjectElements.PFD
+
+        },
+        { 
+            ID: PFD-6nSfH71ogEk2upEN,
+            Label: pfd2,
+            Type: SAS.EG.ProjectElements.PFD
+
+        }]
+
+    3. Make a list of ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode for the v7 file,
+        each from an element in the array.
+        for each of the ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode,
+        set the following tag:
+        1) <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
+        2) set the innerText of the tag ElementID as the ID property from the element of the new array
+        (e.g., <ElementID>ShortCutToFile-frOMCUhUHcJWJKeO</ElementID>)
+        3) set the innerText of the tag Label as the Label property from the elment of the new array
+        (e.g., <Label>a.xlsx</Label>)
+        4) Search for the element in the  
+            v8 file's ProjectCollection.External_Objects.OpenProjectView.TreeItem 
+            whereby the property ID matches the ID property from the element 
+            of the new array. 
+            For such a TreeItem Element, get the attribute IsExpanded, change from lower case
+            to proper case (e.g., 'true' to 'True'), and set as innerText of the tag Expanded.
+        (e.g., <Expanded>True</Expanded>) 
+-->
+
+
+
 When converting from v8 to v7, a EGTreeNode for each process flow should be created 
     and appended into ProjectCollection.External_Objects.ProjectTreeView
     Within the EGTreeNode, there should be four tags for properties:
@@ -11,6 +57,7 @@ When converting from v8 to v7, a EGTreeNode for each process flow should be crea
     For such a ProjectCollection.Elements.Element, the innderText of 
             ProjectCollection.Elements.Element.Element.ID is the PFD ID to be copied for
         the innerText of ElementID of v7.
+
     Note: do not try to find the PFD ID from ProjectCollection.External_Objects.OpenProjectView.TreeItem of v8. 
         Some of the v8 .TreeItem might have an ID attribute begins with "PFD-", but indeed is not a process flow.
         For example, in the sample file, there is a TreeItem of which the attribute ID = "PFD-GirXDnE4Mj4CHrI5-CodeTask".
@@ -60,10 +107,10 @@ When converting from v8 to v7, a EGTreeNode for each process flow should be crea
         i.e., appended as ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode
     Thus, a list of single nodes of different types are inserted in the following: 
     -->
-    <!-- insert a list of EGTreeNode elements, each for a different type, the prototype is from __f00a_external_objects_00_projecttreeview_egtreenode_egtreenode_single_v7.xml -->
+    <!-- insert a list of EGTreeNode elements, each for a different type, the prototype is from __f00a_external_objects_00_projecttreeview_egtreenode_egtreenode_nontask_v7.xml -->
     input__list_EGTreeNode_single_for_each_type
     
     <!-- insert a list of EGTreeNode elements, each is of a different type and contains more than one 
-        tree nodes, the prototype is from __f00b_external_objects_00_projecttreeview_egtreenode_egtreenode_multiple_v7.xml -->
+        tree nodes, the prototype is from __f00b_external_objects_00_projecttreeview_egtreenode_egtreenode_programs_v7.xml -->
     input__list_EGTreeNode_multiple_for_each_type
 </EGTreeNode>
