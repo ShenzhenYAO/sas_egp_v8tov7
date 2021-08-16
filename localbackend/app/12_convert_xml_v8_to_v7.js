@@ -59,14 +59,14 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
 
     // *** add attributes egversion, and type
     jquery_dom_obj_v7.attr("EGVersion", "7.1")
-    jquery_dom_obj_v7.attr("Type",  "SAS.EG.ProjectElements.ProjectCollection")
+    jquery_dom_obj_v7.attr("Type", "SAS.EG.ProjectElements.ProjectCollection")
     // console.log(jquery_dom_obj_v7.prop("outerHTML"))
 
     // *** clone the project element from v8 obj and append it to v7obj
     // make a clone of the project element dom (among the children nodes, the first with the tag of 'element') from the src dom obj and append as the child node to the target dom
     // note: do not use the project element dom with obj_v8. otherwise the project element dom will be removed from obj_v8 after appending to obj_v7!
     let projectElement_dom_v8_clone = jquery_dom_obj_v8.find("eLEMent").clone()[0] // .find() returns the all dom with the requested tagname
-    
+
     // append the projectElement_dom_v8_clone to obj_v7
     jquery_dom_obj_v7.append(projectElement_dom_v8_clone)
     // console.log(jquery_dom_obj_v8.prop('outerHTML').substr(0, 200))
@@ -81,7 +81,7 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
     // // console.log(projectLabel_dom_v7.text())
     // console.log(jquery_dom_obj_v7.prop("outerHTML"))
     // console.log(jquery_dom_obj_v8.prop('outerHTML').substr(0, 200))
-    
+
     // now that the label of the project element of the v7 obj has been changed.
     // Note that the project element of the v8 obj is not affected
 
@@ -99,6 +99,7 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
         "QueueSubmitsForServer",
         "ActionOnError",
         "DataList",
+        "ExternalFileList",
         "InformationMap_List",
         "DecisionManager",
         "Elements",
@@ -108,8 +109,8 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
         "Parameters",
         "ProjectLog"
     ]
-    tags_to_clone_arr.forEach(d=>{
-        append_cloned_components_of_the_first_dom_found_by_tagname(jquery_dom_obj_v8, jquery_dom_obj_v7,d)
+    tags_to_clone_arr.forEach(d => {
+        append_cloned_components_of_the_first_dom_found_by_tagname(jquery_dom_obj_v8, jquery_dom_obj_v7, d)
     })
 
 
@@ -119,30 +120,79 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
         All tags with the name GraphDeviceOverride should be changed; therefore the following is to search
         for an array of all GraphDeviceOverride tags
     */
-   let GraphDeviceOverrideTags_doms_obj = jquery_dom_obj_v7.find('GraphDeviceOverride')
-//    console.log($(GraphDeviceOverrideTags_arr[2]).text())
+    let GraphDeviceOverrideTags_doms_obj = jquery_dom_obj_v7.find('GraphDeviceOverride')
+    //    console.log($(GraphDeviceOverrideTags_arr[2]).text())
     // the GraphDeviceOverrideTags_doms_obj is a jquery object and does not support .forEach({})
-    for (let i = 0; i<GraphDeviceOverrideTags_doms_obj.length;i++ ){
+    for (let i = 0; i < GraphDeviceOverrideTags_doms_obj.length; i++) {
         // Note, the GraphDeviceOverride_elm is an xhtml element, not a jquery object
         let GraphDeviceOverride_elm = GraphDeviceOverrideTags_doms_obj[i]
         $(GraphDeviceOverride_elm).text("Png")
         // same as: 
         // GraphDeviceOverride_elm.textContent = "Png"
         // Note: the values are in .textContent, not in innerText!
-    }
+    } //for (let i = 0; i<GraphDeviceOverrideTags_doms_obj.length;i++ )
 
     // *** for ProjectCollection.Elements.Element components, 
     // get the value in attr "Type", as well as textContent of .Element.ID and .Element.Label
     // push the type, id and label to an array
+    // the PFDComponentTypes_arr is for making ...
+    // the TaskComponents_arr is for making ...
+    // the NonTaskComponents_arr is for making ... 
+    let ComponentTypes_arr = [], Components_arr = [], PFDComponentTypes_arr = [], TaskComponents_arr = [], NonTaskComponents_arr = []
+    let project_components_doms_obj = jquery_dom_obj_v7.find('Elements').children()
+    // console.log(project_components_doms_obj)
 
-    
-    console.log(jquery_dom_obj_v7.prop("outerHTML"))   
+    // console.log(jquery_dom_obj_v7.prop("outerHTML"))   
+    for (let i = 0; i < project_components_doms_obj.length; i++) {
+        let theComponent_elm = project_components_doms_obj[i]
+        let theType_str = $(theComponent_elm).attr("type")
+        // note: multiple doms may be found; therefore always select the first among the doms that are found
+        let theLabel_elm = $(theComponent_elm).find('Element').find('label')[0]
+        let theLabel_str = $(theLabel_elm).text()
+        let theID_elm = $(theComponent_elm).find('Element').find('id')[0]
+        let theID_str = theID_elm.textContent
+        // console.log (theType_str, theLabel_str, theLabel_str)
 
+        // push the distinct types into an array
+        if (!ComponentTypes_arr.includes(theType_str)) { ComponentTypes_arr.push(theType_str) }
+
+        // push individual components into the array Components_arr
+        Components_arr.push({ type: theType_str, label: theLabel_str, id: theID_str })
+
+        // push the task components into the array TaskComponents_arr
+        if (theType_str === "SAS.EG.ProjectElements.CodeTask") {
+            TaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str })
+        } else if (
+            // in v8, thetype is theType_str === "SAS.EG.ProjectElements.ProcessFlowContainer", in v7, ".PFD"
+            theType_str === "SAS.EG.ProjectElements.ProcessFlowContainer" ||
+            theType_str === "SAS.EG.ProjectElements.PFD"
+        ) {
+            // *** for the PFDComponentTypes, chang the type to SAS.EG.ProjectElements.PFD 
+            $(theComponent_elm).attr("type", "SAS.EG.ProjectElements.PFD")
+            PFDComponentTypes_arr.push({ type: "SAS.EG.ProjectElements.PFD", label: theLabel_str, id: theID_str })
+        } else {
+            NonTaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str })
+        }
+    } //for (let i = 0; i< project_components_doms_obj.length;i++ ) 
+
+    // console.log(ComponentTypes_arr)
+    // console.log(PFDComponentTypes_arr)
+    // console.log(TaskComponents_arr.length)
+    // console.log(NonTaskComponents_arr.length)
+
+
+
+
+
+
+
+
+    // console.log(jquery_dom_obj_v7.prop("outerHTML"))
 
 })()
 
 // as the function name says....
-function append_cloned_components_of_the_first_dom_found_by_tagname(srcobj, targetobj,theTag ){
+function append_cloned_components_of_the_first_dom_found_by_tagname(srcobj, targetobj, theTag) {
     let theClone = srcobj.find(theTag).clone()[0]
     // if theClone is null (no such tag is found), the function simply skip without stopping, and nothing will be appended to the targetobj.
     // however, I'll need to have a default component even if it cannot be found from the source obj
