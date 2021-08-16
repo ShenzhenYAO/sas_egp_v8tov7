@@ -6,7 +6,7 @@
         <!-- <Type>FILE</Type> -->
         <Type>input__elementType</Type>
         <Container />
-        <!-- <ID>Data-iE6Dmbd8xLpOSgU8</ID> -->
+        <!-- <ID>ExternalFile-zW4AJ7NDtDv2tGxQ</ID> -->
         <ID>input__elementID</ID>
         <CreatedOn>input__createTimeSerial</CreatedOn>
         <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
@@ -17,10 +17,14 @@
         <InputIDs />
     </Element>
     <ExternalFile>
+        <!-- <ShortCutList> -->
+            <!-- <ShortCutID>ShortCutToFile-frOMCUhUHcJWJKeO</ShortCutID> -->
+        <!-- </ShortCutList> -->
         <ShortCutList>
             input__list_ShortCutID
-            <!-- insert a list of ShortCutIDs (ShortCutToFileIDs), the prototype from __b01_ExternalFileList_ExternalFile_ExternalFile_ShortCutList.xml -->
+            <!-- insert a list of ShortCutIDs (ShortCutToFileIDs), the prototype from __b01_ExternalFileList_ExternalFile_ExternalFile_ShortCutList_v7.xml -->
         </ShortCutList>
+        <!-- <FileTypeType>Excel</FileTypeType> -->
         <FileTypeType>Input__ExternalFile_FileTypeType</FileTypeType>
         <DNA>
             <DNA>

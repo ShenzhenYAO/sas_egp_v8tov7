@@ -58,7 +58,9 @@
         <PowerpointStyleOverride>input__PowerpointStyleOverride</PowerpointStyleOverride>
         <!-- <ExcelStyleOverride>Excel</ExcelStyleOverride> -->
         <ExcelStyleOverride>input__ExcelStyleOverride</ExcelStyleOverride>
-        <!-- <GraphDeviceOverride>Png</GraphDeviceOverride> -->
+        <!-- <GraphDeviceOverride>Default</GraphDeviceOverride> -->
+        
+        <!-- Note!!! in v8, GraphDeviceOverride is "Default", in v7, it is 'Png' -->
         <GraphDeviceOverride>input__GraphDeviceOverride</GraphDeviceOverride>
         <!-- <UseProjectSubmitOptions>true</UseProjectSubmitOptions> -->
         <UseProjectSubmitOptions>input__UseProjectSubmitOptions</UseProjectSubmitOptions>

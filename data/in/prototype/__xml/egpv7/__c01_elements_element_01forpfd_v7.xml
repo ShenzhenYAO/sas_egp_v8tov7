@@ -1,6 +1,6 @@
 <!-- an element within ProjectCollection.Elements, with the type of PFContainer -->
-<!-- Note!!! the type ="SAS.EG.ProjectElements.ProcessFlowContainer" is unique in v8, in v7 type = "SAS.EG.ProjectElements.PFD" -->
-<Element Type="SAS.EG.ProjectElements.ProcessFlowContainer">
+<!-- Note!!! the type ="SAS.EG.ProjectElements.PFD" is unique in v7, in v7 type = "SAS.EG.ProjectElements.ProcessFlowContainer" -->
+<Element Type="SAS.EG.ProjectElements.PFD">
     <Element>
         <Label>input_elementLabel</Label>
         <Type>CONTAINER</Type>
@@ -20,8 +20,15 @@
         <HasSerializationError>input__HasSerializationError</HasSerializationError>
         <InputIDs />
     </Element>
+    <!-- Note !!!, the following tag 'ContainerElement' is unique in v7  -->
+    <ContainerElement>
+        <ContainerType>ProcessFlow</ContainerType>
+    </ContainerElement>
     <PFD>
         input__list_Process
-        <!-- insert a list of Process elements with CodeTask IDs (each from __c01a_elements_element_01forpfd_pfd_process_v8)-->
+        <!-- insert a list of Process elements with CodeTask IDs (each from __c01a_elements_element_01forpfd_pfd_process_v7.xml)-->
     </PFD>
 </Element>
+
+
+

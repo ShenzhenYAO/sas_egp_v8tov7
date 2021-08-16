@@ -58,9 +58,7 @@
         <PowerpointStyleOverride>input__PowerpointStyleOverride</PowerpointStyleOverride>
         <!-- <ExcelStyleOverride>Excel</ExcelStyleOverride> -->
         <ExcelStyleOverride>input__ExcelStyleOverride</ExcelStyleOverride>
-        <!-- <GraphDeviceOverride>Default</GraphDeviceOverride> -->
-        
-        <!-- Note!!! in v8, GraphDeviceOverride is "Default", in v7, it is 'Png' -->
+        <!-- <GraphDeviceOverride>Png</GraphDeviceOverride> -->
         <GraphDeviceOverride>input__GraphDeviceOverride</GraphDeviceOverride>
         <!-- <UseProjectSubmitOptions>true</UseProjectSubmitOptions> -->
         <UseProjectSubmitOptions>input__UseProjectSubmitOptions</UseProjectSubmitOptions>
@@ -71,7 +69,10 @@
         <!-- <ActionOnError>StopCurrentBranch</ActionOnError> -->
         <ActionOnError>input__ActionOnError</ActionOnError>
         <!-- <ExpectedOutputDataList /> -->
-        <ExpectedOutputDataList>input__ExpectedOutputDataList</ExpectedOutputDataList >
+        <ExpectedOutputDataList>
+            input__list_DataDescriptor
+            <!-- input__list_DataDescriptor, prototype from .xml  -->
+        </ExpectedOutputDataList >
         <!-- <Parameters /> -->
         <Parameters>input__Parameters</Parameters>
         <!-- <ExecutionTimeSpan>PT0.3378045S</ExecutionTimeSpan> -->
@@ -83,19 +84,19 @@
                 <!-- <code>Code-KtgYEOok4RfPaxkg</code> -->
                 <code>input__codeID</code>
                 <!-- <OutputDataList> -->
-                    <!-- <ID>ShortCutToData-7t9kkoBjusSTYIt3</ID> -->
+                <!-- <ID>ShortCutToData-7t9kkoBjusSTYIt3</ID> -->
                 <!-- </OutputDataList> -->
                 <OutputDataList>
                     input__list_OutputDataID
-                    <!-- input a list of OutputDataID, prototype from __c04b_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_outputdatalist_id_v8.xml -->
+                    <!-- input a list of OutputDataID, prototype from __c04b_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_outputdatalist_id_v7.xml -->
                 </OutputDataList>
                 <!-- <ODSResultsList> -->
-                    <!-- <ID>ODSResult-MRRcL5RxnQVFIxpf</ID> -->
-                    <!-- <ID>ODSResult-wTgpOsgwuVuqWPVM</ID> -->
+                <!-- <ID>ODSResult-MRRcL5RxnQVFIxpf</ID> -->
+                <!-- <ID>ODSResult-wTgpOsgwuVuqWPVM</ID> -->
                 <!-- </ODSResultsList> -->
                 <ODSResultsList>
                     input__list_ODSResultID
-                    <!-- input a list of ODSResultID, prototype from __c04c_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_odsresultslist_id_v8.xml -->
+                    <!-- input a list of ODSResultID, prototype from __c04c_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_odsresultslist_id_v7.xml -->
                 </ODSResultsList>
             </JobRecipe>
         </JobRecipe>

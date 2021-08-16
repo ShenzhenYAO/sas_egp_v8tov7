@@ -1,0 +1,9 @@
+<!-- a Properties element within ProjectCollection.External_Objects.ProcessFlowView.Containers -->
+<Properties>
+    <!-- <ID>PFD-GirXDnE4Mj4CHrI5</ID> -->
+    <ID>input__PFDID</ID>
+    <!-- <BackgroundColor>Default</BackgroundColor> -->
+    <BackgroundColor>input__BackgroundColor</BackgroundColor>
+    <!-- <Align>AlignNone</Align> -->
+    <Align>input__AlignNone</Align>
+</Properties>

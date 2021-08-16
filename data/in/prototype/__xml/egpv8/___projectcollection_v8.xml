@@ -1,5 +1,7 @@
 <!-- based on data\try\v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_1note_1copytask.xml -->
 <?xml version="1.0" encoding="utf-16"?>
+<!-- Note!!! in v8 it is EGVersion="8.1", in v7 the EGVersion="7.1"  -->
+<!-- Note!!! in v8 it is Type="SAS.EG.ProjectElements.ElementManager", in v7 Type="SAS.EG.ProjectElements.ProjectCollection"  -->
 <ProjectCollection EGVersion="8.1" Type="SAS.EG.ProjectElements.ElementManager">
     <Element>
         <Label>input__elementLabel</Label>
@@ -32,10 +34,12 @@
     <ProjectLogMaxSize>5</ProjectLogMaxSize>
     <ClearProjectLogOnExit>false</ClearProjectLogOnExit>
     <DataList>
-        input_list_Data<!-- insert list of data sets, each in a <Data></Data>, the prototype from __a_datalist_data_v8.xml -->
+        input_list_Data
+        <!-- insert list of data sets, each in a <Data></Data>, the prototype from __a_datalist_data_v8.xml -->
     </DataList>
     <ExternalFileList>
-        input_list_ExternalFileList<!-- insert list of data sets, each in a <ExternalFile></ExternalFile>, the prototype from __b_ExternalFileList_ExternalFile.xml -->
+        input_list_ExternalFileList
+        <!-- insert list of data sets, each in a <ExternalFile></ExternalFile>, the prototype from __b_ExternalFileList_ExternalFile_v8.xml -->
     </ExternalFileList>
     <InformationMap_List />
     <DecisionManager>
@@ -59,7 +63,7 @@
     <GitSourceControl GUID="{input__GitUID}"></GitSourceControl>
     <Containers>
         input__list_PFDID
-        <!-- insert a list of PFD IDs elements (the prototype from __d_containers__id.xml)-->
+        <!-- insert a list of PFD IDs elements (the prototype from __d_containers__id_v8.xml)-->
     </Containers>
     <ExploreDataList />
     <Parameters>
@@ -70,9 +74,11 @@
         <!-- insert a list of projectlog components (the prototype from __e_projectlog_element_v8.xml)-->
     </ProjectLog>
     <External_Objects>
+        <!-- Note !!! the tag ProcessFlowControlManager is unique in v8, no such tag in v7 -->
         <ProcessFlowControlManager>
-            input__list_PF???
-            <!-- insert a list of ProcessFlowControlState components (the prototype from __f_external_objects_processflowcontrolmanager_processflowcontrolstate_v8.xml)-->
+            <!-- Note !!! the tag ProcessFlowControlState is unique in v8, similar to ProcessFlowView in v7 -->
+            input__list_PFControlState
+            <!-- insert a list of ProcessFlowControlState components (the prototype from __f01_external_objects_processflowcontrolmanager_processflowcontrolstate_v8.xml)-->
         </ProcessFlowControlManager>
         <OpenProjectView>
             input__list_TreeItem

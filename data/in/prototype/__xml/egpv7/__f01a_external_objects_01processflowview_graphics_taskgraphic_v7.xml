@@ -1,0 +1,38 @@
+<!-- a TaskGraphic element within ProjectCollection.External_Objects.ProcessFlowView.Graphics.GraphicObjects -->
+<!-- a TaskGraphic element can be CodeTask, ShortCutToData, ShortCutToFile, ShortCutTo a SAS code file (also as CodeTask), EGTask, a ODSResult, or (a link to) an ODSResult file (e.g., an output xlsx file)  -->
+<TaskGraphic>
+    <!--<Type>Task</Type>-->
+    <Type>input__Type</Type>
+    <!--<Id>a88f0628-d05d-4e03-bbee-5b7070afe60e</Id>, Id is the id of the task graphic-->
+    <Id>input__Id</Id>
+    <!--<LineWidth>1</LineWidth>-->
+    <LineWidth>input__LineWidth</LineWidth>
+    <!--<Fill>true</Fill>-->
+    <Fill>input__Fill</Fill>
+    <!--<PosX>24</PosX>-->
+    <PosX>input__PosX</PosX>
+    <!--<PosY>12</PosY>-->
+    <PosY>input__PosY</PosY>
+    <!--<Width>36</Width>-->
+    <Width>input__Width</Width>
+    <!--<Height>36</Height>-->
+    <Height>input__Height</Height>
+    <!--<Rotation>0</Rotation>-->
+    <Rotation>input__Rotation</Rotation>
+    <!--<Visible>true</Visible>-->
+    <Visible>input__Visible</Visible>
+    <!--<Border>false</Border>-->
+    <Border>input__Border</Border>
+    <!--<AutoSize>true</AutoSize>-->
+    <AutoSize>input__AutoSize</AutoSize>
+    <!--<Removable>true</Removable>-->
+    <Removable>input__Removable</Removable>
+    <!--<Child>false</Child>-->
+    <Child>input__Child</Child>
+    <!--<Selected>true</Selected>-->
+    <Selected>input__Selected</Selected>
+    <!--<Label>pfd1_p1</Label>-->
+    <Label>input__Label</Label>
+    <!--<Element>CodeTask-eFeFyI2IrkNJmU7j</Element>, Element refers to the ID of the CodeTask-->
+    <Element>input__Element</Element>
+</TaskGraphic>

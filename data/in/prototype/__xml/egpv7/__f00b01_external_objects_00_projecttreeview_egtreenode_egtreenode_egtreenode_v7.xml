@@ -1,0 +1,65 @@
+<!-- an EGTreeNode element in ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode, 
+    representing one of multiple treeNodes of the same type(e.g., 'Task') -->
+<!-- Note !!! such EGTreeNode is unique for v7, no such tag in v8.
+Within the EGTreeNode, there should be four tags for properties. The setting is similar to
+setting values for the EGVersion elements of process flows (in __f00 v7): 
+When converting from v8 to v7:
+    1. In ProjectCollection.Elements find elements
+        ProjectCollection.Elements.Element and push each to different arrays according 
+        to type of the element. The type of the element is defined in the attribute type of the element
+        (e.g., "SAS.EG.ProjectElements.ShortCutToFile")
+        These arrays contains elements of 3 fields:
+        { 
+            ID: the element id from ProjectCollection.Elements.Element.Element.ID,
+            Label: the element label from ProjectCollection.Elements.Element.Element.Label,
+            Type: the attribute type of the ProjectCollection.Elements.Element.Element
+        }
+
+    2. From the arrays made in step 1, select those with more than one elements, like:
+       [[{ 
+            ID: CodeTask-eFeFyI2IrkNJmU7j,
+            Label: pfd1_p1,
+            Type: SAS.EG.ProjectElements.SAS.EG.ProjectElements.CodeTask
+        },
+        { 
+            ID: CodeTask-cRIArx6TeBFFoe9Z,
+            Label: pfd1_p2,
+            Type: SAS.EG.ProjectElements.SAS.EG.ProjectElements.CodeTask
+        },
+        { 
+            ID: CodeTask-zuxheXrmOhkcqb2t,
+            Label: shortcut_to_a_sas_file,
+            Type: SAS.EG.ProjectElements.SAS.EG.ProjectElements.CodeTask
+
+        }], 
+        [{...}, {...}]
+        ]
+
+    3. For each collection of the same type elements (e.g., the elements of the type "task"), make a list of 
+        ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode.EGTreeNode for the v7 file.
+        For each of the ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode.EGTreeNode,
+        set for 4 tags as for the EGVersion elements of process flows (in __f00b v7):
+
+            1) <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
+            2) set the innerText of the tag ElementID as the ID property from the element of the selected collection
+            (e.g., <ElementID>CodeTask-eFeFyI2IrkNJmU7j</ElementID>)
+            3) set the innerText of the tag Label as the Label property from the elment of the new array
+            (e.g., <Label>pfd1_p1</Label>)
+            4) Search for the element in the  
+                v8 file's ProjectCollection.External_Objects.OpenProjectView.TreeItem 
+                whereby the property ID matches the ID property from the element 
+                of the new array. 
+                For such a TreeItem Element, get the attribute IsExpanded, change from lower case
+                to proper case (e.g., 'true' to 'True'), and set as innerText of the tag Expanded.
+            (e.g., <Expanded>True</Expanded>) 
+    -->
+<EGTreeNode>
+    <!-- <NodeType>NODETYPE_ELEMENT</NodeType> -->
+    <NodeType>input__NodeType</NodeType>
+    <!-- <ElementID>CodeTask-eFeFyI2IrkNJmU7j</ElementID> -->
+    <ElementID>input__ElementID</ElementID>
+    <!-- <Expanded>False</Expanded> -->
+    <Expanded>input_Expanded</Expanded>
+    <!-- <Label>pdf1_p1</Label> -->
+    <Label>input__Label</Label>
+</EGTreeNode>

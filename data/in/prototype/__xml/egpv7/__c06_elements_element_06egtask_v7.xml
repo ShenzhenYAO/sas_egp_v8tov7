@@ -1,5 +1,5 @@
-<!-- an element within ProjectCollection.Elements, with the type of CodeTask (not including short cut to SAS code files) -->
-<Element Type="SAS.EG.ProjectElements.CodeTask">
+<!-- an element within ProjectCollection.Elements, with the type of EGTask (customized eg task like copy file between servers) -->
+<Element Type="SAS.EG.ProjectElements.EGTask">
     <Element>
         <Label>input__elementLabel</Label>
         <Type>TASK</Type>
@@ -58,7 +58,7 @@
         <PowerpointStyleOverride>input__PowerpointStyleOverride</PowerpointStyleOverride>
         <!-- <ExcelStyleOverride>Excel</ExcelStyleOverride> -->
         <ExcelStyleOverride>input__ExcelStyleOverride</ExcelStyleOverride>
-        <!-- <GraphDeviceOverride>Default</GraphDeviceOverride> -->
+        <!-- <GraphDeviceOverride>Png</GraphDeviceOverride> -->
         
         <!-- Note!!! in v8, GraphDeviceOverride is "Default", in v7, it is 'Png' -->
         <GraphDeviceOverride>input__GraphDeviceOverride</GraphDeviceOverride>
@@ -74,7 +74,7 @@
         <ExpectedOutputDataList>input__ExpectedOutputDataList</ExpectedOutputDataList >
         <!-- <Parameters /> -->
         <Parameters>input__Parameters</Parameters>
-        <!-- <ExecutionTimeSpan>PT0.3378045S</ExecutionTimeSpan> -->
+        <!-- <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan> -->
         <ExecutionTimeSpan>input__ExecutionTimeSpan</ExecutionTimeSpan>
         <JobRecipe>
             <JobRecipe>
@@ -83,35 +83,43 @@
                 <!-- <code>Code-KtgYEOok4RfPaxkg</code> -->
                 <code>input__codeID</code>
                 <!-- <OutputDataList> -->
-                    <!-- <ID>ShortCutToData-7t9kkoBjusSTYIt3</ID> -->
+                <!-- <ID>ShortCutToData-7t9kkoBjusSTYIt3</ID> -->
                 <!-- </OutputDataList> -->
                 <OutputDataList>
                     input__list_OutputDataID
-                    <!-- input a list of OutputDataID, prototype from __c04b_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_outputdatalist_id_v8.xml -->
+                                        <!-- input a list of OutputDataID, prototype from __c05a_elements_element_05shortcuttocodetask_submitableelement_jobrecipe_jobrecipe_outputdatalist_id_v8.xml -->
                 </OutputDataList>
                 <!-- <ODSResultsList> -->
-                    <!-- <ID>ODSResult-MRRcL5RxnQVFIxpf</ID> -->
-                    <!-- <ID>ODSResult-wTgpOsgwuVuqWPVM</ID> -->
+                <!-- <ID>ODSResult-MRRcL5RxnQVFIxpf</ID> -->
+                <!-- <ID>ODSResult-wTgpOsgwuVuqWPVM</ID> -->
                 <!-- </ODSResultsList> -->
                 <ODSResultsList>
                     input__list_ODSResultID
-                    <!-- input a list of ODSResultID, prototype from __c04c_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_odsresultslist_id_v8.xml -->
+                                        <!-- input a list of ODSResultID, prototype from __c05b_elements_element_05shortcuttocodetask_submitableelement_jobrecipe_jobrecipe_odsresultslist_id_v8.xml -->
                 </ODSResultsList>
             </JobRecipe>
         </JobRecipe>
     </SubmitableElement>
-    <CodeTask>
-        <IncludeWrapper>input__IncludeWrapper</IncludeWrapper>
-        <Embedded>input__Embedded</Embedded>
-        <DNA>
-            <DNA>
-                <Type>input__DNAType</Type>
-                <Name>input__DNAName</Name>
-                <Version>input_DNAVersion</Version>
-                <Assembly />
-                <Factory />
-                <FullPath>input_DNAFullPath</FullPath>
-            </DNA>
-        </DNA>
-    </CodeTask>
+    <EGTask>
+        <!-- <Task_CLSID>660ed464-dab4-48ad-a1d9-452148b2cffe</Task_CLSID> -->
+        <Task_CLSID>input__Task_CLSID</Task_CLSID>
+        <!-- <CurrentViewType>Advanced</CurrentViewType> -->
+        <CurrentViewType>input__CurrentViewType</CurrentViewType>
+        <!-- <Obs>-1</Obs> -->
+        <Obs>input__Obs</Obs>
+        <!-- <FirstObs>0</FirstObs> -->
+        <FirstObs>input__FirstObs</FirstObs>
+        <!-- <GeneratesCodeFlag>-1</GeneratesCodeFlag> -->
+        <GeneratesCodeFlag>input__GeneratesCodeFlag</GeneratesCodeFlag>
+        <!-- <GenerateOutputDataNames>False</GenerateOutputDataNames> -->
+        <GenerateOutputDataNames>input__GenerateOutputDataNames</GenerateOutputDataNames>
+        <InputDatalist>
+            input__list_InputDatalist
+            <!-- insert a list of inputdataID, prototype from ???.xml -->
+        </InputDatalist>
+        <VarNameParameters>
+            input__list_VarNameParameters
+            <!-- input a list of VarNameParameters, prototype from ???.xml -->
+        </VarNameParameters>
+    </EGTask>
 </Element>

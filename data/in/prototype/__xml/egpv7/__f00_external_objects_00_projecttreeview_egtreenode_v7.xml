@@ -1,0 +1,69 @@
+<!-- an EGTreeNode in ProjectCollection.External_Objects.ProjectTreeView (the EGTreeNode is for a process flow) -->
+<!-- Note !!! such EGTreeNode is unique for v7, no such tag in v8.
+When converting from v8 to v7, a EGTreeNode for each process flow should be created 
+    and appended into ProjectCollection.External_Objects.ProjectTreeView
+    Within the EGTreeNode, there should be four tags for properties:
+    <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
+    <ElementID>PFD-GirXDnE4Mj4CHrI5</ElementID> 
+    The PFD ID from a corresponding element for a v8 process flow
+        in ProjectCollection.Elements.Element whereby
+            its attribute type = "SAS.EG.ProjectElements.ProcessFlowContainer"
+    For such a ProjectCollection.Elements.Element, the innderText of 
+            ProjectCollection.Elements.Element.Element.ID is the PFD ID to be copied for
+        the innerText of ElementID of v7.
+    Note: do not try to find the PFD ID from ProjectCollection.External_Objects.OpenProjectView.TreeItem of v8. 
+        Some of the v8 .TreeItem might have an ID attribute begins with "PFD-", but indeed is not a process flow.
+        For example, in the sample file, there is a TreeItem of which the attribute ID = "PFD-GirXDnE4Mj4CHrI5-CodeTask".
+        That TreeItem is not a PFD at all!
+
+    <Expanded>True</Expanded> The innerText of the tag Expanded is copied from the value 
+        of the attribute "IsExpanded" of the .TreeItem of v8 with the sample attribute ID
+        as the PFD ID identified above for the tag ElementID in v7!
+
+    <Label>pfd1</Label> The innerText (i.e., "pfd1") of the tag Label should be obtained from
+    a v8 file's ProjectCollection.Elements.Element whereby the innerText of
+    ProjectCollection.Elements.Element.Element.ID is the same as the PFD ID identified for
+    ElementID of v7. In such an Element, 
+    the innerText of ProjectCollection.Elements.Element.Element.Label should be copied
+    as the innerText of the tag Label in v7. 
+    
+    So, to summarize this complicated and annoying process, when converting from v8 to v7,
+    1) In ProjectCollection.Elements find the elements
+        ProjectCollection.Elements.Element whereby
+          its attribute type = "SAS.EG.ProjectElements.ProcessFlowContainer"  
+        push ProjectCollection.Elements.Element.Element.ID and          
+        ProjectCollection.Elements.Element.Element.Label into an array.
+        The ID and Label (of each process flow) in the array are to be used for the tag
+           ElementID and Label of v7
+    2) In ProjectCollection.External_Objects.OpenProjectView.TreeItem, find the .TreeItem 
+        elements of which the attribute ID = the identified Process Flow ID 
+            (i.e. the IDs saved in the array in step 1)
+        From the identified .TreeItems (these are Process Flows), the attribute "IsExpanded"
+        is used as the innerText of the tag Expanded, after transforming the values from lower case
+        to proper case (e.g. from IsExpanded="true" to <Expanded>True</Expanded>)
+        O-M-G! I need some air as well, Janice!
+    -->
+<EGTreeNode>
+    <NodeType>NODETYPE_ELEMENT</NodeType>
+    <ElementID>input__PFDID</ElementID>
+    <Expanded>input__Expanded</Expanded>
+    <Label>input__PFDLabel</Label>
+
+    <!-- Note !!! the following is unique in v7, no such tags in v8.
+    When converting from v8 to v7, need to insert a list of EGTreeNode
+    input__list_EGTreeNode_for_different_type_of_nodes (i.e., for shortcut to data or file, egtask, codetask, etc) 
+    
+    Here is the wired setting in v7:
+    
+    For a particular type of node (e.g., shortcut to file), if there is only one node, the
+        node is directly listed as the second layer of EGTreeNode
+        i.e., appended as ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode
+    Thus, a list of single nodes of different types are inserted in the following: 
+    -->
+    <!-- insert a list of EGTreeNode elements, each for a different type, the prototype is from __f00a_external_objects_00_projecttreeview_egtreenode_egtreenode_single_v7.xml -->
+    input__list_EGTreeNode_single_for_each_type
+    
+    <!-- insert a list of EGTreeNode elements, each is of a different type and contains more than one 
+        tree nodes, the prototype is from __f00b_external_objects_00_projecttreeview_egtreenode_egtreenode_multiple_v7.xml -->
+    input__list_EGTreeNode_multiple_for_each_type
+</EGTreeNode>

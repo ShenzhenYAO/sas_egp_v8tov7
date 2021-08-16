@@ -1,9 +1,9 @@
-<!-- an element within ProjectCollection.Elements, with the type of Log (Task Log) -->
-<Element Type="SAS.EG.ProjectElements.Log">
+<!-- an element within ProjectCollection.ProjectLog -->
+<Element Type="SAS.EG.ProjectElements.ProjectLog">
     <Element>
         <Label>input__elementLabel</Label>
-        <Type>LOG</Type>
-        <Container>input__PFDID</Container>
+        <Type>TASK</Type>
+        <Container></Container>
         <ID>input__elementID</ID>
         <CreatedOn>input__createTimeSerial</CreatedOn>
         <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
@@ -17,10 +17,15 @@
         </InputIDs>
     </Element>
     <Log>
-        <Parent>input__parentID</Parent>
         <LineSize>input__LineSize</LineSize>
         <PageSize>input__PageSize</PageSize>
         <Portrait>input__Portrait</Portrait>
         <ConditionParent />
     </Log>
+    <ProjectLog>
+        <!-- <Enabled>False</Enabled> -->
+        <Enabled>input__Enabled</Enabled>
+        <!-- <WrittenTo>False</WrittenTo> -->
+        <WrittenTo>input_WrittenTo</WrittenTo>
+    </ProjectLog>
 </Element>

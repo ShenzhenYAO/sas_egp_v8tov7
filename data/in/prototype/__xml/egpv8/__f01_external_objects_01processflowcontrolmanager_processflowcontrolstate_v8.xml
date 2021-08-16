@@ -1,19 +1,67 @@
 <!-- a ProcessFlowControlState element within ProjectCollection.External_Objects.ProcessFlowControlManager -->
+<!-- Note !!! the tag ProcessFlowControlState is unique in v8, similar to ProcessFlowView in v7 -->
+<!-- Note !!! the tag ProcessFlowView is unique in v7, similar to ProcessFlowControlState in v8 
+    however, there is only ONE ProcessFlowView in v7 for all ProcessFlows
+    While in v8, there can be multiple ProcessFlowControlState, each for a ProcessFlow
+-->
 <ProcessFlowControlState>
     <!-- <ContainerID>PFD-GirXDnE4Mj4CHrI5</ContainerID> -->
+    <!-- Note !!! 
+        the tag ContainerID is unique in v8, no such tag in v7. 
+        When converting from v8 to v7, the innertext of ContainerID (i.e., the PFDID)
+            should be appended as a Properties element into 
+            ProjectCollection.External_Objects.ProcessFlowView.Containers
+        The properties tag should be like: 
+        <Properties>
+            <ID>input__PFDID</ID>
+            <BackgroundColor>Default</BackgroundColor>
+            <Align>AlignNone</Align>
+        </Properties> 
+        see __f01c of v7
+    -->
     <ContainerID>input__PFDID</ContainerID>
     <!-- <Zoom>1</Zoom> -->
+    <!-- Note !!! the Zoom tag is unique in v8, only zoom tag of the first ProcessFlowControlState 
+        should be copied to ProjectCollection.External_Objects.ProcessFlowView of v7
+        see ___projectcollection_v7.xml
+     -->
     <Zoom>input__Zoom</Zoom>
     <!-- <ShowGrid>true</ShowGrid> -->
+    <!-- Note !!! the ShowGrid tag is unique in v8, only ShowGrid tag of the first ProcessFlowControlState 
+        should be copied to ProjectCollection.External_Objects.ProcessFlowView of v7
+        see ___projectcollection_v7.xml
+     -->
     <ShowGrid>input__ShowGrid</ShowGrid>
+    
     <!-- <ShowMargins>false</ShowMargins> -->
-    ShowMargins>input__ShowMargins</ShowMargins>
-<!-- <Align>AlignNone</Align> -->
-<Align>input__Align</Align>
-<GraphicObjects>
-    <!-- insert a list of TaskGraphic elements, the prototype from __f01_external_objects_processflowcontrolmanager_processflowcontrolstate_graphicobjects_taskgraphic_v8.xml -->
+    <!-- Note !!! the ShowMargins tag is unique in v8, no such tag in v7 -->
+    <ShowMargins>input__ShowMargins</ShowMargins>
+    <!-- <Align>AlignNone</Align> -->
+    <!-- Note !!! the Align tag is unique in v8, no such tag in v7 -->
+    <Align>input__Align</Align>
+
+    <!-- Note !!! add a new tag when converting from v8 to v7
+    when converting from v8 to v7, a tag <Layout>False<Layout>
+        should be added to ProjectCollection.External_Objects.ProcessFlowView of v7.
+        the tag <Layout> should only be added for once (There is only one ProcessFlowView for all Process Flows in v7 )
+        In v8, there is no such tag.  
+        see ___projectcollection_v7.xml of v7-->
+
+    <!-- Note !!!
+    When converting from v8 to v7, TaskGraphic elements of GraphicObjects
+        for each ProcessFlowControlState in v8 should be merged into one array of 
+        TaskGraphic elements (for all Process Flows), and insert into 
+        ProjectCollection.External_Objects.ProcessFlowView.Graphics
+    When converting from v8 to v7, NoteGraphic elements of GraphicObjects
+        for each ProcessFlowControlState in v8 should be merged into one array of 
+        NoteGraphic elements (for all Process Flows), and insert into 
+        ProjectCollection.External_Objects.ProcessFlowView.Graphics
+    see ___projectcollection_v7.xml -->
+    
+    <GraphicObjects>
+        <!-- insert a list of TaskGraphic elements, the prototype from __f01_external_objects_processflowcontrolmanager_processflowcontrolstate_graphicobjects_taskgraphic_v8.xml -->
         input__list_TaskGraphic
-        <!-- insert a list of NoteGraphic, the prototype from __f02_external_objects_processflowcontrolmanager_processflowcontrolstate_graphicobjects_notegraphic_v8.xml -->
+                <!-- insert a list of NoteGraphic, the prototype from __f02_external_objects_processflowcontrolmanager_processflowcontrolstate_graphicobjects_notegraphic_v8.xml -->
         input__list_NoteGraphic
-</GraphicObjects>
+    </GraphicObjects>
 </ProcessFlowControlState>
