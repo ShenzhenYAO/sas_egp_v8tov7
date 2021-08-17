@@ -43,7 +43,7 @@ When converting from v8 to v7:
         2) set the innerText of the tag ElementID as the ID property from the element of the new array
         (e.g., <ElementID>ShortCutToFile-frOMCUhUHcJWJKeO</ElementID>)
         3) set the innerText of the tag Label as the Label property from the elment of the new array
-        (e.g., <Label>a.xlsx</Label>)
+        (e.g., <Label>pfd1</Label>)
         4) Search for the element in the  
             v8 file's ProjectCollection.External_Objects.OpenProjectView.TreeItem 
             whereby the property ID matches the ID property from the element 

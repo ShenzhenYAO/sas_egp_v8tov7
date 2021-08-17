@@ -8,7 +8,9 @@ const jsdom = require("jsdom");
 const { window } = new jsdom.JSDOM(`...`);
 var $ = require("jquery")(window);
 
-const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_1note_1copytask.xml';
+// const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_1note_1copytask.xml';
+const thesrcxml = 'data/out/test/project_v8.xml';
+const thetargetxml = 'data/out/test/v8_to_v7.xml';
 (async () => {
 
     // read the xml into a dom object
@@ -129,16 +131,18 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
         $(GraphDeviceOverride_elm).text("Png")
         // same as: 
         // GraphDeviceOverride_elm.textContent = "Png"
-        // Note: the values are in .textContent, not in innerText!
+        // Note: the values are in .textContent, not in textContent!
+
     } //for (let i = 0; i<GraphDeviceOverrideTags_doms_obj.length;i++ )
 
     // *** for ProjectCollection.Elements.Element components, 
     // get the value in attr "Type", as well as textContent of .Element.ID and .Element.Label
     // push the type, id and label to an array
-    // the PFDComponentTypes_arr is for making ...
+    // the PFDComponentTypes_arr is for making EGTreeNodes for PFDs (see __f00 .xml of v7 obj)...
+    // PFDIDs_arr to be used to identify EGTreeNodes
     // the TaskComponents_arr is for making ...
     // the NonTaskComponents_arr is for making ... 
-    let ComponentTypes_arr = [], Components_arr = [], PFDComponentTypes_arr = [], TaskComponents_arr = [], NonTaskComponents_arr = []
+    let ComponentTypes_arr = [], Components_arr = [], PFDComponentTypes_arr = [], PFDIDs_arr = [], TaskComponents_arr = [], NonTaskComponents_arr = []
     let project_components_doms_obj = jquery_dom_obj_v7.find('Elements').children()
     // console.log(project_components_doms_obj)
 
@@ -151,17 +155,19 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
         let theLabel_str = $(theLabel_elm).text()
         let theID_elm = $(theComponent_elm).find('Element').find('id')[0]
         let theID_str = theID_elm.textContent
+        let theContainerID_elm = $(theComponent_elm).find('Element').find('Container')[0]
+        let theContainerID_str = theContainerID_elm.textContent
         // console.log (theType_str, theLabel_str, theLabel_str)
 
         // push the distinct types into an array
         if (!ComponentTypes_arr.includes(theType_str)) { ComponentTypes_arr.push(theType_str) }
 
         // push individual components into the array Components_arr
-        Components_arr.push({ type: theType_str, label: theLabel_str, id: theID_str })
+        Components_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
 
         // push the task components into the array TaskComponents_arr
         if (theType_str === "SAS.EG.ProjectElements.CodeTask") {
-            TaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str })
+            TaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
         } else if (
             // in v8, thetype is theType_str === "SAS.EG.ProjectElements.ProcessFlowContainer", in v7, ".PFD"
             theType_str === "SAS.EG.ProjectElements.ProcessFlowContainer" ||
@@ -169,9 +175,16 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
         ) {
             // *** for the PFDComponentTypes, chang the type to SAS.EG.ProjectElements.PFD 
             $(theComponent_elm).attr("type", "SAS.EG.ProjectElements.PFD")
-            PFDComponentTypes_arr.push({ type: "SAS.EG.ProjectElements.PFD", label: theLabel_str, id: theID_str })
-        } else {
-            NonTaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str })
+            PFDIDs_arr.push(theID_str)
+            PFDComponentTypes_arr.push({ type: "SAS.EG.ProjectElements.PFD", label: theLabel_str, id: theID_str, container: theContainerID_str })
+        } else if ( //*** the nonTask components do not includes Log , last submitted code, shortcut to data, link, and odsresult
+            theType_str !== "SAS.EG.ProjectElements.Log" &&
+            theType_str !== "SAS.EG.ProjectElements.Code" &&
+            theType_str !== "SAS.EG.ProjectElements.ShortCutToData" &&
+            theType_str !== "SAS.EG.ProjectElements.Link" &&
+            theType_str !== "SAS.EG.ProjectElements.ODSResult"
+        ) {
+            NonTaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
         }
     } //for (let i = 0; i< project_components_doms_obj.length;i++ ) 
 
@@ -179,7 +192,6 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
     // console.log(PFDComponentTypes_arr)
     // console.log(TaskComponents_arr.length)
     // console.log(NonTaskComponents_arr.length)
-
 
     // *** create an Empty External_Objects and append to the v7 obj
     let External_Objects_dom_obj = $("<External_Objects></External_Objects>")
@@ -190,23 +202,164 @@ const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_
     jquery_dom_obj_v7.append(External_Objects_dom_obj)
 
     // *** within External_Objects_dom_obj, add a tag ProjectTreeView
-    let ProjectTreeView_dom_obj  = $("<ProjectTreeView></ProjectTreeView>")
-    jquery_dom_obj_v7.append(ProjectTreeView_dom_obj)
+    let ProjectTreeView_dom_obj = $("<ProjectTreeView></ProjectTreeView>")
+    External_Objects_dom_obj.append(ProjectTreeView_dom_obj)
     // wired, this time, the xml of ProjectTreeView_dom_obj was not removed after appending
     // console.log(ProjectTreeView_dom_obj.parent().prop("outerHTML"))
 
     // *** within External_Objects_dom_obj, add a tag ProcessFlowView
-    let ProcessFlowView_dom_obj = $("<ProcessFlowView></ProcessFlowView>")
-    jquery_dom_obj_v7.append(ProcessFlowView_dom_obj)
+    let ProcessFlowView_dom_obj = $("<ProcessFlowView><Zoom>1</Zoom><Grid>True</Grid><Layout>False</Layout></ProcessFlowView>")
+    External_Objects_dom_obj.append(ProcessFlowView_dom_obj)
     // console.log(ProcessFlowView_dom_obj.prop("outerHTML"))
 
     // *** within External_Objects_dom_obj, add a tag MainFrom
     let MainFrom_dom_obj = $("<MainFrom><ActiveData></ActiveData></MainFrom>")
-    jquery_dom_obj_v7.append(MainFrom_dom_obj)
+    External_Objects_dom_obj.append(MainFrom_dom_obj)
     // console.log(MainFrom_dom_obj.prop("outerHTML"))
 
-    // console.log(jquery_dom_obj_v7.prop("outerHTML"))
+    // *** Prepare a list of EGTreeNode elements (for PFDs) and append to ProjectTreeView_dom_obj
+    /* Each EGTreeNode is with the following 4 tags:
+        1) <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
+        2) set the innerText of the tag ElementID as the ID property from the element of the new array
+        (e.g., <ElementID>PFD-GirXDnE4Mj4CHrI5</ElementID>)
+        3) set the innerText of the tag Label as the Label property from the elment of the new array
+        (e.g., <Label>pfd1</Label>)
 
+        I'll save the following, and simply make it <Expanded>True</Expanded>. This is gonna save a lot of calculation.
+        4) Search for the element in the  
+            v8 file's ProjectCollection.External_Objects.OpenProjectView.TreeItem 
+            whereby the property ID matches the ID property from the element 
+            of the new array. 
+            For such a TreeItem Element, get the attribute IsExpanded, change from lower case
+            to proper case (e.g., 'true' to 'True'), and set as textContent of the tag Expanded.
+        (e.g., <Expanded>True</Expanded>) 
+     */
+
+    PFDComponentTypes_arr.forEach(d => {
+        let theID = d.id, theLabel = d.label
+        // make xml str for the EGTreeNode PFD element 
+        let EGTreeNode_PFD_xmlstr = `
+            <EGTreeNode>
+                <NodeType>NODETYPE_ELEMENT</NodeType>
+                <ElementID>${theID}</ElementID>
+                <Label>${theLabel}</Label>
+                <Expanded>True</Expanded>
+            </EGTreeNode>
+                `
+        let EGTreeNode_PFD_dom_obj = $(EGTreeNode_PFD_xmlstr)
+        // *** append the PFD dom into ProjectTreeView_dom_obj
+        ProjectTreeView_dom_obj.append(EGTreeNode_PFD_dom_obj)
+
+    }) // PFDComponentTypes_arr.forEach
+
+    // *** make a dict to identify the PFD according to their PFDID
+    // because for the following, the nontask and task EGTreeNode elements should be appended to the corresponding PDF EGTreeNode
+    let PFDEGTreeNodes_doms_dict = {}
+
+    let PFDEGTreeNodes_doms_obj = ProjectTreeView_dom_obj.find('EGTreeNode')
+    // the finding above may contain EGTreeNode elements that are not for PFD
+    // therefore the following loop is used to select those for PFD and save into the dict
+    for (let i = 0; i < PFDEGTreeNodes_doms_obj.length; i++) {
+        // get the ID of the EGTreeNode
+        let thePFDID = $(PFDEGTreeNodes_doms_obj[i]).find('ElementID')[0].textContent
+        // The following is to check and match the pfd EGTreeNode elements
+        if (PFDIDs_arr.includes(thePFDID)) {
+            PFDEGTreeNodes_doms_dict[thePFDID] = $(PFDEGTreeNodes_doms_obj[i])
+        } // if (PFDIDs_arr.includes(thePFDID))
+    } //EGTreeNodes_doms_obj  
+
+    //*** loop and make nonTaskEGTreeNode elements and append into nonTaskEGTreeNodeContainer_dom_obj*/
+    for (let i = 0; i < NonTaskComponents_arr.length; i++) {
+        let d = NonTaskComponents_arr[i],
+            theNonTaskID = d.id, theNonTaskLabel = d.label, thePFDContainer_dom_obj = PFDEGTreeNodes_doms_dict[d.container]
+        // // append the nonTaskEGTreeNodeContainer_dom_obj into the PFDContainer (only append for once)
+        // if (i === 0) {            
+        //     nonTaskEGTreeNodeContainer_objs_dict[d.container] = $('<EGTreeNode></EGTreeNode>')
+        //     thePFDContainer_dom_obj.append(nonTaskEGTreeNodeContainer_objs_dict[d.container])
+        //  } // if (i===0)
+        
+        // make xml str for the EGTreeNode nonTask element (see __f00a)
+        /**
+         1) <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
+            2) set the innerText of the tag ElementID as the ID property from the element of the new array
+            (e.g., <ElementID>ShortCutToFile-frOMCUhUHcJWJKeO</ElementID>)
+            3) set the innerText of the tag Label as the Label property from the elment of the new array
+            (e.g., <Label>pfd1</Label>)
+            4) <Expanded>True</Expanded> (fixed)
+         */
+        let EGTreeNode_nonTask_xmlstr = `
+            <EGTreeNode>
+                <NodeType>NODETYPE_ELEMENT</NodeType>
+                <ElementID>${theNonTaskID}</ElementID>
+                <Label>${theNonTaskLabel}</Label>
+                <Expanded>False</Expanded>
+            </EGTreeNode>
+                `
+        let EGTreeNode_nonTask_obj = $(EGTreeNode_nonTask_xmlstr)
+        // *** append the nonTask dom into ProjectTreeView_dom_obj
+        thePFDContainer_dom_obj.append(EGTreeNode_nonTask_obj)
+
+    } // for (let i = 0; i < NonTaskComponents_arr.length; i++)
+
+    // *** append the taskEGTreeNode elements
+    // need to create the dict so that a TaskEGTreeNodeContainer_obj is dedicated for a PFD (PFDID as the key for the nonTaskEGTreeNodeContainer_obj)
+    // that way, the dedicated PFDEGTreeNodes_doms_obj can be used to append nonTask EGTreeNode elements to the corresponding PFD without messing up
+    let TaskEGTreeNodeContainer_objs_dict ={}
+    //*** loop and make TaskEGTreeNode elements and append into TaskEGTreeNodeContainer_dom_obj*/
+    for (let i = 0; i < TaskComponents_arr.length; i++) {
+        let d = TaskComponents_arr[i],
+            theTaskID = d.id, theTaskLabel = d.label, thePFDContainer_dom_obj = PFDEGTreeNodes_doms_dict[d.container]
+        // append the TaskEGTreeNodeContainer_dom_obj into the PFDContainer (only append once)
+        if (i === 0) {            
+            TaskEGTreeNodeContainer_objs_dict[d.container] = $('<EGTreeNode><NodeType>NODETYPE_PROGRAMFOLDER</NodeType><Expanded>True</Expanded><Label>Programs</Label></EGTreeNode>')
+            thePFDContainer_dom_obj.append(TaskEGTreeNodeContainer_objs_dict[d.container])
+         } // if (i===0)
+        
+        // *** make xml str for the EGTreeNode nonTask element (see __f00b)
+        /***
+         1) <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
+            2) set the innerText of the tag ElementID as the ID property from the element of the new array
+            (e.g., <ElementID>ShortCutToFile-frOMCUhUHcJWJKeO</ElementID>)
+            3) set the innerText of the tag Label as the Label property from the elment of the new array
+            (e.g., <Label>pfd1</Label>)
+            4) <Expanded>False</Expanded> (fixed)
+         */
+        let EGTreeNode_Task_xmlstr = `
+            <EGTreeNode>
+                <NodeType>NODETYPE_ELEMENT</NodeType>
+                <ElementID>${theTaskID}</ElementID>
+                <Label>${theTaskLabel}</Label>
+                <Expanded>False</Expanded>
+            </EGTreeNode>
+                `
+        let EGTreeNode_Task_obj = $(EGTreeNode_Task_xmlstr)
+        // *** append the nonTask dom into ProjectTreeView_dom_obj
+        TaskEGTreeNodeContainer_objs_dict[d.container].append(EGTreeNode_Task_obj)
+
+    } // for (let i = 0; i < NonTaskComponents_arr.length; i++)
+
+    // *** in the .ProcessFlowView, add a Graphics element
+    let Graphics_dom_obj = $('<Graphics></Graphics>')
+    //*** append Graphics_dom_obj to ProcessFlowView_dom_obj */
+    ProcessFlowView_dom_obj.append(Graphics_dom_obj)
+
+    // from the v8 obj, get TaskGraphic elements and append into Graphics_dom_obj (see __f01)
+    let TaskGraphic_doms_obj_v8 = jquery_dom_obj_v8.find("TaskGraphic")
+    let TaskGraphic_doms_obj_v8_clone = TaskGraphic_doms_obj_v8.clone()
+    Graphics_dom_obj.append(TaskGraphic_doms_obj_v8_clone)
+
+    // from the v8 obj, get NoteGraphic elements and append into Graphics_dom_obj (see __f02)
+    let NoteGraphic_doms_obj_v8 = jquery_dom_obj_v8.find("NoteGraphic")
+    let NoteGraphic_doms_obj_v8_clone = NoteGraphic_doms_obj_v8.clone()
+    Graphics_dom_obj.append(NoteGraphic_doms_obj_v8_clone)
+
+    // console.log(jquery_dom_obj_v7.prop("outerHTML"))
+    // save the xmlstr into a text file as ../data/out/
+    let converted_v7_xmlstr = jquery_dom_obj_v7.prop("outerHTML")
+    // change  <Table123> back to <table>
+    converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<table123\>/g, "<table>")
+    converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<\/table123\>/g, "</table>")
+    await mymodules.saveLocalTxtFile(converted_v7_xmlstr, thetargetxml, 'utf16le');
 })()
 
 // as the function name says....
