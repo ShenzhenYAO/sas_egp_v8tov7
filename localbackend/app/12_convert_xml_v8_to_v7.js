@@ -9,8 +9,8 @@ const { window } = new jsdom.JSDOM(`...`);
 var $ = require("jquery")(window);
 
 // const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_1note_1copytask.xml';
-const thesrcxml = 'data/out/test/project_v8.xml';
-const thetargetxml = 'data/out/test/v8_to_v7.xml';
+const thesrcxml = 'data/in/do_not_git/sample0_v8.xml';
+const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
 (async () => {
 
     // read the xml into a dom object
@@ -24,6 +24,51 @@ const thetargetxml = 'data/out/test/v8_to_v7.xml';
     // *** convert the cleaned xml str to a DOM (like <PROJECTCOLLECTION>...</PROJECTCOLLECTION>)
     let jquery_dom_obj_v8 = $(thesrcxmlstr_cleaned)
     // console.log(jquery_dom_obj_v8.prop('outerHTML').substr(0, 200))
+
+    /*** make a list of tagNames (in lowercase), and a list of attribute names
+        jquery normalize tagNames (to upper case) and attribute names (to lower case).
+        Most xml interpreters is not case sensitve to tagnamess and attribute names
+        However, this is not the case for SAS EG!
+        The following is to map the tagnames and attribute names (original case form vs normalized case form)
+        so that later (after the v7 xml convertion is done), the normalized names are restored to original case form
+    */
+    let TagAttrNames_obj= getTagAttrNames(jquery_dom_obj_v8)
+    // console.log(TagAttrNames_obj)
+
+    function getTagAttrNames(doms) {
+        let tagNames_arr = ["containerelement", "containertype"], attrNames_arr = ["usesubcontainers"] //ContainerElement, UseSubcontainers is unique in v7
+        for (let i = 0; i < doms.length; i++) {
+            let thedom = doms[i]
+            let theTagName = thedom.tagName
+            if (!tagNames_arr.includes(theTagName)) { tagNames_arr.push(theTagName) }
+            let attrs = thedom.attributes
+            // console.log(attrs)
+            if (attrs) {
+                for (let j = 0; j < attrs.length; j++) {
+                    let theAttrName = attrs[j].nodeName
+                    // console.log(theAttrName)
+                    if (!attrNames_arr.includes(theAttrName)) { attrNames_arr.push(theAttrName) }
+                } //for (let j = 0; j < attrs.length; j++)
+            } //if (attrs)
+
+            // recursion for children nodes
+            if (thedom.children && thedom.children.length > 0) {
+                let tmp = getTagAttrNames(thedom.children)
+                if (tmp && tmp.tagnames && tmp.tagnames.length > 0) {
+                    tmp.tagnames.forEach(d => {
+                        if (!tagNames_arr.includes(d)) { tagNames_arr.push(d) }
+                    })
+                }
+                if (tmp && tmp.attrnames && tmp.attrnames.length > 0) {
+                    tmp.attrnames.forEach(d => {
+                        if (!attrNames_arr.includes(d)) { attrNames_arr.push(d) }
+                    })
+                }
+            }
+        } //for (let i = 1; i< doms_obj.length
+        return { tagnames: tagNames_arr, attrnames: attrNames_arr }
+    }//
+
 
     // the jsdom_obj is like jQuery { '0': HTMLUnknownElement {}, length: 1 }
     // let thesrcxmldom_v8 = jquery_dom_obj_v8[0]
@@ -79,7 +124,7 @@ const thetargetxml = 'data/out/test/v8_to_v7.xml';
     // that way, once the projectLabel_dom_v7 changes, the whole jquery_dom_obj_v7 changes
     let projectLabel_dom_v7 = jquery_dom_obj_v7.find("element").find("label")
     // console.log(projectLabel_dom_v7.prop("outerHTML"))
-    projectLabel_dom_v7.text("v7_converted_from_v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_1note_1copytask")
+    projectLabel_dom_v7.text("v8_to_v7")
     // // console.log(projectLabel_dom_v7.text())
     // console.log(jquery_dom_obj_v7.prop("outerHTML"))
     // console.log(jquery_dom_obj_v8.prop('outerHTML').substr(0, 200))
@@ -177,6 +222,20 @@ const thetargetxml = 'data/out/test/v8_to_v7.xml';
             $(theComponent_elm).attr("type", "SAS.EG.ProjectElements.PFD")
             PFDIDs_arr.push(theID_str)
             PFDComponentTypes_arr.push({ type: "SAS.EG.ProjectElements.PFD", label: theLabel_str, id: theID_str, container: theContainerID_str })
+            // *** also append the ContainerElement tag as the second child of the PFD Element
+            // make a clone of the exsting children nodes (i.e., the element and the pfd tags)
+            let PFDElementChildren_clone = $(theComponent_elm.children).clone()
+            // empty children nodes of the PFD element
+            $(theComponent_elm).empty()
+            // hard code to append the existing children back, and insert the containerelement (unique in v7) as the second child
+            //1. append the child <element>
+            $(theComponent_elm).append($(PFDElementChildren_clone[0]))
+            //2. append the newly added containerelement
+            let ContainerElement_dom_obj = $("<ContainerElement><ContainerType>ProcessFlow</ContainerType></ContainerElement>")
+            $(theComponent_elm).append(ContainerElement_dom_obj)
+            //3. append the existing child <pfd>
+            $(theComponent_elm).append($(PFDElementChildren_clone[1]))
+        
         } else if ( //*** the nonTask components do not includes Log , last submitted code, shortcut to data, link, and odsresult
             theType_str !== "SAS.EG.ProjectElements.Log" &&
             theType_str !== "SAS.EG.ProjectElements.Code" &&
@@ -195,14 +254,14 @@ const thetargetxml = 'data/out/test/v8_to_v7.xml';
 
     // *** create an Empty External_Objects and append to the v7 obj
     let External_Objects_dom_obj = $("<External_Objects></External_Objects>")
-    External_Objects_dom_obj.attr("EGVersion", "7.1")
-    External_Objects_dom_obj.attr("Type", "SAS.EG.ProjectElements.ProjectCollection")
 
     // *** append the External_Objects_dom_obj to the v7 obj
     jquery_dom_obj_v7.append(External_Objects_dom_obj)
 
     // *** within External_Objects_dom_obj, add a tag ProjectTreeView
     let ProjectTreeView_dom_obj = $("<ProjectTreeView></ProjectTreeView>")
+    ProjectTreeView_dom_obj.attr("EGVersion", "7.1")
+    ProjectTreeView_dom_obj.attr("UseSubcontainers", "True")
     External_Objects_dom_obj.append(ProjectTreeView_dom_obj)
     // wired, this time, the xml of ProjectTreeView_dom_obj was not removed after appending
     // console.log(ProjectTreeView_dom_obj.parent().prop("outerHTML"))
@@ -277,7 +336,7 @@ const thetargetxml = 'data/out/test/v8_to_v7.xml';
         //     nonTaskEGTreeNodeContainer_objs_dict[d.container] = $('<EGTreeNode></EGTreeNode>')
         //     thePFDContainer_dom_obj.append(nonTaskEGTreeNodeContainer_objs_dict[d.container])
         //  } // if (i===0)
-        
+
         // make xml str for the EGTreeNode nonTask element (see __f00a)
         /**
          1) <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
@@ -304,17 +363,17 @@ const thetargetxml = 'data/out/test/v8_to_v7.xml';
     // *** append the taskEGTreeNode elements
     // need to create the dict so that a TaskEGTreeNodeContainer_obj is dedicated for a PFD (PFDID as the key for the nonTaskEGTreeNodeContainer_obj)
     // that way, the dedicated PFDEGTreeNodes_doms_obj can be used to append nonTask EGTreeNode elements to the corresponding PFD without messing up
-    let TaskEGTreeNodeContainer_objs_dict ={}
+    let TaskEGTreeNodeContainer_objs_dict = {}
     //*** loop and make TaskEGTreeNode elements and append into TaskEGTreeNodeContainer_dom_obj*/
     for (let i = 0; i < TaskComponents_arr.length; i++) {
         let d = TaskComponents_arr[i],
             theTaskID = d.id, theTaskLabel = d.label, thePFDContainer_dom_obj = PFDEGTreeNodes_doms_dict[d.container]
         // append the TaskEGTreeNodeContainer_dom_obj into the PFDContainer (only append once)
-        if (i === 0) {            
+        if (i === 0) {
             TaskEGTreeNodeContainer_objs_dict[d.container] = $('<EGTreeNode><NodeType>NODETYPE_PROGRAMFOLDER</NodeType><Expanded>True</Expanded><Label>Programs</Label></EGTreeNode>')
             thePFDContainer_dom_obj.append(TaskEGTreeNodeContainer_objs_dict[d.container])
-         } // if (i===0)
-        
+        } // if (i===0)
+
         // *** make xml str for the EGTreeNode nonTask element (see __f00b)
         /***
          1) <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
@@ -353,12 +412,36 @@ const thetargetxml = 'data/out/test/v8_to_v7.xml';
     let NoteGraphic_doms_obj_v8_clone = NoteGraphic_doms_obj_v8.clone()
     Graphics_dom_obj.append(NoteGraphic_doms_obj_v8_clone)
 
+    // *** create an element Containers
+    let Containers_dom_obj = $('<Containers></Containers>')
+    //  within Containers, add Properties, each for a PFD
+    PFDComponentTypes_arr.forEach(d => {
+        let theID = d.id
+        // make xml str for the EGTreeNode PFD element 
+        let Properties_PFD_xmlstr = `
+            <Properties>
+                <ID>${theID}</ID>
+                <BackgroundColor>Default</BackgroundColor>
+                <Align>AlignTop</Align>
+            </Properties>
+                `
+        let Properties_PFD_dom_obj = $(Properties_PFD_xmlstr)
+        // *** append the Properties_PFD_dom_obj into Containers_dom_obj
+        Containers_dom_obj.append(Properties_PFD_dom_obj)
+
+    }) // PFDComponentTypes_arr.forEach
+    // *** after ProjectCollection.External_Objects.ProcessFlowView.Graphics
+    // append the Containers_dom_obj
+    ProcessFlowView_dom_obj.append(Containers_dom_obj)
+    
+
     // console.log(jquery_dom_obj_v7.prop("outerHTML"))
     // save the xmlstr into a text file as ../data/out/
     let converted_v7_xmlstr = jquery_dom_obj_v7.prop("outerHTML")
     // change  <Table123> back to <table>
     converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<table123\>/g, "<table>")
     converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<\/table123\>/g, "</table>")
+    converted_v7_xmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + converted_v7_xmlstr
     await mymodules.saveLocalTxtFile(converted_v7_xmlstr, thetargetxml, 'utf16le');
 })()
 
