@@ -8,14 +8,14 @@ const jsdom = require("jsdom");
 const { window } = new jsdom.JSDOM(`...`);
 var $ = require("jquery")(window);
 
-// const thesrcxml = 'data/try/v8_2pfd_3p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_1note_1copytask.xml';
-const thesrcxml = 'data/in/do_not_git/sample0_v8.xml';
-const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
-(async () => {
+// const thesrcxmlfile = 'data/in/do_not_git/sample0_v8.xml';
+const thesrcxmlfile = 'data/try/v8_2pfd_4p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_3note_3copytask.xml';
 
+const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
+(async () => {
     // read the xml into a dom object
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxml, encoding);
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
     // console.log(thesrcxmlstr.substr(0, 100))
     thebodyxmlstr = thesrcxmlstr.split('encoding="utf-16"?>')[1]
     let thesrcxmlstr_cleaned = cleanxmlstr(thebodyxmlstr)
@@ -24,51 +24,6 @@ const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
     // *** convert the cleaned xml str to a DOM (like <PROJECTCOLLECTION>...</PROJECTCOLLECTION>)
     let jquery_dom_obj_v8 = $(thesrcxmlstr_cleaned)
     // console.log(jquery_dom_obj_v8.prop('outerHTML').substr(0, 200))
-
-    /*** make a list of tagNames (in lowercase), and a list of attribute names
-        jquery normalize tagNames (to upper case) and attribute names (to lower case).
-        Most xml interpreters is not case sensitve to tagnamess and attribute names
-        However, this is not the case for SAS EG!
-        The following is to map the tagnames and attribute names (original case form vs normalized case form)
-        so that later (after the v7 xml convertion is done), the normalized names are restored to original case form
-    */
-    let TagAttrNames_obj= getTagAttrNames(jquery_dom_obj_v8)
-    // console.log(TagAttrNames_obj)
-
-    function getTagAttrNames(doms) {
-        let tagNames_arr = ["containerelement", "containertype"], attrNames_arr = ["usesubcontainers"] //ContainerElement, UseSubcontainers is unique in v7
-        for (let i = 0; i < doms.length; i++) {
-            let thedom = doms[i]
-            let theTagName = thedom.tagName
-            if (!tagNames_arr.includes(theTagName)) { tagNames_arr.push(theTagName) }
-            let attrs = thedom.attributes
-            // console.log(attrs)
-            if (attrs) {
-                for (let j = 0; j < attrs.length; j++) {
-                    let theAttrName = attrs[j].nodeName
-                    // console.log(theAttrName)
-                    if (!attrNames_arr.includes(theAttrName)) { attrNames_arr.push(theAttrName) }
-                } //for (let j = 0; j < attrs.length; j++)
-            } //if (attrs)
-
-            // recursion for children nodes
-            if (thedom.children && thedom.children.length > 0) {
-                let tmp = getTagAttrNames(thedom.children)
-                if (tmp && tmp.tagnames && tmp.tagnames.length > 0) {
-                    tmp.tagnames.forEach(d => {
-                        if (!tagNames_arr.includes(d)) { tagNames_arr.push(d) }
-                    })
-                }
-                if (tmp && tmp.attrnames && tmp.attrnames.length > 0) {
-                    tmp.attrnames.forEach(d => {
-                        if (!attrNames_arr.includes(d)) { attrNames_arr.push(d) }
-                    })
-                }
-            }
-        } //for (let i = 1; i< doms_obj.length
-        return { tagnames: tagNames_arr, attrnames: attrNames_arr }
-    }//
-
 
     // the jsdom_obj is like jQuery { '0': HTMLUnknownElement {}, length: 1 }
     // let thesrcxmldom_v8 = jquery_dom_obj_v8[0]
@@ -235,7 +190,7 @@ const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
             $(theComponent_elm).append(ContainerElement_dom_obj)
             //3. append the existing child <pfd>
             $(theComponent_elm).append($(PFDElementChildren_clone[1]))
-        
+
         } else if ( //*** the nonTask components do not includes Log , last submitted code, shortcut to data, link, and odsresult
             theType_str !== "SAS.EG.ProjectElements.Log" &&
             theType_str !== "SAS.EG.ProjectElements.Code" &&
@@ -271,8 +226,8 @@ const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
     External_Objects_dom_obj.append(ProcessFlowView_dom_obj)
     // console.log(ProcessFlowView_dom_obj.prop("outerHTML"))
 
-    // *** within External_Objects_dom_obj, add a tag MainFrom
-    let MainFrom_dom_obj = $("<MainFrom><ActiveData></ActiveData></MainFrom>")
+    // *** within External_Objects_dom_obj, add a tag MainForm
+    let MainFrom_dom_obj = $("<MainForm><ActiveData></ActiveData></MainForm>")
     External_Objects_dom_obj.append(MainFrom_dom_obj)
     // console.log(MainFrom_dom_obj.prop("outerHTML"))
 
@@ -301,8 +256,8 @@ const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
             <EGTreeNode>
                 <NodeType>NODETYPE_ELEMENT</NodeType>
                 <ElementID>${theID}</ElementID>
-                <Label>${theLabel}</Label>
                 <Expanded>True</Expanded>
+                <Label>${theLabel}</Label>
             </EGTreeNode>
                 `
         let EGTreeNode_PFD_dom_obj = $(EGTreeNode_PFD_xmlstr)
@@ -350,8 +305,8 @@ const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
             <EGTreeNode>
                 <NodeType>NODETYPE_ELEMENT</NodeType>
                 <ElementID>${theNonTaskID}</ElementID>
-                <Label>${theNonTaskLabel}</Label>
                 <Expanded>False</Expanded>
+                <Label>${theNonTaskLabel}</Label>
             </EGTreeNode>
                 `
         let EGTreeNode_nonTask_obj = $(EGTreeNode_nonTask_xmlstr)
@@ -387,8 +342,8 @@ const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
             <EGTreeNode>
                 <NodeType>NODETYPE_ELEMENT</NodeType>
                 <ElementID>${theTaskID}</ElementID>
-                <Label>${theTaskLabel}</Label>
                 <Expanded>False</Expanded>
+                <Label>${theTaskLabel}</Label>                
             </EGTreeNode>
                 `
         let EGTreeNode_Task_obj = $(EGTreeNode_Task_xmlstr)
@@ -433,17 +388,181 @@ const thetargetxml = 'data/out/test/sample0_v8_to_v7.xml';
     // *** after ProjectCollection.External_Objects.ProcessFlowView.Graphics
     // append the Containers_dom_obj
     ProcessFlowView_dom_obj.append(Containers_dom_obj)
-    
+
 
     // console.log(jquery_dom_obj_v7.prop("outerHTML"))
     // save the xmlstr into a text file as ../data/out/
     let converted_v7_xmlstr = jquery_dom_obj_v7.prop("outerHTML")
+
+    /*** make a list of tagNames (in lowercase), and a list of attribute names
+        jquery normalize tagNames (to upper case) and attribute names (to lower case).
+        Most xml interpreters is not case sensitve to tagnamess and attribute names
+        However, this is not the case for SAS EG!
+        The following is to map the tagnames and attribute names (original case form vs normalized case form)
+        so that later (after the v7 xml convertion is done), the normalized names are restored to original case form
+    */
+
+    // for Each normalized tag name, find its original case form according to originalTagnames_arr and originalAttrNames_arr
+    // in the original text, search for the existing tagnames that matches the normalized tagnames
+    // the idea is to find tagnames in the pattern of </Tagname> or <Tagname />
+    // this should be completed for both normal and self-closing tags!
+    // note: the original tag 'Table' has been converted to 'Table123'
+
+    let originalTagnames_dict = getOriginalTagNames_dict(thesrcxmlstr_cleaned)
+    let originalAttrNames_dict = getOriginalAttrNames_dict(thesrcxmlstr_cleaned)
+    // console.log(originalTagnames_dict)
+    // console.log(originalAttrNames_dict)
+
+    let additional_v7tag_dict={
+        "CONTAINERELEMENT":"ContainerElement",
+        "CONTAINERTYPE":"ContainerType",
+        "PROJECTTREEVIEW":"ProjectTreeView",
+        "EGTREENODE":"EGTreeNode",
+        "NODETYPE":"NodeType",
+        "ELEMENTID":"ElementID",
+        "EXPANDED":"Expanded",
+        "PROCESSFLOWVIEW":"ProcessFlowView",
+        "GRID":"Grid",
+        "LAYOUT":"Layout",
+        "GRAPHICS":"Graphics",
+        "PROPERTIES":"Properties",
+        "BACKGROUNDCOLOR":"BackgroundColor",
+        "MAINFORM":"MainForm",
+        "ACTIVEDATA":"ActiveData"
+    } //
+
+    // merge the tagname_dicts
+    let Tagnames_dict = {...additional_v7tag_dict, ...originalTagnames_dict }
+
+    let additional_v7attr_dict={"usesubcontainers":"UseSubcontainers",}
+    let Attrnames_dict = {...additional_v7attr_dict, ...originalAttrNames_dict }    
+    // console.log(Tagnames_dict)
+    // console.log(Attrnames_dict)
+
+    // in converted_v7_xmlstr, the tagnames and attr names are all in lowcase.
+    // This will cause error for SAS EG to interpret (SAS EG only recognize tag and attr names in the original case form, e.g., EGVersion is recognized, egversion is not)
+    // The following is to restore to origanl tag and attr case forms
+    
+
+    Object.keys(Tagnames_dict).forEach(d=>{
+        let theoriginal = Tagnames_dict[d]
+        let regEx_normalized1 = new RegExp('\<'+d.toLowerCase()+'\x20', 'g')
+        let regEx_normalized2 = new RegExp('\<'+d.toLowerCase()+'\>', 'g')
+        let regEx_normalized3 = new RegExp('\<\/'+d.toLowerCase()+'>', 'g')
+        converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized1, '<' + theoriginal+' ')
+        converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized2, '<' + theoriginal+'>')
+        converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized3, '</' + theoriginal+'>')
+    })
+
+    Object.keys(Attrnames_dict).forEach(d=>{
+        let theoriginal = Attrnames_dict[d]
+        // console.log(theoriginal)
+        let regEx_normalized1 = new RegExp(d.toLowerCase()+'=', 'g')
+        converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized1, theoriginal+'=')
+    })
+
     // change  <Table123> back to <table>
-    converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<table123\>/g, "<table>")
-    converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<\/table123\>/g, "</table>")
+    converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<Table123\>/g, "<Table>")
+    converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<\/Table123\>/g, "</Table>")
     converted_v7_xmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + converted_v7_xmlstr
-    await mymodules.saveLocalTxtFile(converted_v7_xmlstr, thetargetxml, 'utf16le');
+    await mymodules.saveLocalTxtFile(converted_v7_xmlstr, thetargetxmlfile, 'utf16le');
+    console.log("done")
 })()
+// get a dict of attribute names in original case form like {"egversion":"EGversion"} (key is the normalized attribute name)
+function getOriginalAttrNames_dict(thexhmlstr) {
+    let orignalAttrnames_dict={}
+    // get strings between ' ' and '='
+    // the matchAll returns all instances match a regexpress pattern, note: must use /g to indicate for repeating search
+    // the '...' in [... blabla] is to join the found instances into an array
+    // e.g., find all matched instances and join them into the array matched_arr1
+    // the regular express fails to identify strings betwen a white space and something
+    // for example: <ProjectCollection EGVersion="8.1" Type="...">
+    // the expected matched strs are EGVersion=, and Type=
+    // however, the match returns ProjectCollection EGVersion="8.1" Type= (two attributes are messed up in a single match result)
+    // let matched_arr1 = [...thexhmlstr.matchAll(/\<(.*)=/g)]
+    // To avoid it, thexhmlstr is splitted into segments by ' '
+    let thexhmlstr_segs = thexhmlstr.split(' ')
+    // that way, the EGVersion="8.1" Type= are splitted into separate segments
+    // next, split each segment by = (if there is a = in the str) and select the first element of the split (e.g., for 'EGVersion="8.1"', the first element of the split is 'EGVersion')
+
+    thexhmlstr_segs.forEach(d => {
+        if (d.includes('=')) {
+            let theAttrName = d.split('=')[0]
+            if (!Object.keys(orignalAttrnames_dict).includes(theAttrName.toLowerCase())) { 
+                orignalAttrnames_dict[theAttrName.toLowerCase()] = theAttrName
+            }
+        }
+    }) // thexhmlstr_segs.forEach
+
+    return orignalAttrnames_dict
+} // function getOriginalTagNames(thexhmlstr)
+;
+// get a list of tagnames in original case form
+function getOriginalTagNames_dict(thexhmlstr) {
+
+    let orignalTagnames_dict = {}
+    // get strings between '</' and '>', or between '<' and '/>'
+    // the matchAll returns all instances match a regexpress pattern, note: must use /g to indicate for repeating search
+    // the '...' in [... blabla] is to join the found instances into an array
+    // e.g., find all matched instances and join them into the array matched_arr1
+    let matched_arr1 = [...thexhmlstr.matchAll(/\<\/(.*)\>/g)]
+    // console.log("line503", matched_arr1[0])
+    let matched_arr2 = [...thexhmlstr.matchAll(/\<(.*) \/\>/g)]
+    // console.log("matched_arr1", matched_arr1.length)
+    // console.log("matched_arr2", matched_arr2)
+    /** each element of the array is like the following, in which the second element is the text of the origianl tagname
+        ['<Tag6 />','Tag6', ...]
+    */
+    // the following is to push such a second element into the final arr with distinct tagNames
+    matched_arr1.forEach(d => {
+        // console.log(d[1])
+        let theTag = d[1]
+        if (!Object.keys(orignalTagnames_dict).includes(theTag.toUpperCase())) {
+            orignalTagnames_dict[theTag.toUpperCase()]=theTag
+        }
+    })
+    matched_arr2.forEach(d => {
+        let theTag = d[1]
+        if (!Object.keys(orignalTagnames_dict).includes(theTag.toUpperCase())) {
+            orignalTagnames_dict[theTag.toUpperCase()]=theTag
+        }
+    })
+    return orignalTagnames_dict
+} // function getOriginalTagNames(thexhmlstr)
+// get the tag and attribute names and save into an obj {tagnames[], attrnames[]}
+function getTagAttrNames(doms) {
+    let tagNames_arr = ["containerelement", "containertype"], attrNames_arr = ["usesubcontainers"] //ContainerElement, UseSubcontainers is unique in v7
+    for (let i = 0; i < doms.length; i++) {
+        let thedom = doms[i]
+        let theTagName = thedom.tagName
+        if (!tagNames_arr.includes(theTagName)) { tagNames_arr.push(theTagName) }
+        let attrs = thedom.attributes
+        // console.log(attrs)
+        if (attrs) {
+            for (let j = 0; j < attrs.length; j++) {
+                let theAttrName = attrs[j].nodeName
+                // console.log(theAttrName)
+                if (!attrNames_arr.includes(theAttrName)) { attrNames_arr.push(theAttrName) }
+            } //for (let j = 0; j < attrs.length; j++)
+        } //if (attrs)
+
+        // recursion for children nodes
+        if (thedom.children && thedom.children.length > 0) {
+            let tmp = getTagAttrNames(thedom.children)
+            if (tmp && tmp.tagnames && tmp.tagnames.length > 0) {
+                tmp.tagnames.forEach(d => {
+                    if (!tagNames_arr.includes(d)) { tagNames_arr.push(d) }
+                })
+            }
+            if (tmp && tmp.attrnames && tmp.attrnames.length > 0) {
+                tmp.attrnames.forEach(d => {
+                    if (!attrNames_arr.includes(d)) { attrNames_arr.push(d) }
+                })
+            }
+        }
+    } //for (let i = 1; i< doms_obj.length
+    return { tagnames: tagNames_arr, attrnames: attrNames_arr }
+}//
 
 // as the function name says....
 function append_cloned_components_of_the_first_dom_found_by_tagname(srcobj, targetobj, theTag) {
@@ -458,9 +577,13 @@ function append_cloned_components_of_the_first_dom_found_by_tagname(srcobj, targ
 // clean up the xmlstr
 function cleanxmlstr(thexmlstr) {
 
+    // to cleanup the nonprintable chars
+    // let thexmlstr_remove_nonprintable = thexmlstr.replace(/[^\x20-\x7E\s\S]+/g, "")
+    let thexmlstr_remove_nonprintable =thexmlstr
+
     // the xmlstr is messed up with strange chars like &amp;lt; &lt;, etc
     // 1. The following is to change &amp;lt to <, &gt to > ...
-    let thesrcxmlstr_ampersand_code_normalized = normalize_ampersand_code(thexmlstr)
+    let thesrcxmlstr_ampersand_code_normalized = normalize_ampersand_code(thexmlstr_remove_nonprintable)
 
     // jsdom does not handle the tag <Table>A</Table> well
     // In that case, it alters the html to '<Table></Table>A' !
@@ -517,11 +640,15 @@ function convertSelfClosingHTML_to_OldSchoolHTML(str) {
     // console.log(matched_arr)
     if (matched_arr && matched_arr.length > 0) {
         let seg1 = matched_arr[1].split('<')
+        // sometimes the lastmatchedstr is like GitSourceControl GUID="x2K5fW8CFtZy3Ke7"
+        // in that case, the part after the first whitespace (GUID="x2K5fW8CFtZy3Ke7") should be excluded 
         let theLastMatchedStr = seg1[seg1.length - 1]
-        // console.log(theLastMatchedStr)    
+        // console.log(theLastMatchedStr)
+        let theLastMatchedStr_tagName = theLastMatchedStr.split(' ')[0]
+        // console.log(theLastMatchedStr_tagName)
         // replace <Others /> with <Others></<Others />
         let xhtmlstr = "<" + theLastMatchedStr + " />"
-        let htmlstr = "<" + theLastMatchedStr + ">" + "</" + theLastMatchedStr + ">"
+        let htmlstr = "<" + theLastMatchedStr + ">" + "</" + theLastMatchedStr_tagName + ">"
         str = str.replace(xhtmlstr, htmlstr)
         let matched_arr2 = str.match(/\<(.*) \/\>/)
         if (matched_arr && matched_arr.length > 0) {

@@ -1,6 +1,8 @@
 Source for showing xml nodes:
 https://jsonformatter.org/xml-viewer 
 
+1. copy and replace by 
+<GitSourceControl GUID="x2K5fW8CFtZy3Ke7"></GitSourceControl>
 
 
 Remaining issues:
