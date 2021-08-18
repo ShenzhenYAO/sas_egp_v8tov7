@@ -1,29 +1,9 @@
-<external_objects egversion="7.1" type="SAS.EG.ProjectElements.ProjectCollection">
-    <projecttreeview>
-        <egtreenode>
-            <nodetype>NODETYPE_ELEMENT</nodetype>
-            <elementid>PFD-GirXDnE4Mj4CHrI5</elementid>
-            <label>pfd1</label>
-            <expanded>True</expanded>
-            <egtreenode>
-                <ttt></ttt>
-                <egtreenode>
-                    <nodetype>NODETYPE_ELEMENT</nodetype>
-                    <elementid>ShortCutToData-dGoyvIraA6lVr3jS</elementid>
-                    <label>A</label>
-                    <expanded>True</expanded>
-                </egtreenode>
-            </egtreenode>
-        </egtreenode>
-        <egtreenode>
-            <nodetype>NODETYPE_ELEMENT</nodetype>
-            <elementid>PFD-6nSfH71ogEk2upEN</elementid>
-            <label>pfd2</label>
-            <expanded>True</expanded>
-        </egtreenode>
-    </projecttreeview>
-    <processflowview></processflowview>
-    <mainfrom>
-        <activedata></activedata>
-    </mainfrom>
-</external_objects>
+&lt;DNA>
+  &lt;Type>LocalFile&lt;/Type>
+  &lt;Name>sas.sas&lt;/Name>
+  &lt;Version>1&lt;/Version>
+  &lt;Assembly />
+  &lt;Factory />
+  &lt;FullPath>C:\Users\Z70\Desktop\sas.sas&lt;/FullPath>
+&lt;/DNA>
+    

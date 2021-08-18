@@ -10,23 +10,26 @@ const srcfolder = 'data/in/prototype/__xml/egpv8/';
 (async () => {
     // search between 
     let str =`
-    <Tag1>
-        <tAg2 attr="xx"></tAg2>
-        <tAg3 attr="yy"></tAg3>
-    </Tag1>
-    <Tag5 />
-    <Tag6 />
-        <Tag6 />
+    <DNA>&lt;DNA&gt;
+    &lt;Type&gt;LocalFile&lt;/Type&gt;
+    &lt;Name&gt;sas.sas&lt;/Name&gt;
+    &lt;Version&gt;1&lt;/Version&gt;
+    &lt;Assembly /&gt;
+    &lt;Factory /&gt;
+    &lt;FullPath&gt;C:\Users\Z70\Desktop\sas.sas&lt;/FullPath&gt;
+  &lt;/DNA&gt;</DNA>
     `
 
-    let matched_arr1 = [...str.matchAll(/\<\/(.*)\>/g)]
-    let matched_arr2 = [...str.matchAll(/\<(.*) \/\>/g)]
-    console.log("matched_arr1", matched_arr1)
-    console.log("matched_arr2", matched_arr2)
+    function htmlDecode(input){
+        var e = $('<textarea>')[0];
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+      }
+      
+      let xxx =htmlDecode(str); 
+      console.log(xxx)
 
-    // let str2 = 'test1test2'
-    // const array = [...str2.matchAll(/t(e)(st(\d?))/g)];
-    // console.log(array)
 })()
 
 

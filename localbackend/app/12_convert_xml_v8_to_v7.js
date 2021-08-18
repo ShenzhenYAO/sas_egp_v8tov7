@@ -9,9 +9,13 @@ const { window } = new jsdom.JSDOM(`...`);
 var $ = require("jquery")(window);
 
 // const thesrcxmlfile = 'data/in/do_not_git/sample0_v8.xml';
-const thesrcxmlfile = 'data/try/v8_2pfd_4p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_3note_3copytask.xml';
+// const thesrcxmlfile = 'data/try/v8_2pfd_4p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_3note_3copytask.xml';
+const thesrcxmlfile = 'data/out/test/sample4_v8.xml'
 
-const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
+// const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
+// const thetargetxmlfile = 'data/out/test/sample8_v8_to_v7.xml';
+const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
+
 (async () => {
     // read the xml into a dom object
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
@@ -318,13 +322,15 @@ const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
     // *** append the taskEGTreeNode elements
     // need to create the dict so that a TaskEGTreeNodeContainer_obj is dedicated for a PFD (PFDID as the key for the nonTaskEGTreeNodeContainer_obj)
     // that way, the dedicated PFDEGTreeNodes_doms_obj can be used to append nonTask EGTreeNode elements to the corresponding PFD without messing up
-    let TaskEGTreeNodeContainer_objs_dict = {}
+    let TaskEGTreeNodeContainer_objs_dict = {}, currentPFDID
     //*** loop and make TaskEGTreeNode elements and append into TaskEGTreeNodeContainer_dom_obj*/
     for (let i = 0; i < TaskComponents_arr.length; i++) {
         let d = TaskComponents_arr[i],
             theTaskID = d.id, theTaskLabel = d.label, thePFDContainer_dom_obj = PFDEGTreeNodes_doms_dict[d.container]
         // append the TaskEGTreeNodeContainer_dom_obj into the PFDContainer (only append once)
-        if (i === 0) {
+        // not i===0, rather, when the d.container (PFD ID changes)
+        if (currentPFDID !== d.container) {
+            currentPFDID = d.container
             TaskEGTreeNodeContainer_objs_dict[d.container] = $('<EGTreeNode><NodeType>NODETYPE_PROGRAMFOLDER</NodeType><Expanded>True</Expanded><Label>Programs</Label></EGTreeNode>')
             thePFDContainer_dom_obj.append(TaskEGTreeNodeContainer_objs_dict[d.container])
         } // if (i===0)
@@ -373,11 +379,12 @@ const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
     PFDComponentTypes_arr.forEach(d => {
         let theID = d.id
         // make xml str for the EGTreeNode PFD element 
+        // AlignTop for autoarrange of icons, AlignNone for not autoarrange
         let Properties_PFD_xmlstr = `
             <Properties>
                 <ID>${theID}</ID>
                 <BackgroundColor>Default</BackgroundColor>
-                <Align>AlignTop</Align>
+                <Align>AlignNone</Align>
             </Properties>
                 `
         let Properties_PFD_dom_obj = $(Properties_PFD_xmlstr)
@@ -408,8 +415,38 @@ const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
     // this should be completed for both normal and self-closing tags!
     // note: the original tag 'Table' has been converted to 'Table123'
 
-    let originalTagnames_dict = getOriginalTagNames_dict(thesrcxmlstr_cleaned)
-    let originalAttrNames_dict = getOriginalAttrNames_dict(thesrcxmlstr_cleaned)
+    let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(thesrcxmlstr_cleaned)
+    /**
+     // the function getOriginalTagNames_dict_crude merely identify the str like a tag note
+    // but not all such strings are attribute names. e.g., '<note!>' in submitted code <note!> the dat set need to be sorted first!
+    // therefore the getOriginalTagNames_dict_crude need to be matched with tag names obtained from the doms_obj
+    // those in  getOriginalTagNames_dict_crude but not in tagnames from the doms_obj should be removed
+     */
+    // console.log(originalTagnames_dict_crude)
+    let originalTagnames_dict = {};    
+    let TagAttrNames_v8_obj = getTagAttrNames(jquery_dom_obj_v8)
+    // console.log(TagAttrNames_v8_obj)
+    Object.keys(originalTagnames_dict_crude).forEach(d=>{
+        if (TagAttrNames_v8_obj.tagnames.includes(d)){
+            originalTagnames_dict[d]= originalTagnames_dict_crude[d]
+        }
+    })
+
+    let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(thesrcxmlstr_cleaned)
+    // the function getOriginalAttrNames_dict_crude merely identify a str before '='.
+    // but not all such strings are attribute names. e.g., some are part of the submitted code like 'a' in 'a=1;'
+    // therefore the originalAttrNames_dict_crude need to be matched with attribute names obtained from the doms_obj
+    // those in  originalAttrNames_dict_crude but not in attributenames from the doms_obj should be removed
+    let originalAttrNames_dict = {};    
+    // let TagAttrNames_v8_obj = getTagAttrNames(jquery_dom_obj_v8)
+    // console.log(TagAttrNames_v8_obj)
+    Object.keys(originalAttrNames_dict_crude).forEach(d=>{
+        if (TagAttrNames_v8_obj.attrnames.includes(d)){
+            originalAttrNames_dict[d]= originalAttrNames_dict_crude[d]
+        }
+    })
+    // console.log(originalAttrNames_dict)
+
     // console.log(originalTagnames_dict)
     // console.log(originalAttrNames_dict)
 
@@ -434,7 +471,7 @@ const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
     // merge the tagname_dicts
     let Tagnames_dict = {...additional_v7tag_dict, ...originalTagnames_dict }
 
-    let additional_v7attr_dict={"usesubcontainers":"UseSubcontainers",}
+    let additional_v7attr_dict={"usesubcontainers":"UseSubcontainers"}
     let Attrnames_dict = {...additional_v7attr_dict, ...originalAttrNames_dict }    
     // console.log(Tagnames_dict)
     // console.log(Attrnames_dict)
@@ -453,10 +490,10 @@ const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
         converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized2, '<' + theoriginal+'>')
         converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized3, '</' + theoriginal+'>')
     })
+  
 
     Object.keys(Attrnames_dict).forEach(d=>{
         let theoriginal = Attrnames_dict[d]
-        // console.log(theoriginal)
         let regEx_normalized1 = new RegExp(d.toLowerCase()+'=', 'g')
         converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized1, theoriginal+'=')
     })
@@ -464,12 +501,20 @@ const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
     // change  <Table123> back to <table>
     converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<Table123\>/g, "<Table>")
     converted_v7_xmlstr = converted_v7_xmlstr.replace(/\<\/Table123\>/g, "</Table>")
+
+    // recover the screwed escape characters. These escape characters must be restore (otherwise SAS cannot show graphics correctly)
+    converted_v7_xmlstr = converted_v7_xmlstr.replace(/__sasdeeplyscrewedamplt__/g, '&amp;lt;')
+    converted_v7_xmlstr = converted_v7_xmlstr.replace(/__sasdeeplyscrewedampgt__/g, '&amp;gt;')
+    converted_v7_xmlstr = converted_v7_xmlstr.replace(/__sasdeeplyscrewedlt__/g, '&lt;')
+    converted_v7_xmlstr = converted_v7_xmlstr.replace(/__sasdeeplyscrewedgt__/g, '&gt;')
+
     converted_v7_xmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + converted_v7_xmlstr
     await mymodules.saveLocalTxtFile(converted_v7_xmlstr, thetargetxmlfile, 'utf16le');
     console.log("done")
 })()
 // get a dict of attribute names in original case form like {"egversion":"EGversion"} (key is the normalized attribute name)
-function getOriginalAttrNames_dict(thexhmlstr) {
+// it is called _crude as it included strings in submitted code like "a in the submitted code a=1;"
+function getOriginalAttrNames_dict_crude(thexhmlstr) {
     let orignalAttrnames_dict={}
     // get strings between ' ' and '='
     // the matchAll returns all instances match a regexpress pattern, note: must use /g to indicate for repeating search
@@ -498,7 +543,8 @@ function getOriginalAttrNames_dict(thexhmlstr) {
 } // function getOriginalTagNames(thexhmlstr)
 ;
 // get a list of tagnames in original case form
-function getOriginalTagNames_dict(thexhmlstr) {
+// it is _crude as it contains tag like strings in submitted code (e.g., '<note!>' in submitted code '/*<note!> the dat set need to be sorted first!*/)
+function getOriginalTagNames_dict_crude(thexhmlstr) {
 
     let orignalTagnames_dict = {}
     // get strings between '</' and '>', or between '<' and '/>'
@@ -531,7 +577,7 @@ function getOriginalTagNames_dict(thexhmlstr) {
 } // function getOriginalTagNames(thexhmlstr)
 // get the tag and attribute names and save into an obj {tagnames[], attrnames[]}
 function getTagAttrNames(doms) {
-    let tagNames_arr = ["containerelement", "containertype"], attrNames_arr = ["usesubcontainers"] //ContainerElement, UseSubcontainers is unique in v7
+    let tagNames_arr = [], attrNames_arr = [] 
     for (let i = 0; i < doms.length; i++) {
         let thedom = doms[i]
         let theTagName = thedom.tagName
@@ -616,11 +662,15 @@ function cleanxmlstr(thexmlstr) {
 
 // change &amp;lt to <,  &gt to > ...
 function normalize_ampersand_code(thestr) {
-    /* quite annoying! need to change &amp;lt to < &gt to > */
-    thestr = thestr.replace(/&amp;lt;/g, '<')
-    thestr = thestr.replace(/&amp;gt;/g, '>')
-    thestr = thestr.replace(/&lt;/g, '<')
-    thestr = thestr.replace(/&gt;/g, '>')
+    /* quite annoying! need to change escape &amp;lt to __sasdeeplyscrewedamplt__ 
+        For unknown reason, SAS EG creates these escape chars in project.xml
+        these chars may cause error during conversion (v8 to v7)  if not replaced.
+        When the converted v7 xmlstr is ready, restore these escape chars. 
+    */
+    thestr = thestr.replace(/&amp;lt;/g, '__sasdeeplyscrewedamplt__')
+    thestr = thestr.replace(/&amp;gt;/g, '__sasdeeplyscrewedampgt__')
+    thestr = thestr.replace(/&lt;/g, '__sasdeeplyscrewedlt__')
+    thestr = thestr.replace(/&gt;/g, '__sasdeeplyscrewedgt__')
     thestr = thestr.replace(/&amp;/g, '_')// cannot have &amp; or & in xml
     return thestr
 } //function normalize_ampersand_code
