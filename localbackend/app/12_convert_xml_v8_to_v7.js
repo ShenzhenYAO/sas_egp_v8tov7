@@ -516,6 +516,30 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
     await mymodules.saveLocalTxtFile(converted_v7_xmlstr, thetargetxmlfile, 'utf16le');
     console.log("done")
 })()
+
+
+ /*
+
+  convert amp sign code like '&lt;' to normal html code like '<'
+    let str =`
+    <DNA>&lt;DNA&gt;
+    &lt;Type&gt;LocalFile&lt;/Type&gt;
+    &lt;Name&gt;sas.sas&lt;/Name&gt;
+    &lt;Version&gt;1&lt;/Version&gt;
+    &lt;Assembly /&gt;
+    &lt;Factory /&gt;
+    &lt;FullPath&gt;C:\Users\Z70\Desktop\sas.sas&lt;/FullPath&gt;
+  &lt;/DNA&gt;</DNA>
+    `
+    */
+// 
+function htmlDecode(input){
+    var e = $('<textarea>')[0];
+    e.innerHTML = input;
+    // handle case of empty input
+    return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+  }
+  
 // get a dict of attribute names in original case form like {"egversion":"EGversion"} (key is the normalized attribute name)
 // it is called _crude as it included strings in submitted code like "a in the submitted code a=1;"
 function getOriginalAttrNames_dict_crude(thexhmlstr) {

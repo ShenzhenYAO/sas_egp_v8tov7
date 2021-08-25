@@ -9,26 +9,11 @@ const srcfolder = 'data/in/prototype/__xml/egpv8/';
 
 (async () => {
     // search between 
-    let str =`
-    <DNA>&lt;DNA&gt;
-    &lt;Type&gt;LocalFile&lt;/Type&gt;
-    &lt;Name&gt;sas.sas&lt;/Name&gt;
-    &lt;Version&gt;1&lt;/Version&gt;
-    &lt;Assembly /&gt;
-    &lt;Factory /&gt;
-    &lt;FullPath&gt;C:\Users\Z70\Desktop\sas.sas&lt;/FullPath&gt;
-  &lt;/DNA&gt;</DNA>
-    `
-
-    function htmlDecode(input){
-        var e = $('<textarea>')[0];
-        e.innerHTML = input;
-        // handle case of empty input
-        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-      }
+ 
       
-      let xxx =htmlDecode(str); 
-      console.log(xxx)
+      const date0 = new Date('0001-01-01')
+      const datenow = new Date()
+      console.log(datenow-date0)
 
 })()
 

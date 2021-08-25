@@ -1,22 +1,6 @@
-/** To read the v8 xml and convert to a v7 xml file 
- * In this version, the following is cleaned up or simplified.
- * 
-
-a. In .elements, remove element with the type of code (last submitted code)
-b. For each element remove contents in element.JobRecipe and replace with the following scala
-                    <JobRecipe>
-                        <log />
-                        <code />
-                        <OutputDataList />
-                        <ODSResultsList />
-                    </JobRecipe>
-
-c. for each element.codetask remove contents and replace with the following scala
-<IncludeWrapper>True</IncludeWrapper><Embedded>True</Embedded><DNA />
-
-d. anything within .datalist
-e. anything within .ExternalFileList
- * 
+/* To create a project xml from the prototype 
+    The prototypes are saved at data/in/prototype/egpv7
+    components of a typical v7 project.xml are saved as individual xml files
 */
 
 // load custom modules
@@ -27,23 +11,22 @@ const jsdom = require("jsdom");
 const { window } = new jsdom.JSDOM(`...`);
 var $ = require("jquery")(window);
 
-// const thesrcxmlfile = 'data/in/do_not_git/sample0_v8.xml';
-// const thesrcxmlfile = 'data/try/v8_2pfd_4p_3log_2data_2datashortcut_2link_1rpt_1xls_1sas_3note_3copytask.xml';
-const thesrcxmlfile = 'data/out/test/sample3_v8.xml'
-
 // const thetargetxmlfile = 'data/out/test/sample0_v8_to_v7.xml';
 // const thetargetxmlfile = 'data/out/test/sample8_v8_to_v7.xml';
-const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
+// const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
 
 (async () => {
+
+    // 1. make a project collection scala
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___projectcollection_v7.xml'
     // read the xml into a dom object
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
     // console.log(thesrcxmlstr.substr(0, 100))
     thebodyxmlstr = thesrcxmlstr.split('encoding="utf-16"?>')[1]
     let thesrcxmlstr_cleaned = cleanxmlstr(thebodyxmlstr)
-    // console.log(thesrcxmlstr_cleaned.substr(0, 500))
-
+    console.log(thesrcxmlstr_cleaned.substr(0, 500))
+async function notrun(){
     // *** convert the cleaned xml str to a DOM (like <PROJECTCOLLECTION>...</PROJECTCOLLECTION>)
     let jquery_dom_obj_v8 = $(thesrcxmlstr_cleaned)
     // console.log(jquery_dom_obj_v8.prop('outerHTML').substr(0, 200))
@@ -138,6 +121,7 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
         append_cloned_components_of_the_first_dom_found_by_tagname(jquery_dom_obj_v8, jquery_dom_obj_v7, d)
     })
 
+
     /*** For ProjectCollection.Elements.Element components (programs, logs, links, shortcuts, etc)
         some are with a tag ProjectCollection.Elements.Element.SubmitableElement.GraphDeviceOverride
         the textContent of such tags is "Default" in v8, and need to be changed to "Png" for v7
@@ -168,116 +152,66 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
     let project_components_doms_obj = jquery_dom_obj_v7.find('Elements').children()
     // console.log(project_components_doms_obj)
 
-    // *********  to simplify, remove the component if the type is SAS.EG.ProjectElements.Code (submitted code)
-    // Note, must start from the last theComponent_elm so that not to mess up the index number
-    for (let i = project_components_doms_obj.length - 1; i >= 0; i--) {
-        let theComponent_elm = project_components_doms_obj[i]
-        let theType_str = $(theComponent_elm).attr("type")
-        if (theType_str !== "SAS.EG.ProjectElements.CodeTask"
-            && theType_str !== "SAS.EG.ProjectElements.EGTask"
-            && theType_str !== "SAS.EG.ProjectElements.ProcessFlowContainer"
-            && theType_str !== "SAS.EG.ProjectElements.PFD"
-            && theType_str !== "SAS.EG.ProjectElements.Note"
-        ) {
-            $(project_components_doms_obj[i]).remove()
-        } else {
-            //********* to simplify, empty contents element.JobRecipe and replace with the basic scala
-            let JobRecipe_doms_obj = $(theComponent_elm).find("SubmitableElement").find('JobRecipe')
-            // console.log('250', JobRecipe_doms_obj)
-            let theJobRecipe_dom_obj
-            if (JobRecipe_doms_obj.length > 0) {
-                theJobRecipe_dom_obj = $(JobRecipe_doms_obj[0])
-                // console.log('254', theJobRecipe_dom_obj.prop('outerHTML'))
-                theJobRecipe_dom_obj.empty() // clean its contents
-                let JobRecipe_scala = $('<JobRecipe><log></log><code></code><OutputDataList></OutputDataList><ODSResultsList></ODSResultsList></JobRecipe>')
-                theJobRecipe_dom_obj.append(JobRecipe_scala)
-            } // if (JobRecipe_doms_obj){
-
-            //********* to simplify, empty contents element.CodeTask and replace with the basic scala
-            let SubCodeTask_doms_obj = $(theComponent_elm).find("CodeTask")
-            // console.log('262', SubCodeTask_doms_obj)
-            let SubCodeTask_dom_obj
-            if (SubCodeTask_doms_obj.length > 0) {
-                SubCodeTask_dom_obj = $(SubCodeTask_doms_obj[0])
-                // console.log('266', SubCodeTask_dom_obj.prop('outerHTML'))
-                SubCodeTask_dom_obj.empty() // clean its contents
-                let SubCodeTask_scala = $('<IncludeWrapper>True</IncludeWrapper><Embedded>True</Embedded><DNA></DNA>')
-                SubCodeTask_dom_obj.append(SubCodeTask_scala)
-            } // if (JobRecipe_doms_obj){
-        }
-    } //
-
     // console.log(jquery_dom_obj_v7.prop("outerHTML"))   
     for (let i = 0; i < project_components_doms_obj.length; i++) {
-        if (project_components_doms_obj[i]) {
+        let theComponent_elm = project_components_doms_obj[i]
+        let theType_str = $(theComponent_elm).attr("type")
+        // note: multiple doms may be found; therefore always select the first among the doms that are found
+        let theLabel_elm = $(theComponent_elm).find('Element').find('label')[0]
+        let theLabel_str = $(theLabel_elm).text()
+        let theID_elm = $(theComponent_elm).find('Element').find('id')[0]
+        let theID_str = theID_elm.textContent
+        let theContainerID_elm = $(theComponent_elm).find('Element').find('Container')[0]
+        let theContainerID_str = theContainerID_elm.textContent
+        // console.log (theType_str, theLabel_str, theLabel_str)
 
-            let theComponent_elm = project_components_doms_obj[i]
-            let theType_str = $(theComponent_elm).attr("type")
-            // note: multiple doms may be found; therefore always select the first among the doms that are found
-            let theLabel_elm = $(theComponent_elm).find('Element').find('label')[0]
-            let theLabel_str = $(theLabel_elm).text()
-            let theID_elm = $(theComponent_elm).find('Element').find('id')[0]
-            let theID_str = theID_elm.textContent
-            let theContainerID_elm = $(theComponent_elm).find('Element').find('Container')[0]
-            let theContainerID_str = theContainerID_elm.textContent
-            // console.log (theType_str, theLabel_str, theLabel_str)
+        // push the distinct types into an array
+        if (!ComponentTypes_arr.includes(theType_str)) { ComponentTypes_arr.push(theType_str) }
 
-            // push the distinct types into an array
-            if (!ComponentTypes_arr.includes(theType_str)) { ComponentTypes_arr.push(theType_str) }
+        // push individual components into the array Components_arr
+        Components_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
 
-            // push individual components into the array Components_arr
-            Components_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
+        // save the type of the components
+        let tmpfile = 'data/out/test/element_types.json'
+        await mymodules.saveJSON(ComponentTypes_arr, tmpfile)
 
-            // save the type of the components
-            let tmpfile = 'data/out/test/element_types.json'
-            await mymodules.saveJSON(ComponentTypes_arr, tmpfile)
+        // push the task components into the array TaskComponents_arr
+        if (theType_str === "SAS.EG.ProjectElements.CodeTask") {
+            TaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
+        } else if (
+            // in v8, thetype is theType_str === "SAS.EG.ProjectElements.ProcessFlowContainer", in v7, ".PFD"
+            theType_str === "SAS.EG.ProjectElements.ProcessFlowContainer" ||
+            theType_str === "SAS.EG.ProjectElements.PFD"
+        ) {
+            // *** for the PFDComponentTypes, chang the type to SAS.EG.ProjectElements.PFD 
+            $(theComponent_elm).attr("type", "SAS.EG.ProjectElements.PFD")
+            PFDIDs_arr.push(theID_str)
+            PFDComponentTypes_arr.push({ type: "SAS.EG.ProjectElements.PFD", label: theLabel_str, id: theID_str, container: theContainerID_str })
+            // *** also append the ContainerElement tag as the second child of the PFD Element
+            // make a clone of the exsting children nodes (i.e., the element and the pfd tags)
+            let PFDElementChildren_clone = $(theComponent_elm.children).clone()
+            // empty children nodes of the PFD element
+            $(theComponent_elm).empty()
+            // hard code to append the existing children back, and insert the containerelement (unique in v7) as the second child
+            //1. append the child <element>
+            $(theComponent_elm).append($(PFDElementChildren_clone[0]))
+            //2. append the newly added containerelement
+            let ContainerElement_dom_obj = $("<ContainerElement><ContainerType>ProcessFlow</ContainerType></ContainerElement>")
+            $(theComponent_elm).append(ContainerElement_dom_obj)
+            //3. append the existing child <pfd>
+            $(theComponent_elm).append($(PFDElementChildren_clone[1]))
 
-            // push the task components into the array TaskComponents_arr
-            if (theType_str === "SAS.EG.ProjectElements.CodeTask") {
-                TaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
-            } else if (
-                // in v8, thetype is theType_str === "SAS.EG.ProjectElements.ProcessFlowContainer", in v7, ".PFD"
-                theType_str === "SAS.EG.ProjectElements.ProcessFlowContainer" ||
-                theType_str === "SAS.EG.ProjectElements.PFD"
-            ) {
-                // *** for the PFDComponentTypes, chang the type to SAS.EG.ProjectElements.PFD 
-                $(theComponent_elm).attr("type", "SAS.EG.ProjectElements.PFD")
-                PFDIDs_arr.push(theID_str)
-                PFDComponentTypes_arr.push({ type: "SAS.EG.ProjectElements.PFD", label: theLabel_str, id: theID_str, container: theContainerID_str })
-                // *** also append the ContainerElement tag as the second child of the PFD Element
-                // make a clone of the exsting children nodes (i.e., the element and the pfd tags)
-                let PFDElementChildren_clone = $(theComponent_elm.children).clone()
-                // empty children nodes of the PFD element
-                $(theComponent_elm).empty()
-                // hard code to append the existing children back, and insert the containerelement (unique in v7) as the second child
-                //1. append the child <element>
-                $(theComponent_elm).append($(PFDElementChildren_clone[0]))
-                //2. append the newly added containerelement
-                let ContainerElement_dom_obj = $("<ContainerElement><ContainerType>ProcessFlow</ContainerType></ContainerElement>")
-                $(theComponent_elm).append(ContainerElement_dom_obj)
-                //3. append the existing child <pfd>
-                $(theComponent_elm).append($(PFDElementChildren_clone[1]))
+        } else if ( //*** the nonTask components do not includes Log , last submitted code, shortcut to data, link, and odsresult
+            theType_str !== "SAS.EG.ProjectElements.Log" &&
+            theType_str !== "SAS.EG.ProjectElements.Code" &&
+            theType_str !== "SAS.EG.ProjectElements.ShortCutToData" &&
+            theType_str !== "SAS.EG.ProjectElements.Link" &&
+            theType_str !== "SAS.EG.ProjectElements.ODSResult"
+        ) {
+            NonTaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
+        }
+    } //for (let i = 0; i< project_components_doms_obj.length;i++ ) 
 
-
-                //********* to simplify in .pfd.Process.Dependencies, empty contents */
-                let Dependencies_dom = $(theComponent_elm).find('Process').find('Dependencies')[0]
-                if (Dependencies_dom){ $(Dependencies_dom).empty()}
-
-            } else if ( //*** the nonTask components do not includes Log , last submitted code, shortcut to data, link, and odsresult
-                theType_str !== "SAS.EG.ProjectElements.Log" &&
-                theType_str !== "SAS.EG.ProjectElements.Code" &&
-                theType_str !== "SAS.EG.ProjectElements.ShortCutToData" &&
-                theType_str !== "SAS.EG.ProjectElements.Link" &&
-                theType_str !== "SAS.EG.ProjectElements.ODSResult"
-            ) {
-                NonTaskComponents_arr.push({ type: theType_str, label: theLabel_str, id: theID_str, container: theContainerID_str })
-            }
-        } //if (project_components_doms_obj[i])
-    } //for (let i = 0; i< project_components_doms_obj.length;i++ )
-    // console.log('238', project_components_doms_obj)
-
-
-    // console.log('249', project_components_doms_obj.length)
     // console.log(ComponentTypes_arr)
     // console.log(PFDComponentTypes_arr)
     // console.log(TaskComponents_arr.length)
@@ -441,9 +375,9 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
     Graphics_dom_obj.append(TaskGraphic_doms_obj_v8_clone)
 
     // from the v8 obj, get NoteGraphic elements and append into Graphics_dom_obj (see __f02)
-    // let NoteGraphic_doms_obj_v8 = jquery_dom_obj_v8.find("NoteGraphic")
-    // let NoteGraphic_doms_obj_v8_clone = NoteGraphic_doms_obj_v8.clone()
-    // Graphics_dom_obj.append(NoteGraphic_doms_obj_v8_clone)
+    let NoteGraphic_doms_obj_v8 = jquery_dom_obj_v8.find("NoteGraphic")
+    let NoteGraphic_doms_obj_v8_clone = NoteGraphic_doms_obj_v8.clone()
+    Graphics_dom_obj.append(NoteGraphic_doms_obj_v8_clone)
 
     // *** create an element Containers
     let Containers_dom_obj = $('<Containers></Containers>')
@@ -468,13 +402,6 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
     // append the Containers_dom_obj
     ProcessFlowView_dom_obj.append(Containers_dom_obj)
 
-    // ********* to simplify, empty contents in .DataList
-    let DataList_dom_obj = $(jquery_dom_obj_v7.find('DataList')[0])
-    DataList_dom_obj.empty()
-
-    // ********* to simplify, empty contents in .ExternalFileList
-    let ExternalFileList_dom_obj = $(jquery_dom_obj_v7.find('ExternalFileList')[0])
-    ExternalFileList_dom_obj.empty()
 
     // console.log(jquery_dom_obj_v7.prop("outerHTML"))
     // save the xmlstr into a text file as ../data/out/
@@ -502,16 +429,12 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
     // those in  getOriginalTagNames_dict_crude but not in tagnames from the doms_obj should be removed
      */
     // console.log(originalTagnames_dict_crude)
-    let originalTagnames_dict = {};
+    let originalTagnames_dict = {};    
     let TagAttrNames_v8_obj = getTagAttrNames(jquery_dom_obj_v8)
-
-    let tagattrnamefile='data/out/test/tagattrNames.json'
-    await mymodules.saveJSON(TagAttrNames_v8_obj, tagattrnamefile)
-
     // console.log(TagAttrNames_v8_obj)
-    Object.keys(originalTagnames_dict_crude).forEach(d => {
-        if (TagAttrNames_v8_obj.tagnames.includes(d)) {
-            originalTagnames_dict[d] = originalTagnames_dict_crude[d]
+    Object.keys(originalTagnames_dict_crude).forEach(d=>{
+        if (TagAttrNames_v8_obj.tagnames.includes(d)){
+            originalTagnames_dict[d]= originalTagnames_dict_crude[d]
         }
     })
 
@@ -520,12 +443,12 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
     // but not all such strings are attribute names. e.g., some are part of the submitted code like 'a' in 'a=1;'
     // therefore the originalAttrNames_dict_crude need to be matched with attribute names obtained from the doms_obj
     // those in  originalAttrNames_dict_crude but not in attributenames from the doms_obj should be removed
-    let originalAttrNames_dict = {};
+    let originalAttrNames_dict = {};    
     // let TagAttrNames_v8_obj = getTagAttrNames(jquery_dom_obj_v8)
     // console.log(TagAttrNames_v8_obj)
-    Object.keys(originalAttrNames_dict_crude).forEach(d => {
-        if (TagAttrNames_v8_obj.attrnames.includes(d)) {
-            originalAttrNames_dict[d] = originalAttrNames_dict_crude[d]
+    Object.keys(originalAttrNames_dict_crude).forEach(d=>{
+        if (TagAttrNames_v8_obj.attrnames.includes(d)){
+            originalAttrNames_dict[d]= originalAttrNames_dict_crude[d]
         }
     })
     // console.log(originalAttrNames_dict)
@@ -533,52 +456,52 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
     // console.log(originalTagnames_dict)
     // console.log(originalAttrNames_dict)
 
-    let additional_v7tag_dict = {
-        "CONTAINERELEMENT": "ContainerElement",
-        "CONTAINERTYPE": "ContainerType",
-        "PROJECTTREEVIEW": "ProjectTreeView",
-        "EGTREENODE": "EGTreeNode",
-        "NODETYPE": "NodeType",
-        "ELEMENTID": "ElementID",
-        "EXPANDED": "Expanded",
-        "PROCESSFLOWVIEW": "ProcessFlowView",
-        "GRID": "Grid",
-        "LAYOUT": "Layout",
-        "GRAPHICS": "Graphics",
-        "PROPERTIES": "Properties",
-        "BACKGROUNDCOLOR": "BackgroundColor",
-        "MAINFORM": "MainForm",
-        "ACTIVEDATA": "ActiveData"
+    let additional_v7tag_dict={
+        "CONTAINERELEMENT":"ContainerElement",
+        "CONTAINERTYPE":"ContainerType",
+        "PROJECTTREEVIEW":"ProjectTreeView",
+        "EGTREENODE":"EGTreeNode",
+        "NODETYPE":"NodeType",
+        "ELEMENTID":"ElementID",
+        "EXPANDED":"Expanded",
+        "PROCESSFLOWVIEW":"ProcessFlowView",
+        "GRID":"Grid",
+        "LAYOUT":"Layout",
+        "GRAPHICS":"Graphics",
+        "PROPERTIES":"Properties",
+        "BACKGROUNDCOLOR":"BackgroundColor",
+        "MAINFORM":"MainForm",
+        "ACTIVEDATA":"ActiveData"
     } //
 
     // merge the tagname_dicts
-    let Tagnames_dict = { ...additional_v7tag_dict, ...originalTagnames_dict }
+    let Tagnames_dict = {...additional_v7tag_dict, ...originalTagnames_dict }
 
-    let additional_v7attr_dict = { "usesubcontainers": "UseSubcontainers" }
-    let Attrnames_dict = { ...additional_v7attr_dict, ...originalAttrNames_dict }
+    let additional_v7attr_dict={"usesubcontainers":"UseSubcontainers"}
+    let Attrnames_dict = {...additional_v7attr_dict, ...originalAttrNames_dict }    
     // console.log(Tagnames_dict)
     // console.log(Attrnames_dict)
 
     // in converted_v7_xmlstr, the tagnames and attr names are all in lowcase.
     // This will cause error for SAS EG to interpret (SAS EG only recognize tag and attr names in the original case form, e.g., EGVersion is recognized, egversion is not)
     // The following is to restore to origanl tag and attr case forms
+    
 
-
-    Object.keys(Tagnames_dict).forEach(d => {
+    Object.keys(Tagnames_dict).forEach(d=>{
         let theoriginal = Tagnames_dict[d]
-        let regEx_normalized1 = new RegExp('\<' + d.toLowerCase() + '\x20', 'g')
-        let regEx_normalized2 = new RegExp('\<' + d.toLowerCase() + '\>', 'g')
-        let regEx_normalized3 = new RegExp('\<\/' + d.toLowerCase() + '>', 'g')
-        converted_v7_xmlstr = converted_v7_xmlstr.replace(regEx_normalized1, '<' + theoriginal + ' ')
-        converted_v7_xmlstr = converted_v7_xmlstr.replace(regEx_normalized2, '<' + theoriginal + '>')
-        converted_v7_xmlstr = converted_v7_xmlstr.replace(regEx_normalized3, '</' + theoriginal + '>')
+        let regEx_normalized1 = new RegExp('\<'+d.toLowerCase()+'\x20', 'g')
+        let regEx_normalized2 = new RegExp('\<'+d.toLowerCase()+'\>', 'g')
+        let regEx_normalized3 = new RegExp('\<\/'+d.toLowerCase()+'>', 'g')
+        converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized1, '<' + theoriginal+' ')
+        converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized2, '<' + theoriginal+'>')
+        converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized3, '</' + theoriginal+'>')
     })
+  
 
-
-    Object.keys(Attrnames_dict).forEach(d => {
+    Object.keys(Attrnames_dict).forEach(d=>{
         let theoriginal = Attrnames_dict[d]
-        let regEx_normalized1 = new RegExp(d.toLowerCase() + '=', 'g')
-        converted_v7_xmlstr = converted_v7_xmlstr.replace(regEx_normalized1, theoriginal + '=')
+        let regEx_normalized1 = new RegExp(d.toLowerCase()+'=', 'g')
+        converted_v7_xmlstr=converted_v7_xmlstr.replace(regEx_normalized1, theoriginal+'=')
     })
 
     // change  <Table123> back to <table>
@@ -594,7 +517,10 @@ const thetargetxmlfile = 'data/out/test/v8_to_v7.xml';
     converted_v7_xmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + converted_v7_xmlstr
     await mymodules.saveLocalTxtFile(converted_v7_xmlstr, thetargetxmlfile, 'utf16le');
     console.log("done")
+}//function notrun(){
 })()
+
+
  /*
 
   convert amp sign code like '&lt;' to normal html code like '<'
@@ -616,10 +542,11 @@ function htmlDecode(input){
     // handle case of empty input
     return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
   }
+  
 // get a dict of attribute names in original case form like {"egversion":"EGversion"} (key is the normalized attribute name)
 // it is called _crude as it included strings in submitted code like "a in the submitted code a=1;"
 function getOriginalAttrNames_dict_crude(thexhmlstr) {
-    let orignalAttrnames_dict = {}
+    let orignalAttrnames_dict={}
     // get strings between ' ' and '='
     // the matchAll returns all instances match a regexpress pattern, note: must use /g to indicate for repeating search
     // the '...' in [... blabla] is to join the found instances into an array
@@ -637,7 +564,7 @@ function getOriginalAttrNames_dict_crude(thexhmlstr) {
     thexhmlstr_segs.forEach(d => {
         if (d.includes('=')) {
             let theAttrName = d.split('=')[0]
-            if (!Object.keys(orignalAttrnames_dict).includes(theAttrName.toLowerCase())) {
+            if (!Object.keys(orignalAttrnames_dict).includes(theAttrName.toLowerCase())) { 
                 orignalAttrnames_dict[theAttrName.toLowerCase()] = theAttrName
             }
         }
@@ -668,20 +595,20 @@ function getOriginalTagNames_dict_crude(thexhmlstr) {
         // console.log(d[1])
         let theTag = d[1]
         if (!Object.keys(orignalTagnames_dict).includes(theTag.toUpperCase())) {
-            orignalTagnames_dict[theTag.toUpperCase()] = theTag
+            orignalTagnames_dict[theTag.toUpperCase()]=theTag
         }
     })
     matched_arr2.forEach(d => {
         let theTag = d[1]
         if (!Object.keys(orignalTagnames_dict).includes(theTag.toUpperCase())) {
-            orignalTagnames_dict[theTag.toUpperCase()] = theTag
+            orignalTagnames_dict[theTag.toUpperCase()]=theTag
         }
     })
     return orignalTagnames_dict
 } // function getOriginalTagNames(thexhmlstr)
 // get the tag and attribute names and save into an obj {tagnames[], attrnames[]}
 function getTagAttrNames(doms) {
-    let tagNames_arr = [], attrNames_arr = []
+    let tagNames_arr = [], attrNames_arr = [] 
     for (let i = 0; i < doms.length; i++) {
         let thedom = doms[i]
         let theTagName = thedom.tagName
@@ -729,7 +656,7 @@ function cleanxmlstr(thexmlstr) {
 
     // to cleanup the nonprintable chars
     // let thexmlstr_remove_nonprintable = thexmlstr.replace(/[^\x20-\x7E\s\S]+/g, "")
-    let thexmlstr_remove_nonprintable = thexmlstr
+    let thexmlstr_remove_nonprintable =thexmlstr
 
     // the xmlstr is messed up with strange chars like &amp;lt; &lt;, etc
     // 1. The following is to change &amp;lt to <, &gt to > ...
