@@ -18,6 +18,22 @@ var $ = require("jquery")(window);
 (async () => {
 
     // 1. make a project collection scala
+    let config={}
+    config.Element={}
+    config.Element.Label = "EGP1"
+    config.Element.ID = 'ProjectCollection-' + mymodules.generateUUID()
+    // set init time (for the fields like createon, modifiedon,etc)
+    // the time serial here is different from the SAS time serial
+    // the later is the difference between the date and 1960-01-01
+    // the former is the difference between the date and 0001-01-01
+    const timenow = new Date()
+    config.Element.CreatedOn = await getTimeSerial(timenow)
+    config.Element.ModifiedOn = config.Element.CreatedOn
+    // console.log('config.Element.CreatedOn', config.Element.CreatedOn)
+    // console.log('config.Element.ModifiedOn', config.Element.ModifiedOn)
+    config.Element.ModifiedBy = 'Me'
+    config.Element.ModifiedByEGID = 'Me'
+
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___projectcollection_v7.xml'
     // read the xml into a dom object
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
@@ -25,51 +41,35 @@ var $ = require("jquery")(window);
     // console.log(thesrcxmlstr.substr(0, 100))
     thebodyxmlstr = thesrcxmlstr.split('encoding="utf-16"?>')[1]
     let thesrcxmlstr_cleaned = cleanxmlstr(thebodyxmlstr)
-    console.log(thesrcxmlstr_cleaned.substr(0, 500))
-async function notrun(){
+    // console.log(thesrcxmlstr_cleaned.substr(0, 500))
+
     // *** convert the cleaned xml str to a DOM (like <PROJECTCOLLECTION>...</PROJECTCOLLECTION>)
-    let jquery_dom_obj_v8 = $(thesrcxmlstr_cleaned)
-    // console.log(jquery_dom_obj_v8.prop('outerHTML').substr(0, 200))
+    let doms_obj = $(thesrcxmlstr_cleaned)
 
-    // the jsdom_obj is like jQuery { '0': HTMLUnknownElement {}, length: 1 }
-    // let thesrcxmldom_v8 = jquery_dom_obj_v8[0]
-    /* thexmldom_v8 is like HTMLUnknownElement:
-        {
-            tagName: "PROJECTCOLLECTION",
-            attributes:[
-                {nodeName: "egversion", nodeValue:"8.1"},
-                {nodeName: "type", nodeValue:"SAS.EG.ProjectElements.ElementManager"},
-            ],
-            children: [...]
-        }
-        however, the thexmldom_v8 is not a plain json object
-    */
-    // console.log(thexmldom_v8.tagName, thexmldom_v8.attributes[0].nodeName, thexmldom_v8.attributes[0].nodeValue)
-    // console.log(Object.keys(thexmldom_v8))
+    // find the Element dom within the obj
+    let projectElement = $(doms_obj.find('Element')[0])
+    // config the project properties
+    $(projectElement.find("Label")[0]).text(config.Element.Label)
+    $(projectElement.find("ID")[0]).text(config.Element.ID)
+    $(projectElement.find("CreatedOn")[0]).text(config.Element.CreatedOn)
+    $(projectElement.find("ModifiedOn")[0]).text(config.Element.ModifiedOn)
+    $(projectElement.find("ModifiedBy")[0]).text(config.Element.ModifiedBy)
+    $(projectElement.find("ModifiedByEGID")[0]).text(config.Element.ModifiedByEGID)
 
-    // // The following is to get all the keys of srcxmldom_v8_obj and save into a json file, which is helpful in understanding the various properties of the obj
-    // let srcxmldom_v8_obj = []
-    // $.each(thesrcxmldom_v8, function(key, value){
-    //     srcxmldom_v8_obj.push({key:key, value:value})
-    // })
+    $(doms_obj.find('DataList')).text('')
+    $(doms_obj.find('ExternalFileList')).text('')
+    $(doms_obj.find('Containers')).text('')
 
-    // // let thejsonstr = JSON.stringify(srcxmldom_v8_obj)
-    // let thejsonfile ="./data/out/12_test_projectxml2json_v8.json";
-    // await mymodules.saveJSON(srcxmldom_v8_obj, thejsonfile)
+    $(doms_obj.find('Elements')).empty()
+    
 
-    // get the attribute 'EGVersion'
-    // let attr_egversion = jquery_dom_obj_v8.attr('EGVersion')
-    // console.log(attr_egversion)
+    let targetxmlstr = doms_obj.prop('outerHTML')
+    targetxmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + targetxmlstr
+    let thetargetxmlfile = "data/out/test/___test.xml"
+    await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
-    // *** create an empty dom obj for v7
-    let jquery_dom_obj_v7 = $('<ProjectCollection></ProjectCollection>')
-    // console.log(jquery_dom_obj_v7.prop("outerHTML"))
 
-    // *** add attributes egversion, and type
-    jquery_dom_obj_v7.attr("EGVersion", "7.1")
-    jquery_dom_obj_v7.attr("Type", "SAS.EG.ProjectElements.ProjectCollection")
-    // console.log(jquery_dom_obj_v7.prop("outerHTML"))
-
+async function notrun(){
     // *** clone the project element from v8 obj and append it to v7obj
     // make a clone of the project element dom (among the children nodes, the first with the tag of 'element') from the src dom obj and append as the child node to the target dom
     // note: do not use the project element dom with obj_v8. otherwise the project element dom will be removed from obj_v8 after appending to obj_v7!
@@ -519,6 +519,21 @@ async function notrun(){
     console.log("done")
 }//function notrun(){
 })()
+
+    // set init time (for the fields like createon, modifiedon,etc)
+    // the time serial here is different from the SAS time serial
+    // the later is the difference between the date and 1960-01-01
+    // the former is the difference between the date and 0001-01-01
+async function getTimeSerial(targetdatetime){
+    let date0 = new Date('0001-01-01')
+    // the time serial here is very strange. It is longer than milliseconds and microseconds, but shorter than nanoseconds
+    // the following is a work around by multiplying the original number by 10000
+    // note that the default integer in javascript cannot be as precise as to 18 digits
+    // to get that precision, the function BigInt must be applied
+    // Get bigint number is with an end of 'n', use toString() to convert the number to a string
+    let timeSerial = BigInt((targetdatetime - date0)*10000).toString()
+    return timeSerial
+}//function getTimeSerial
 
 
  /*
