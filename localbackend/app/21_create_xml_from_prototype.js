@@ -56,12 +56,24 @@ var $ = require("jquery")(window);
     $(projectElement.find("ModifiedBy")[0]).text(config.Element.ModifiedBy)
     $(projectElement.find("ModifiedByEGID")[0]).text(config.Element.ModifiedByEGID)
 
-    $(doms_obj.find('DataList')).text('')
-    $(doms_obj.find('ExternalFileList')).text('')
-    $(doms_obj.find('Containers')).text('')
+    $(doms_obj.find('DataList')[0]).text('')
+    $(doms_obj.find('ExternalFileList')[0]).text('')    
 
-    $(doms_obj.find('Elements')).empty()
+    $(doms_obj.find('Elements')[0]).empty()
     
+    $(doms_obj.find('GitSourceControl')[0]).attr('GUID', mymodules.generateUUID())
+
+    $(doms_obj.find('Containers')[0]).text('')
+    $(doms_obj.find('ProjectLog')[0]).text('')
+    $(doms_obj.find('External_Objects').find('ProjectTreeView')[0]).text('')
+
+    $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Zoom')[0]).text('')
+    $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Grid')[0]).text('')
+    $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Layout')[0]).text('')
+    $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Graphics')[0]).text('')
+    $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Containers')[0]).text('')
+
+    $(doms_obj.find('External_Objects').find('MainForm').find('ActiveData')[0]).text('')
 
     let targetxmlstr = doms_obj.prop('outerHTML')
     targetxmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + targetxmlstr
@@ -755,7 +767,21 @@ function convertSelfClosingHTML_to_OldSchoolHTML(str) {
 } // function convertSelfClosingHTML_to_OldSchoolHTML(str...
 
 // remmove comments
-function removecomments(thestr) {
+function removecomments(thestr){
+    let result = ''
+    // split str by '<!--'
+    let segments = thestr.split('<!--')
+    for (let i=0;i<segments.length;i++){
+      if (segments[i].includes('-->')){
+        let theSeg=segments[i].split('-->')[1]
+        result = result + theSeg
+      } else {
+        result = result +segments[i]
+      }
+    }
+    return result
+  } //function removecomments
+function removecomments_regex(thestr) {
     // find anything between <!-- and -->
     let matched_arr = thestr.match(/\<!--(.*)--\>/)
     // console.log(matched_arr[0], thestr)

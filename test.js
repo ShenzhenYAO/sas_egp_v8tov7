@@ -10,14 +10,40 @@ const srcfolder = 'data/in/prototype/__xml/egpv8/';
 (async () => {
     // search between 
  
-      
-      const date0 = new Date('0001-01-01')
-      const datenow = new Date()
-      console.log(datenow-date0)
+      let str=`
+      <projecttreeview egversion="7.1" usesubcontainers="True"></projecttreeview>
+        
+        <!-- Note !!! the tag ProcessFlowView is unique in v7, similar to ProcessFlowControlState in v8 
+            however, there is only ONE ProcessFlowView in v7 for all ProcessFlows
+            While in v8, there can be multiple ProcessFlowControlState, each for a ProcessFlow
+        -->
+        <processflowview>
+
+        <!-- Note2 !!! the tag ProcessFlowView is unique in v7, similar to ProcessFlowControlState in v8 
+            however, there is only ONE ProcessFlowView in v7 for all ProcessFlows
+            While in v8, there can be multiple ProcessFlowControlState, each for a ProcessFlow
+        -->
+        <div></div>
+      `
+      let result = removecomments(str)
+      console.log(result)
 
 })()
 
-
+function removecomments(thestr){
+  let result = ''
+  // split str by '<!--'
+  let segments = thestr.split('<!--')
+  for (let i=0;i<segments.length;i++){
+    if (segments[i].includes('-->')){
+      let theSeg=segments[i].split('-->')[1]
+      result = result + theSeg
+    } else {
+      result = result +segments[i]
+    }
+  }
+  return result
+} //function removecomments
 
 
 
