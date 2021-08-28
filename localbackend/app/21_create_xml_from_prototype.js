@@ -264,6 +264,10 @@ async function config_projectcollection() {
 async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     // 1. get the modified xmlstr
     let modified_xmlstr = doms_obj.prop('outerHTML')
+    // the program does not work well in identifying the tag names if there are two tags in a line
+    // the following is to force line breaking between two tags. 
+    // the forced line breakers are with special marks ('___123456___')
+    // that way, after identifying the tag names, the target xml will be recovered to the original layout by removing these marked line breakers
     modified_xmlstr=modified_xmlstr.replace(/\>/g, '>\n___123456___\n')
 
     // 2. make dictionaries to map out original tagnames and attributenames
@@ -293,7 +297,7 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
 
     // 2. make a dictionary to map out the standardized and original tagnames
     let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(str_all_prototype_xmlfiles)
-    console.log('line294',originalTagnames_dict_crude)
+    // console.log('line294',originalTagnames_dict_crude)
     // 3. make a dictionary to map out the standardized and original attribute names
     let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(str_all_prototype_xmlfiles)
     // console.log(originalAttrNames_dict_crude)
