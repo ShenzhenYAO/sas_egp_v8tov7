@@ -26,81 +26,9 @@ const __gitzipfile = "data/in/prototype/__git.zip";
     // console.log(thesrcxmlstr_cleaned)
 
     // 3. add a process flow (PFD)
-    /* add a process flow (PFD)
-    1) within ProjectCollection.Elements,add:
-        <Element Type="SAS.EG.ProjectElements.PFD">
-            <Element>
-                <Label>Process Flow</Label>
-                <Type>CONTAINER</Type>
-                <Container>ProjectCollection-YSaOXvMlqZ6BRnFU</Container>
-                <ID>PFD-n8WHPEFdyR4ZkBwa</ID>
-                <CreatedOn>637653859954823300</CreatedOn>
-                <ModifiedOn>637653859954823300</ModifiedOn>
-                <ModifiedBy>Z70</ModifiedBy>
-                <ModifiedByEGID>Z70</ModifiedByEGID>
-                <ModifiedByEGVer>7.100.5.0</ModifiedByEGVer>
-                <HasSerializationError>False</HasSerializationError>
-                <InputIDs />
-            </Element>
-            <ContainerElement>
-                <ContainerType>ProcessFlow</ContainerType>
-            </ContainerElement>
-            <PFD />
-        </Element>
-    2) within ProjectCollection.External_Objects.ProjectTreeView, add:
-            <EGTreeNode>
-                <NodeType>NODETYPE_ELEMENT</NodeType>
-                <ElementID>PFD-n8WHPEFdyR4ZkBwa</ElementID>
-                <Expanded>False</Expanded>
-                <Label>Process Flow</Label>
-            </EGTreeNode>
-    3) within ProjectCollection.External_Objects.ProcessFlowView.Containers, add:
-            <Properties>
-                <ID>PFD-n8WHPEFdyR4ZkBwa</ID>
-                <BackgroundColor>Default</BackgroundColor>
-                <Align>AlignTop</Align>
-            </Properties>
-    */
     // config the pfd element
-    let config_pfd={} 
-    config_pfd.element={}
-    config_pfd.element.attrs = [{ "Type": "SAS.EG.ProjectElements.PFD" }]
-    config_pfd.element.Label = 'PFD1'
-    config_pfd.element.Type = 'CONTAINER'
-    config_pfd.element.Container = config_project.Element.ID
-    config_pfd.element.ID = 'PFD-' + mymodules.generateUUID()
-    config_pfd.element.CreatedOn = config_project.Element.CreatedOn
-    config_pfd.element.ModifiedOn = config_project.Element.ModifiedOn
-    config_pfd.element.ModifiedBy = config_project.Element.ModifiedBy
-    config_pfd.element.ModifiedByEGID = config_project.Element.ModifiedByEGID
-
-    config_pfd.egtreenode={}
-    config_pfd.egtreenode.NodeType = 'NODETYPE_ELEMENT'
-    config_pfd.egtreenode.ElementID = config_pfd.element.ID
-    config_pfd.egtreenode.Label = config_pfd.element.Label
-
-    config_pfd.properties = {}
-    config_pfd.properties.ID = config_pfd.element.ID
+    let config_pfd = await config_pdf(config_project)
     doms_obj = await make_append_pfd_component(doms_obj, config_pfd)
-
-// make and appennd components for pfd  
-async function make_append_pfd_component(doms_obj, config_pfd){
-    // make the PFD component to append to ProjectCollection.Elements
-    let component_pfd_dom_obj = await make_pfd_component(config_pfd.element)
-    // append the PFD to ProjectCollection.Elements
-    $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
-
-    // make the egtreenode component to append to ProjectCollection.External_Objects.ProjectTreeView
-    let component_pfd_egtreenode_dom_obj = await make_EGTreeNode(config_pfd.egtreenode)
-    // append the treenode to ProjectCollection.External_Objects.ProjectTreeView
-    $(doms_obj.find('External_Objects').find('ProjectTreeView')[0]).append(component_pfd_egtreenode_dom_obj)
-
-    // make the properties component to append to ProjectCollection.External_Objects.ProcessFlowView.Containers 
-    let component_pfd_properties_dom_obj = await make_processflowview_properties(config_pfd.properties)
-    // append it to ProjectCollection.External_Objects.ProcessFlowView.Containers
-    $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Containers')[0]).append(component_pfd_properties_dom_obj)
-    return doms_obj
-} //function make_append_pfd_component
 
     let targetxmlstr = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
     // console.log(targetxmlstr)
@@ -134,16 +62,73 @@ async function make_append_pfd_component(doms_obj, config_pfd){
     }//function notrun(){
 })()
 
+// configuration for the pfd components
+async function config_pdf(config_project) {
+    let config_pfd = {}
+    // config the elemment tags (properties of the pfd)
+    config_pfd.element = {}
+    config_pfd.element.attrs = [{ "Type": "SAS.EG.ProjectElements.PFD" }]
+    config_pfd.element.Label = 'PFD1'
+    config_pfd.element.Type = 'CONTAINER'
+    config_pfd.element.Container = config_project.Element.ID
+    config_pfd.element.ID = 'PFD-' + mymodules.generateUUID()
+    config_pfd.element.CreatedOn = config_project.Element.CreatedOn
+    config_pfd.element.ModifiedOn = config_project.Element.ModifiedOn
+    config_pfd.element.ModifiedBy = config_project.Element.ModifiedBy
+    config_pfd.element.ModifiedByEGID = config_project.Element.ModifiedByEGID
+    //config the egtreenode tags
+    config_pfd.egtreenode = {}
+    config_pfd.egtreenode.NodeType = 'NODETYPE_ELEMENT'
+    config_pfd.egtreenode.ElementID = config_pfd.element.ID
+    config_pfd.egtreenode.Label = config_pfd.element.Label
+    //config the properties tags
+    config_pfd.properties = {}
+    config_pfd.properties.ID = config_pfd.element.ID
+    return config_pfd
+}//async function config_pdf
+// make and appennd components for pfd
+/* add a process flow (PFD)
+1) within ProjectCollection.Elements,add:
+    <Element Type="SAS.EG.ProjectElements.PFD">
+        <Element>...</Element>
+        <ContainerElement>...</ContainerElement>
+        <PFD />
+    </Element>
+2) within ProjectCollection.External_Objects.ProjectTreeView, add:
+        <EGTreeNode>...</EGTreeNode>
+3) within ProjectCollection.External_Objects.ProcessFlowView.Containers, add:
+        <Properties>...</Properties>
+*/
+async function make_append_pfd_component(doms_obj, config_pfd) {
+    // make the PFD component to append to ProjectCollection.Elements
+    let component_pfd_dom_obj = await make_pfd_component(config_pfd.element)
+    // append the PFD to ProjectCollection.Elements
+    $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
+
+    // make the egtreenode component to append to ProjectCollection.External_Objects.ProjectTreeView
+    let component_pfd_egtreenode_dom_obj = await make_EGTreeNode(config_pfd.egtreenode)
+    // append the treenode to ProjectCollection.External_Objects.ProjectTreeView
+    $(doms_obj.find('External_Objects').find('ProjectTreeView')[0]).append(component_pfd_egtreenode_dom_obj)
+
+    // make the properties component to append to ProjectCollection.External_Objects.ProcessFlowView.Containers 
+    let component_pfd_properties_dom_obj = await make_processflowview_properties(config_pfd.properties)
+    // append it to ProjectCollection.External_Objects.ProcessFlowView.Containers
+    $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Containers')[0]).append(component_pfd_properties_dom_obj)
+    return doms_obj
+}; //function make_append_pfd_component
+
 // make properties tag for ProjectCollection.External_Objects.ProcessFlowView.Containers
 async function make_processflowview_properties(config) {
-    let xmlstr = `
-    <Properties>
-        <ID></ID>
-        <BackgroundColor>Default</BackgroundColor>
-        <Align>AlignTop</Align>
-    </Properties>
-    `
-    let dom_obj = $(xmlstr)
+
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c03_pfd_properties_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log(thesrcxmlstr.substr(0, 100))
+
+    // 3.cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+
+    let dom_obj = $(thesrcxmlstr_cleaned)
     if (config.ID) { $(dom_obj.find('ID')[0]).text(config.ID) }
     if (config.BackgroundColor) { $(dom_obj.find('BackgroundColor')[0]).text(config.BackgroundColor) }
     if (config.Align) { $(dom_obj.find('Align')[0]).text(config.Align) }
@@ -153,15 +138,16 @@ async function make_processflowview_properties(config) {
 
 // make a EGTreeNode
 async function make_EGTreeNode(config) {
-    let xmlstr = `
-    <EGTreeNode>
-            <NodeType></NodeType>
-            <ElementID></ElementID>
-            <Expanded>False</Expanded>
-            <Label></Label>
-        </EGTreeNode>
-    `
-    let dom_obj = $(xmlstr)
+
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c02_pfd_egtreenode_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log(thesrcxmlstr.substr(0, 100))
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+
+    let dom_obj = $(thesrcxmlstr_cleaned)
     if (config.NodeType) { $(dom_obj.find('NodeType')[0]).text(config.NodeType) }
     if (config.ElementID) { $(dom_obj.find('ElementID')[0]).text(config.ElementID) }
     if (config.Expanded) { $(dom_obj.find('Expanded')[0]).text(config.Expanded) }
@@ -174,12 +160,16 @@ async function make_pfd_component(config) {
     // make the pfd element (properties of the pfd)
     let element_PFD1_dom_obj = await define_element(config)
     // make the container element of the pfd, this part is fixed for any PFD obj
-    let container_PFD1_xmlstr = `
-            <ContainerElement>
-                <ContainerType>ProcessFlow</ContainerType>
-            </ContainerElement>
-            `
-    let container_PFD1_dom_obj = $(container_PFD1_xmlstr)
+
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c01_pfd_containers_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log(thesrcxmlstr.substr(0, 100))
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+
+    let container_PFD1_dom_obj = $(thesrcxmlstr_cleaned)
     // make the default PFD element (the empty PFD element)
     let pfd_PFD1_dom_obj = $('<PFD></PFD>')
     // assemble the PFD component to be added to ProjectCollection.Elements
@@ -189,29 +179,22 @@ async function make_pfd_component(config) {
     component_pfd_dom_obj.append(pfd_PFD1_dom_obj)
 
     return component_pfd_dom_obj
-} // function make_pfd_component()
+}; // function make_pfd_component()
 /* define properties of a component.
     properties of a compenent are defined in the tag 'Element'. 
     The properties are standardized for most components
 */
 async function define_element(config) {
-    let xmlstr = `
-           <Element>
-                <Label></Label>
-                <Type></Type>
-                <Container></Container>
-                <ID></ID>
-                <CreatedOn></CreatedOn>
-                <ModifiedOn></ModifiedOn>
-                <ModifiedBy></ModifiedBy>
-                <ModifiedByEGID></ModifiedByEGID>
-                <ModifiedByEGVer>7.100.5.0</ModifiedByEGVer>
-                <HasSerializationError>False</HasSerializationError>
-                <InputIDs></InputIDs>
-            </Element>
-           `
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___b_element_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log(thesrcxmlstr.substr(0, 100))
+
+    // 3.cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+
     // make the obj
-    let theElement_dom_obj = $(xmlstr)
+    let theElement_dom_obj = $(thesrcxmlstr_cleaned)
     // set element attributes
     if (config.attrs && config.attrs.length > 0) {
         config.attrs.forEach(d => {
@@ -253,7 +236,7 @@ async function config_projectcollection() {
     config.Element.ModifiedBy = 'Me'
     config.Element.ModifiedByEGID = 'Me'
     return config
-} // function config_projectcollection
+}; // function config_projectcollection
 
 // clean up the target xml (e.g., convert standardized tag names and attribute names to original case form, etc)
 async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
@@ -284,14 +267,14 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
         modified_xmlstr = modified_xmlstr.replace(regEx_normalized1, theoriginal + '=')
     })
     return modified_xmlstr
-} //async function cleanup_targetxml()
+}; //async function cleanup_targetxml()
 
 
-// make the basic xml code for the project.xml
+// make the basic xml code for project.xml
 async function f01_makeBasicProjectScala(config) {
 
     // 1. read the xml code from the prototype scala of project collection
-    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___projectcollection_v7.xml'
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___a_projectcollection_v7.xml'
     // read the xml into a dom object
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
@@ -335,9 +318,8 @@ async function f01_makeBasicProjectScala(config) {
 
     $(doms_obj.find('External_Objects').find('MainForm').find('ActiveData')[0]).text('')
 
-
     return { "doms_obj": doms_obj, "thesrcxmlstr_cleaned": thesrcxmlstr_cleaned }
-}//async function f01_makeBasicProjectScala
+};//async function f01_makeBasicProjectScala
 
 // set init time (for the fields like createon, modifiedon,etc)
 // the time serial here is different from the SAS time serial
@@ -352,7 +334,7 @@ async function getTimeSerial(targetdatetime) {
     // Get bigint number is with an end of 'n', use toString() to convert the number to a string
     let timeSerial = BigInt((targetdatetime - date0) * 10000).toString()
     return timeSerial
-}//function getTimeSerial
+};//function getTimeSerial
 
 
 /*
@@ -375,7 +357,7 @@ function htmlDecode(input) {
     e.innerHTML = input;
     // handle case of empty input
     return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-}
+};
 
 // get a dict of attribute names in original case form like {"egversion":"EGversion"} (key is the normalized attribute name)
 // it is called _crude as it included strings in submitted code like "a in the submitted code a=1;"
@@ -439,7 +421,7 @@ function getOriginalTagNames_dict_crude(thexhmlstr) {
         }
     })
     return orignalTagnames_dict
-} // function getOriginalTagNames(thexhmlstr)
+}; // function getOriginalTagNames(thexhmlstr)
 // get the tag and attribute names and save into an obj {tagnames[], attrnames[]}
 function getTagAttrNames(doms) {
     let tagNames_arr = [], attrNames_arr = []
@@ -483,7 +465,7 @@ function append_cloned_components_of_the_first_dom_found_by_tagname(srcobj, targ
     // ...
     targetobj.append(theClone)
     // Note that nothing need to be returned, as the change will be made in v7 obj (remember that targetobj is just a nickname!)
-} //function append_cloned_components_of_the_first_dom_found_bytagname
+}; //function append_cloned_components_of_the_first_dom_found_bytagname
 
 // clean up the xmlstr
 function cleanxmlstr(thexmlstr) {
@@ -522,7 +504,7 @@ function cleanxmlstr(thexmlstr) {
     // console.log(thesrcxmlstr_removecomments)
 
     return thesrcxmlstr_removecomments
-} //
+}; //
 
 
 // change &amp;lt to <,  &gt to > ...
@@ -538,7 +520,7 @@ function normalize_ampersand_code(thestr) {
     thestr = thestr.replace(/&gt;/g, '__sasdeeplyscrewedgt__')
     thestr = thestr.replace(/&amp;/g, '_')// cannot have &amp; or & in xml
     return thestr
-} //function normalize_ampersand_code
+}; //function normalize_ampersand_code
 
 // jsdom does not handle the tag <Table>A</Table> well
 // In that case, it alters the html to '<Table></Table>A' !
@@ -547,7 +529,7 @@ function rename_tag_named_table(thestr) {
     thestr = thestr.replace(/\<Table\>/g, '<Table123>')
     thestr = thestr.replace(/\<\/Table\>/g, '</Table123>')
     return thestr
-} // function rename_tag_named_table
+}; // function rename_tag_named_table
 
 // convert <Parameters /> to <Parameters></Parameters>
 function convertSelfClosingHTML_to_OldSchoolHTML(str) {
@@ -571,7 +553,7 @@ function convertSelfClosingHTML_to_OldSchoolHTML(str) {
         }
     }
     return str
-} // function convertSelfClosingHTML_to_OldSchoolHTML(str...
+}; // function convertSelfClosingHTML_to_OldSchoolHTML(str...
 
 // remmove comments
 function removecomments(thestr) {
@@ -587,7 +569,8 @@ function removecomments(thestr) {
         }
     }
     return result
-} //function removecomments
+}; //function removecomments
+
 function removecomments_regex(thestr) {
     // find anything between <!-- and -->
     let matched_arr = thestr.match(/\<!--(.*)--\>/)
@@ -597,4 +580,4 @@ function removecomments_regex(thestr) {
         thestr = removecomments(thestr)
     }
     return thestr
-} // function convertSelfClosingHTML_to_OldSchoolHTML(str...
+}; // function convertSelfClosingHTML_to_OldSchoolHTML(str...
