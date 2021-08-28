@@ -86,7 +86,6 @@ async function config_pfd_function(config_project) {
     let config_pfd = {}
     // config the elemment tags (properties of the pfd)
     config_pfd.element = {}
-    config_pfd.element.attrs = [{ "Type": "SAS.EG.ProjectElements.PFD" }]
     config_pfd.element.Label = 'PFD1'
     config_pfd.element.Type = 'CONTAINER'
     config_pfd.element.Container = config_project.Element.ID
@@ -122,7 +121,7 @@ async function make_append_pfd_component(doms_obj, config_pfd) {
     // console.log(config_pfd.element)
     // make the PFD component to append to ProjectCollection.Elements
     let component_pfd_dom_obj = await make_pfd_component(config_pfd.element)
-    // console.log('line106', component_pfd_dom_obj.prop('outerHTML'))
+    // console.log('line125', component_pfd_dom_obj.prop('outerHTML'))
     // append the PFD to ProjectCollection.Elements
     $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
 
@@ -196,7 +195,7 @@ async function make_pfd_component(config) {
     // make the default PFD element (the empty PFD element)
     let pfd_PFD1_dom_obj = $('<PFD></PFD>')
     // assemble the PFD component to be added to ProjectCollection.Elements
-    let component_pfd_dom_obj = $('<Element></Element>')
+    let component_pfd_dom_obj = $('<Element Type="SAS.EG.ProjectElements.PFD"></Element>')
     component_pfd_dom_obj.append(element_PFD1_dom_obj)
     component_pfd_dom_obj.append(container_PFD1_dom_obj)
     component_pfd_dom_obj.append(pfd_PFD1_dom_obj)
@@ -265,6 +264,7 @@ async function config_projectcollection() {
 async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     // 1. get the modified xmlstr
     let modified_xmlstr = doms_obj.prop('outerHTML')
+    modified_xmlstr=modified_xmlstr.replace(/\>/g, '>\n')
 
     // 2. make dictionaries to map out original tagnames and attributenames
     // read all files in the prototype folder
@@ -273,13 +273,14 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     let filenames_prototypexmlfiles = await getfilenames_from_a_folder(thefolder_prototypexmls)
     // console.log('line274', filenames_prototypexmlfiles)
     // loop for each file in the prototypexml file folder, concat the xml strings in the file
-    let str_all_prototype_xmlfiles='<Table></Table>'
+    let str_all_prototype_xmlfiles='<Table></Table><PFD></PFD>'
     for (let i=0;i<filenames_prototypexmlfiles.length;i++){
         let d = filenames_prototypexmlfiles[i]
         if (d.substr(0, 3) === '___' && d !=='___sample.xml') {
             let thesrcxmlfile = thefolder_prototypexmls + '/' + d
             let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
             let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+            thesrcxmlfile.replace(/\>/g, '>\n')
             // console.log('line282', thesrcxmlstr)
             // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
             let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
@@ -292,7 +293,7 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
 
     // 2. make a dictionary to map out the standardized and original tagnames
     let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(str_all_prototype_xmlfiles)
-    // console.log(originalTagnames_dict_crude)
+    console.log('line294',originalTagnames_dict_crude)
     // 3. make a dictionary to map out the standardized and original attribute names
     let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(str_all_prototype_xmlfiles)
     // console.log(originalAttrNames_dict_crude)
