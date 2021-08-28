@@ -50,7 +50,6 @@ const __gitzipfile = "data/in/prototype/__git.zip";
         // save the xmlstr into a text file as ../data/out/
         let converted_v7_xmlstr = jquery_dom_obj_v7.prop("outerHTML")
 
-
         // merge the tagname_dicts
         let Tagnames_dict = { ...additional_v7tag_dict, ...originalTagnames_dict }
 
@@ -61,6 +60,26 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 
     }//function notrun(){
 })()
+
+// get an array of file names from a folder
+async function getfilenames_from_a_folder(thefolder) {
+    let fs = require('fs');
+    // get all files within the src folder
+    let newpromise = new Promise(
+        // then new promise is to define a resolved value
+        (resolve) => {
+            fs.readdir(thefolder, (err, files) => {
+                resolve(files)
+            });
+        }//resolve
+    ) // new promise1;
+    // create thestage
+    const resolved = await newpromise.then(d => {
+        // console.log(d)
+        return d
+    });
+    return resolved
+} // async function getfiles_from_a_folder
 
 // configuration for the pfd components
 async function config_pfd_function(config_project) {
@@ -85,7 +104,7 @@ async function config_pfd_function(config_project) {
     config_pfd.properties = {}
     config_pfd.properties.ID = config_pfd.element.ID
     return config_pfd
-}//async function config_pdf
+};//async function config_pdf
 // make and appennd components for pfd
 /* add a process flow (PFD)
 1) within ProjectCollection.Elements,add:
@@ -125,7 +144,7 @@ async function make_processflowview_properties(config) {
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c03_pfd_properties_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-    console.log('line128', thesrcxmlstr)
+    // console.log('line147', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
@@ -246,11 +265,36 @@ async function config_projectcollection() {
 async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     // 1. get the modified xmlstr
     let modified_xmlstr = doms_obj.prop('outerHTML')
+
+    // 2. make dictionaries to map out original tagnames and attributenames
+    // read all files in the prototype folder
+    // get all file names in 
+    let thefolder_prototypexmls = 'data/in/prototype/__xml/egpv7'
+    let filenames_prototypexmlfiles = await getfilenames_from_a_folder(thefolder_prototypexmls)
+    // console.log('line274', filenames_prototypexmlfiles)
+    // loop for each file in the prototypexml file folder, concat the xml strings in the file
+    let str_all_prototype_xmlfiles='<Table></Table>'
+    for (let i=0;i<filenames_prototypexmlfiles.length;i++){
+        let d = filenames_prototypexmlfiles[i]
+        if (d.substr(0, 3) === '___' && d !=='___sample.xml') {
+            let thesrcxmlfile = thefolder_prototypexmls + '/' + d
+            let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+            let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+            // console.log('line282', thesrcxmlstr)
+            // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+            let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+            // console.log('line285',thesrcxmlstr_cleaned )
+            str_all_prototype_xmlfiles=str_all_prototype_xmlfiles+thesrcxmlstr_cleaned
+            // console.log('line287', str_all_prototype_xmlfiles)
+        } // if (d.substr(0, 3) === '___')
+    } //filenames_prototypexmlfiles.forEach(d
+    // console.log('line291', str_all_prototype_xmlfiles )
+
     // 2. make a dictionary to map out the standardized and original tagnames
-    let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(thesrcxmlstr_cleaned)
+    let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(str_all_prototype_xmlfiles)
     // console.log(originalTagnames_dict_crude)
     // 3. make a dictionary to map out the standardized and original attribute names
-    let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(thesrcxmlstr_cleaned)
+    let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(str_all_prototype_xmlfiles)
     // console.log(originalAttrNames_dict_crude)
 
     // 4. replacce the standardized tagnames (all in uppercase) to original names
