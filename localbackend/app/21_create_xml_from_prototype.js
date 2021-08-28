@@ -264,7 +264,7 @@ async function config_projectcollection() {
 async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     // 1. get the modified xmlstr
     let modified_xmlstr = doms_obj.prop('outerHTML')
-    modified_xmlstr=modified_xmlstr.replace(/\>/g, '>\n')
+    modified_xmlstr=modified_xmlstr.replace(/\>/g, '>\n___123456___\n')
 
     // 2. make dictionaries to map out original tagnames and attributenames
     // read all files in the prototype folder
@@ -273,14 +273,14 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     let filenames_prototypexmlfiles = await getfilenames_from_a_folder(thefolder_prototypexmls)
     // console.log('line274', filenames_prototypexmlfiles)
     // loop for each file in the prototypexml file folder, concat the xml strings in the file
-    let str_all_prototype_xmlfiles='<Table></Table><PFD></PFD>'
+    let str_all_prototype_xmlfiles='<Table>\n</Table>\n<PFD>\n</PFD>\n'
     for (let i=0;i<filenames_prototypexmlfiles.length;i++){
         let d = filenames_prototypexmlfiles[i]
         if (d.substr(0, 3) === '___' && d !=='___sample.xml') {
             let thesrcxmlfile = thefolder_prototypexmls + '/' + d
             let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
             let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-            thesrcxmlfile.replace(/\>/g, '>\n')
+            thesrcxmlstr=thesrcxmlstr.replace(/\>/g, '>\n')
             // console.log('line282', thesrcxmlstr)
             // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
             let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
@@ -315,6 +315,10 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
         let regEx_normalized1 = new RegExp(d.toLowerCase() + '=', 'g')
         modified_xmlstr = modified_xmlstr.replace(regEx_normalized1, theoriginal + '=')
     })
+
+    // 6. remove the '\n___123456___\n'
+    modified_xmlstr=modified_xmlstr.replace(/\n___123456___\n/g, '')
+
     return modified_xmlstr
 }; //async function cleanup_targetxml()
 
