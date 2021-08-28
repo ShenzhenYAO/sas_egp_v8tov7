@@ -27,7 +27,7 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 
     // 3. add a process flow (PFD)
     // config the pfd element
-    let config_pfd = await config_pdf(config_project)
+    let config_pfd = await config_pfd_function(config_project)
     doms_obj = await make_append_pfd_component(doms_obj, config_pfd)
 
     let targetxmlstr = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
@@ -63,7 +63,7 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 })()
 
 // configuration for the pfd components
-async function config_pdf(config_project) {
+async function config_pfd_function(config_project) {
     let config_pfd = {}
     // config the elemment tags (properties of the pfd)
     config_pfd.element = {}
@@ -100,8 +100,10 @@ async function config_pdf(config_project) {
         <Properties>...</Properties>
 */
 async function make_append_pfd_component(doms_obj, config_pfd) {
+    // console.log(config_pfd.element)
     // make the PFD component to append to ProjectCollection.Elements
     let component_pfd_dom_obj = await make_pfd_component(config_pfd.element)
+    // console.log('line106', component_pfd_dom_obj.prop('outerHTML'))
     // append the PFD to ProjectCollection.Elements
     $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
 
@@ -123,9 +125,9 @@ async function make_processflowview_properties(config) {
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c03_pfd_properties_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-    // console.log(thesrcxmlstr.substr(0, 100))
+    console.log('line128', thesrcxmlstr)
 
-    // 3.cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
 
     let dom_obj = $(thesrcxmlstr_cleaned)
@@ -142,7 +144,7 @@ async function make_EGTreeNode(config) {
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c02_pfd_egtreenode_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-    // console.log(thesrcxmlstr.substr(0, 100))
+    // console.log('line147',thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
@@ -157,14 +159,16 @@ async function make_EGTreeNode(config) {
 
 // make a pfd component (to be appended to ProjectCollection.Elements)
 async function make_pfd_component(config) {
+    // console.log('line 162', config)
     // make the pfd element (properties of the pfd)
     let element_PFD1_dom_obj = await define_element(config)
+    // console.log('line165', element_PFD1_dom_obj.prop('outerHTML'))
     // make the container element of the pfd, this part is fixed for any PFD obj
 
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c01_pfd_containers_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-    // console.log(thesrcxmlstr.substr(0, 100))
+    // console.log('line171', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
@@ -188,9 +192,9 @@ async function define_element(config) {
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___b_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-    // console.log(thesrcxmlstr.substr(0, 100))
+    // console.log('line 195', thesrcxmlstr)
 
-    // 3.cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
 
     // make the obj
@@ -199,8 +203,8 @@ async function define_element(config) {
     if (config.attrs && config.attrs.length > 0) {
         config.attrs.forEach(d => {
             theElement_dom_obj.attr(d.name, d.value)
-        })
-    }
+        })//config.attrs.forEach
+    } //if (config.attrs && config.attrs.length > 0)
     // set properties
     if (config.Label) { $(theElement_dom_obj.find('label')[0]).text(config.Lable) }
     if (config.Type) { $(theElement_dom_obj.find('Type')[0]).text(config.Type) }
