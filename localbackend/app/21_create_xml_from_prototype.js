@@ -41,19 +41,14 @@ const __gitzipfile = "data/in/prototype/__git.zip";
     // 4. add a task
     // 4.1 configuration for the task_component
     let config_task = await config_task_function(config_pfd)
-    // console.log('line46', config_task)
+    // console.log('line44', config_task)
 
     // 4.2 add task components
-    async function make_append_task_component(config_task) {
+    doms_obj = await make_append_task_component(doms_obj, config_task)
+    // make and append task related components
+    async function make_append_task_component(doms_obj, config_task) {
         // 1. within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
-        async function make_append_task_process_component(doms_obj, config_task) {
-            // 1a. make task_process
-            async function make_task_process_component(config_task) { };//async function make_task_process_component 
-            // 1b. append task_process
-            async function append_task_process_component(doms_obj, config_task) { }; //async function append_task_process_component
-
-            return doms_obj
-        }; // async function make_append_task_process_component 
+        doms_obj = await make_append_task_process_component(doms_obj, config_task)
 
         // 2. within ProjectCollection.Elements, add a element tag for task (in which multiple tags are encompassed)
         async function make_append_task_element_component(doms_obj, config_task) {
@@ -66,14 +61,9 @@ const __gitzipfile = "data/in/prototype/__git.zip";
         }; // async function make_append_task_element_component  
 
         // 3. within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
-        async function make_append_task_egtreenode_component(doms_obj, config_task) {
-            // 1a. make task_egtreenode_component
-            async function make_task_egtreenode_component(config_task) { };//async function make_task_process_component 
-            // 1b. append task_egtreenode_component
-            async function append_task_egtreenode_component(doms_obj, config_task) { }; //async function append_task_process_component
+        doms_obj = await make_append_task_egtreenode_component(doms_obj, config_task)
 
-            return doms_obj
-        }; // async function make_append_task_egtreenode_component  
+
 
         //4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic component
         async function make_append_task_taskgraphic_component(doms_obj, config_task) {
@@ -85,111 +75,10 @@ const __gitzipfile = "data/in/prototype/__git.zip";
             return doms_obj
         }; // async function make_append_task_taskgraphic_component  
 
+        return doms_obj
     };//async function make_append_task_element_component
 
 
-    /* within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add:
-                <Process>
-                    <Element>
-                        <ID>CodeTask-fGud3CP5bdr2Hxot</ID>
-                    </Element>
-                    <Dependencies />
-                </Process>
-
-       within ProjectCollection.Elements, add a task component
-       <Element Type="SAS.EG.ProjectElements.CodeTask">
-            <Element>
-                <Label>pfd1 p1</Label>
-                <Type>TASK</Type>
-                <Container>PFD-g1w76DFl1gaR65CW</Container>
-                <ID>CodeTask-fGud3CP5bdr2Hxot</ID>
-                <CreatedOn>637657899265464154</CreatedOn>
-                <ModifiedOn>637657899763139188</ModifiedOn>
-                <ModifiedBy>Z70</ModifiedBy>
-                <ModifiedByEGID>Z70</ModifiedByEGID>
-                <ModifiedByEGVer>7.100.5.6226</ModifiedByEGVer>
-                <HasSerializationError>False</HasSerializationError>
-                <InputIDs />
-            </Element>
-            <SubmitableElement>
-                <UseGlobalOptions>True</UseGlobalOptions>
-                <Server>Local</Server>
-                <HASERROR>False</HASERROR>
-                <HASWARNING>False</HASWARNING>
-                <HtmlActiveOverride>false</HtmlActiveOverride>
-                <RtfActiveOverride>false</RtfActiveOverride>
-                <PdfActiveOverride>false</PdfActiveOverride>
-                <SasReportActiveOverride>true</SasReportActiveOverride>
-                <ListingActiveOverride>false</ListingActiveOverride>
-                <PowerpointActiveOverride>false</PowerpointActiveOverride>
-                <ExcelActiveOverride>false</ExcelActiveOverride>
-                <AutoDisplayActiveOverride>true</AutoDisplayActiveOverride>
-                <PdfStyleOverride>Pearl</PdfStyleOverride>
-                <RtfStyleOverride>RTF</RtfStyleOverride>
-                <HtmlStyleNameOverride>HtmlBlue</HtmlStyleNameOverride>
-                <HtmlStyleCategoryOverride>BuiltIn</HtmlStyleCategoryOverride>
-                <HtmlStyleUrlOverride>F:\Program Files\SASHome\SASEnterpriseGuide\7.1\Styles\HtmlBlue.css</HtmlStyleUrlOverride>
-                <SasReportStyleNameOverride>HtmlBlue</SasReportStyleNameOverride>
-                <SasReportStyleCategoryOverride>BuiltIn</SasReportStyleCategoryOverride>
-                <SasReportStyleUrlOverride>F:\Program Files\SASHome\SASEnterpriseGuide\7.1\Styles\HtmlBlue.css</SasReportStyleUrlOverride>
-                <PowerpointStyleOverride>PowerPointLight</PowerpointStyleOverride>
-                <ExcelStyleOverride>Excel</ExcelStyleOverride>
-                <GraphDeviceOverride>Png</GraphDeviceOverride>
-                <UseProjectSubmitOptions>true</UseProjectSubmitOptions>
-                <SubmitToGrid>false</SubmitToGrid>
-                <QueueSubmitsForServer>true</QueueSubmitsForServer>
-                <ActionOnError>StopCurrentBranch</ActionOnError>
-                <ExpectedOutputDataList />
-                <Parameters />
-                <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan>
-                <JobRecipe>
-                    <JobRecipe>
-                        <log />
-                        <code />
-                        <OutputDataList />
-                        <ODSResultsList />
-                    </JobRecipe>
-                </JobRecipe>
-            </SubmitableElement>
-            <CodeTask>
-                <IncludeWrapper>True</IncludeWrapper>
-                <Embedded>True</Embedded>
-                <DNA />
-            </CodeTask>
-        </Element>
-        3. within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1), add:
-                <EGTreeNode>
-                    <NodeType>NODETYPE_PROGRAMFOLDER</NodeType>
-                    <Expanded>True</Expanded>
-                    <Label>Programs</Label>
-                    <EGTreeNode>
-                        <NodeType>NODETYPE_ELEMENT</NodeType>
-                        <ElementID>CodeTask-fGud3CP5bdr2Hxot</ElementID>
-                        <Expanded>False</Expanded>
-                        <Label>pfd1 p1</Label>
-                    </EGTreeNode>
-                </EGTreeNode>
-        4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add:
-                <TaskGraphic>
-                    <Type>Task</Type>
-                    <Id>a0452d75-5792-454d-bd1b-ea1c5cb250d0</Id>
-                    <LineWidth>1</LineWidth>
-                    <Fill>false</Fill>
-                    <PosX>24</PosX>
-                    <PosY>12</PosY>
-                    <Width>36</Width>
-                    <Height>36</Height>
-                    <Rotation>0</Rotation>
-                    <Visible>true</Visible>
-                    <Border>false</Border>
-                    <AutoSize>true</AutoSize>
-                    <Removable>true</Removable>
-                    <Child>false</Child>
-                    <Selected>false</Selected>
-                    <Label>pfd1 p1</Label>
-                    <Element>CodeTask-fGud3CP5bdr2Hxot</Element>
-                </TaskGraphic>        
-     */
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
     // remove lines only containing spaces and line breakers
     let targetxmlstr = remove_spaces_linebreakers(targetxmlstr_cleaned)
@@ -207,6 +96,92 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 
 })()
 
+// within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
+async function make_append_task_egtreenode_component(doms_obj, config_task) {
+    // 1a. make task_egtreenode_component
+    let task_egtreenode_dom_obj = await make_EGTreeNode(config_task.EGTreeNode)
+    // console.log('line69', task_egtreenode_dom_obj.prop('outerHTML'))
+    // 1b. append task_egtreenode_component
+    // find all PFD EGTreeNode under Elements ProjectColletion.External_Objects.ProjectTreeView
+    let egtreenode_pfd_doms_obj = $(doms_obj.find('External_Objects').find('ProjectTreeView').find('EGTreeNode'))
+    // loop for each of such EGTreeNode elements, and identify the one with the same PFD ID as in config_task.Element.Container
+    let break_i_loop = 0
+    for (let i = 0; i < egtreenode_pfd_doms_obj.length; i++) {
+        let the_egtreenode_pfd_dom_obj = $(egtreenode_pfd_doms_obj[i])
+        // get the textcontent of .ElementID tag of the_egtreenode_pfd_dom_obj
+        let the_egtreenode_pfd_elementid_dom_obj = $(the_egtreenode_pfd_dom_obj.find('ElementID')[0])
+        let the_pfd_id = the_egtreenode_pfd_elementid_dom_obj.text()
+        // compare the_pfd_id with the pfd id in config_task.Element.Container (config_task.Element.Container)
+        if (the_pfd_id && the_pfd_id === config_task.Element.Container) {
+            // identify the EGTreeNode for programs under the identified PFD EGTreeNode
+            let egtreenode_program_egtreenode_pfd_doms_obj = $(the_egtreenode_pfd_dom_obj.find('EGTreeNode'))
+            // console.log('line84', egtreenode_program_egtreenode_pfd_doms_obj.prop('outerHTML'))
+            // loop for each of such EGTreeNode elements, and identify the program EGTreeNode, i.e. the one with NoteType.text() = 'NODETYPE_PROGRAMFOLDER' and Label.text()='Programs'
+            for (let j = 0; j < egtreenode_program_egtreenode_pfd_doms_obj.length; j++) {
+                let the_egtreenode_program_dom_obj = $(egtreenode_program_egtreenode_pfd_doms_obj[j])
+                // console.log('line88', the_egtreenode_program_dom_obj)
+                let nodetype_the_egtreenode_dom_obj = $(the_egtreenode_program_dom_obj.find('NodeType')[0])
+                let nodetypetext_the_egtreenode_dom_obj = nodetype_the_egtreenode_dom_obj.text()
+                let label_the_egtreenode_dom_obj = $(the_egtreenode_program_dom_obj.find('Label')[0])
+                let labeltext_the_egtreenode_dom_obj = label_the_egtreenode_dom_obj.text()
+                if (nodetypetext_the_egtreenode_dom_obj === 'NODETYPE_PROGRAMFOLDER' && labeltext_the_egtreenode_dom_obj === 'Programs') {
+                    // append the task_egtreenode_dom_obj to the current the_egtreenode_dom_obj
+                    the_egtreenode_program_dom_obj.append(task_egtreenode_dom_obj)
+                    break_i_loop = 1
+                    break
+                } //if (nodetypetext_the_egtreenode_dom_obj === '' && labeltext_the_egtreenode_dom_obj === '')
+            }//  for (let j = 0; j < the_egtreenode_program_egtreenode_pfd_doms_obj.length; j++)
+            if (break_i_loop === 1) { break }
+        } // if (the_pfd_id && the_pfd_id === config_pfd.Element.ID )
+    } // for (let i=0; i < egtreenode_pfd_doms_obj.length; i++)
+    return doms_obj
+}; // async function make_append_task_egtreenode_component  
+
+//within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
+async function make_append_task_process_component(doms_obj, config_task) {
+    // console.log('line150', doms_obj)
+    // 1a. make task_process            
+    let task_process_doms_obj = await make_task_process_component(config_task)
+    // console.log('line54', task_process_doms_obj.prop('outerHTML'))
+
+    // 1b. append task_process to the corresponding PFD
+    // find all PFD Elements under Elements
+    let element_pfd_doms_obj = $(doms_obj.find('Elements').find('Element'))
+    // loop for each of such Element elements, and identify the one with the same PFD ID as in config_task.Element.Container
+    for (let i = 0; i < element_pfd_doms_obj.length; i++) {
+        let the_element_pfd_dom_obj = $(element_pfd_doms_obj[i])
+        // get the textcontent of .ElementID tag of the_egtreenode_pfd_dom_obj
+        let the_element_pfd_element_id_dom_obj = $(the_element_pfd_dom_obj.find('Element').find('ID')[0])
+        let the_pfd_id = the_element_pfd_element_id_dom_obj.text()
+        // compare the_pfd_id with the pfd id in config_task.Element.Container (config_task.Element.Container)
+        if (the_pfd_id && the_pfd_id === config_task.Element.Container) {
+            // append the task_process_doms_obj to the specified PFD's PFD tag
+            $(the_element_pfd_dom_obj.find('PFD')[0]).append(task_process_doms_obj)
+            break
+        } // if (the_pfd_id && the_pfd_id === config_pfd.Element.ID )
+    } // for (let i=0; i < egtreenode_pfd_doms_obj.length; i++)
+    // console.log('line171', doms_obj)
+    return doms_obj
+}; // async function make_append_task_process_component 
+
+// make process components for a task
+async function make_task_process_component(config_task) {
+    // load the prototype xml for the target component
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___e01_task_process_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log('line57', thesrcxmlstr)
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+    let component_dom_obj = $(thesrcxmlstr_cleaned)
+
+    if (config_task.Process.Element.ID) { $(component_dom_obj.find('Element').find('ID')[0]).text(config_task.Process.Element.ID) }
+    // could config more... 
+
+    return component_dom_obj
+};//async function make_task_process_component 
+
 // remove lines only containing spaces and line breakers
 function remove_spaces_linebreakers(text) {
     let result = ''
@@ -217,7 +192,8 @@ function remove_spaces_linebreakers(text) {
         let theline_removing_whitespaces = d.replace(/\s/g, '')
         // console.log(theline_removing_whitespaces)
         if (theline_removing_whitespaces.length > 0) {
-            result = result + theline_removing_whitespaces + '\n'
+            // it is tricky here, for lines not only with white spaces, use the original string in d. That way, a string like 'PFD1 p1' won't be converted to 'PFD1p1'
+            result = result + d + '\n'
         } // if (theline_removing_whitespaces.length >0)    
     }) //lines.forEach
     // console.log(result)
@@ -407,11 +383,11 @@ async function make_processflowview_properties(config) {
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
 
-    let dom_obj = $(thesrcxmlstr_cleaned)
-    if (config.ID) { $(dom_obj.find('ID')[0]).text(config.ID) }
-    if (config.BackgroundColor) { $(dom_obj.find('BackgroundColor')[0]).text(config.BackgroundColor) }
-    if (config.Align) { $(dom_obj.find('Align')[0]).text(config.Align) }
-    return dom_obj
+    let component_dom_obj = $(thesrcxmlstr_cleaned)
+    if (config.ID) { $(component_dom_obj.find('ID')[0]).text(config.ID) }
+    if (config.BackgroundColor) { $(component_dom_obj.find('BackgroundColor')[0]).text(config.BackgroundColor) }
+    if (config.Align) { $(component_dom_obj.find('Align')[0]).text(config.Align) }
+    return component_dom_obj
 }; // function make_processflowview_properties
 
 
@@ -426,12 +402,12 @@ async function make_EGTreeNode(config) {
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
 
-    let dom_obj = $(thesrcxmlstr_cleaned)
-    if (config.NodeType) { $(dom_obj.find('NodeType')[0]).text(config.NodeType) }
-    if (config.ElementID) { $(dom_obj.find('ElementID')[0]).text(config.ElementID) }
-    if (config.Expanded) { $(dom_obj.find('Expanded')[0]).text(config.Expanded) }
-    if (config.Label) { $(dom_obj.find('Label')[0]).text(config.Label) }
-    return dom_obj
+    let component_dom_obj = $(thesrcxmlstr_cleaned)
+    if (config.NodeType) { $(component_dom_obj.find('NodeType')[0]).text(config.NodeType) }
+    if (config.ElementID) { $(component_dom_obj.find('ElementID')[0]).text(config.ElementID) }
+    if (config.Expanded) { $(component_dom_obj.find('Expanded')[0]).text(config.Expanded) }
+    if (config.Label) { $(component_dom_obj.find('Label')[0]).text(config.Label) }
+    return component_dom_obj
 } // function make_EGTreeNode()
 
 // make a pfd component (to be appended to ProjectCollection.Elements)
