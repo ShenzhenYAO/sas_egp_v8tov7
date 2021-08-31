@@ -13,6 +13,7 @@ var $ = require("jquery")(window);
 
 // https://www.npmjs.com/package/adm-zip
 const AdmZip = require('adm-zip');
+const { config } = require('process');
 
 const __gitzipfile = "data/in/prototype/__git.zip";
 
@@ -30,7 +31,168 @@ const __gitzipfile = "data/in/prototype/__git.zip";
     let config_pfd = await config_pfd_function(config_project)
     doms_obj = await make_append_pfd_component(doms_obj, config_pfd)
 
-    let targetxmlstr = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
+    // 4. add an EGTreeNode for wrapping all programs/tasks for ProjectTreeView. 
+    // The EGTreeNode is to be added to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+    // 4a. Configuration of the EGTreeNode    
+    let config_programs = await config_programs_function(config_pfd)
+    // 4b. make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+    doms_obj = await make_append_egtreenode_programs(doms_obj, config_programs, config_pfd)
+
+    // 4. add a task
+    // 4.1 configuration for the task_component
+    let config_task = await config_task_function(config_pfd)
+    // console.log('line46', config_task)
+
+    // 4.2 add task components
+    async function make_append_task_component(config_task) {
+        // 1. within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
+        async function make_append_task_process_component(doms_obj, config_task) {
+            // 1a. make task_process
+            async function make_task_process_component(config_task) { };//async function make_task_process_component 
+            // 1b. append task_process
+            async function append_task_process_component(doms_obj, config_task) { }; //async function append_task_process_component
+
+            return doms_obj
+        }; // async function make_append_task_process_component 
+
+        // 2. within ProjectCollection.Elements, add a element tag for task (in which multiple tags are encompassed)
+        async function make_append_task_element_component(doms_obj, config_task) {
+            // 1a. make task_element_component
+            async function make_task_element_component(config_task) { };//async function make_task_process_component 
+            // 1b. append task_element_component
+            async function append_task_element_component(doms_obj, config_task) { }; //async function append_task_process_component
+
+            return doms_obj
+        }; // async function make_append_task_element_component  
+
+        // 3. within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
+        async function make_append_task_egtreenode_component(doms_obj, config_task) {
+            // 1a. make task_egtreenode_component
+            async function make_task_egtreenode_component(config_task) { };//async function make_task_process_component 
+            // 1b. append task_egtreenode_component
+            async function append_task_egtreenode_component(doms_obj, config_task) { }; //async function append_task_process_component
+
+            return doms_obj
+        }; // async function make_append_task_egtreenode_component  
+
+        //4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic component
+        async function make_append_task_taskgraphic_component(doms_obj, config_task) {
+            // 1a. make task_taskgraphic
+            async function make_task_taskgraphic_component(config_task) { };//async function make_task_process_component 
+            // 1b. append task_taskgraphic components
+            async function append_task_taskgraphic_component(doms_obj, config_task) { }; //async function append_task_process_component
+
+            return doms_obj
+        }; // async function make_append_task_taskgraphic_component  
+
+    };//async function make_append_task_element_component
+
+
+    /* within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add:
+                <Process>
+                    <Element>
+                        <ID>CodeTask-fGud3CP5bdr2Hxot</ID>
+                    </Element>
+                    <Dependencies />
+                </Process>
+
+       within ProjectCollection.Elements, add a task component
+       <Element Type="SAS.EG.ProjectElements.CodeTask">
+            <Element>
+                <Label>pfd1 p1</Label>
+                <Type>TASK</Type>
+                <Container>PFD-g1w76DFl1gaR65CW</Container>
+                <ID>CodeTask-fGud3CP5bdr2Hxot</ID>
+                <CreatedOn>637657899265464154</CreatedOn>
+                <ModifiedOn>637657899763139188</ModifiedOn>
+                <ModifiedBy>Z70</ModifiedBy>
+                <ModifiedByEGID>Z70</ModifiedByEGID>
+                <ModifiedByEGVer>7.100.5.6226</ModifiedByEGVer>
+                <HasSerializationError>False</HasSerializationError>
+                <InputIDs />
+            </Element>
+            <SubmitableElement>
+                <UseGlobalOptions>True</UseGlobalOptions>
+                <Server>Local</Server>
+                <HASERROR>False</HASERROR>
+                <HASWARNING>False</HASWARNING>
+                <HtmlActiveOverride>false</HtmlActiveOverride>
+                <RtfActiveOverride>false</RtfActiveOverride>
+                <PdfActiveOverride>false</PdfActiveOverride>
+                <SasReportActiveOverride>true</SasReportActiveOverride>
+                <ListingActiveOverride>false</ListingActiveOverride>
+                <PowerpointActiveOverride>false</PowerpointActiveOverride>
+                <ExcelActiveOverride>false</ExcelActiveOverride>
+                <AutoDisplayActiveOverride>true</AutoDisplayActiveOverride>
+                <PdfStyleOverride>Pearl</PdfStyleOverride>
+                <RtfStyleOverride>RTF</RtfStyleOverride>
+                <HtmlStyleNameOverride>HtmlBlue</HtmlStyleNameOverride>
+                <HtmlStyleCategoryOverride>BuiltIn</HtmlStyleCategoryOverride>
+                <HtmlStyleUrlOverride>F:\Program Files\SASHome\SASEnterpriseGuide\7.1\Styles\HtmlBlue.css</HtmlStyleUrlOverride>
+                <SasReportStyleNameOverride>HtmlBlue</SasReportStyleNameOverride>
+                <SasReportStyleCategoryOverride>BuiltIn</SasReportStyleCategoryOverride>
+                <SasReportStyleUrlOverride>F:\Program Files\SASHome\SASEnterpriseGuide\7.1\Styles\HtmlBlue.css</SasReportStyleUrlOverride>
+                <PowerpointStyleOverride>PowerPointLight</PowerpointStyleOverride>
+                <ExcelStyleOverride>Excel</ExcelStyleOverride>
+                <GraphDeviceOverride>Png</GraphDeviceOverride>
+                <UseProjectSubmitOptions>true</UseProjectSubmitOptions>
+                <SubmitToGrid>false</SubmitToGrid>
+                <QueueSubmitsForServer>true</QueueSubmitsForServer>
+                <ActionOnError>StopCurrentBranch</ActionOnError>
+                <ExpectedOutputDataList />
+                <Parameters />
+                <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan>
+                <JobRecipe>
+                    <JobRecipe>
+                        <log />
+                        <code />
+                        <OutputDataList />
+                        <ODSResultsList />
+                    </JobRecipe>
+                </JobRecipe>
+            </SubmitableElement>
+            <CodeTask>
+                <IncludeWrapper>True</IncludeWrapper>
+                <Embedded>True</Embedded>
+                <DNA />
+            </CodeTask>
+        </Element>
+        3. within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1), add:
+                <EGTreeNode>
+                    <NodeType>NODETYPE_PROGRAMFOLDER</NodeType>
+                    <Expanded>True</Expanded>
+                    <Label>Programs</Label>
+                    <EGTreeNode>
+                        <NodeType>NODETYPE_ELEMENT</NodeType>
+                        <ElementID>CodeTask-fGud3CP5bdr2Hxot</ElementID>
+                        <Expanded>False</Expanded>
+                        <Label>pfd1 p1</Label>
+                    </EGTreeNode>
+                </EGTreeNode>
+        4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add:
+                <TaskGraphic>
+                    <Type>Task</Type>
+                    <Id>a0452d75-5792-454d-bd1b-ea1c5cb250d0</Id>
+                    <LineWidth>1</LineWidth>
+                    <Fill>false</Fill>
+                    <PosX>24</PosX>
+                    <PosY>12</PosY>
+                    <Width>36</Width>
+                    <Height>36</Height>
+                    <Rotation>0</Rotation>
+                    <Visible>true</Visible>
+                    <Border>false</Border>
+                    <AutoSize>true</AutoSize>
+                    <Removable>true</Removable>
+                    <Child>false</Child>
+                    <Selected>false</Selected>
+                    <Label>pfd1 p1</Label>
+                    <Element>CodeTask-fGud3CP5bdr2Hxot</Element>
+                </TaskGraphic>        
+     */
+    let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
+    // remove lines only containing spaces and line breakers
+    let targetxmlstr = remove_spaces_linebreakers(targetxmlstr_cleaned)
     // console.log(targetxmlstr)
     targetxmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + targetxmlstr
     let thetargetxmlfile = 'data/out/test/' + config_project.Element.Label + '.xml'
@@ -40,26 +202,122 @@ const __gitzipfile = "data/in/prototype/__git.zip";
     const newZip = new AdmZip()
     // using Buffer to impor the xml with utf16 encoding
     newZip.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
-
     // writeZip the newZip instead of the original (theZip)
     await newZip.writeZip("data/out/test/" + config_project.Element.Label + ".egp")
 
-    async function notrun() {
-
-        // console.log(jquery_dom_obj_v7.prop("outerHTML"))
-        // save the xmlstr into a text file as ../data/out/
-        let converted_v7_xmlstr = jquery_dom_obj_v7.prop("outerHTML")
-
-        // merge the tagname_dicts
-        let Tagnames_dict = { ...additional_v7tag_dict, ...originalTagnames_dict }
-
-        let additional_v7attr_dict = { "usesubcontainers": "UseSubcontainers" }
-        let Attrnames_dict = { ...additional_v7attr_dict, ...originalAttrNames_dict }
-        // console.log(Tagnames_dict)
-        // console.log(Attrnames_dict)
-
-    }//function notrun(){
 })()
+
+// remove lines only containing spaces and line breakers
+function remove_spaces_linebreakers(text) {
+    let result = ''
+    // read the str into lines
+    let lines = text.split('\n')
+    // for each line, replace the white spaces with nothing and then concat
+    lines.forEach(d => {
+        let theline_removing_whitespaces = d.replace(/\s/g, '')
+        // console.log(theline_removing_whitespaces)
+        if (theline_removing_whitespaces.length > 0) {
+            result = result + theline_removing_whitespaces + '\n'
+        } // if (theline_removing_whitespaces.length >0)    
+    }) //lines.forEach
+    // console.log(result)
+    return result
+};//remove_spaces_linebreakers
+
+// configuration of the EGTreeNode for programs. The EGTreeNode is to be added to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+async function config_programs_function(config_pfd) {
+    // for the progerams_EGTreeNode, the config_pfd input is not used (no need to set PFD ID there)
+    // however, the input is kept to be consistent with configuaration functions of other components
+    let config_programs = {}
+    config_programs.NodeType = 'NODETYPE_PROGRAMFOLDER'
+    config_programs.ElementID = ''
+    config_programs.Expanded = 'True'
+    config_programs.Label = 'Programs'
+    return config_programs
+};//config_egtreenode_programs_function
+
+// make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+async function make_append_egtreenode_programs(doms_obj, config_program_egtreenode, config_pfd) {
+    // console.log('line221', config_pfd)
+    //1. make the EGTreeNode component
+    let component_egtreenode_programs_dom_obj = await make_EGTreeNode(config_program_egtreenode)
+    // console.log('line224', component_egtreenode_programs_dom_obj.prop('outerHTML'))
+
+    //2. append the EGTreeNode to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+    // find all EGTreeNode Elements under ProjectTreeView
+    let egtreenode_pfd_doms_obj = $(doms_obj.find('External_Objects').find('EGTreeNode'))
+    // loop for each of such EGTreeNode elements, and identify the one with the same PFD ID as the PFD ID specified in config_pfd
+    for (let i = 0; i < egtreenode_pfd_doms_obj.length; i++) {
+        let the_egtreenode_pfd_dom_obj = $(egtreenode_pfd_doms_obj[i])
+        // get the textcontent of .ElementID tag of the_egtreenode_pfd_dom_obj
+        let the_pfd_elementid_dom_obj = $(the_egtreenode_pfd_dom_obj.find('ElementID')[0])
+        let the_pfd_id = the_pfd_elementid_dom_obj.text()
+        // compare the_pfd_id with the pfd id in config_pfd (config_pfd.Element.ID)
+        if (the_pfd_id && the_pfd_id === config_pfd.Element.ID) {
+            // append the programs EGTreeNode to the specified PFD's EGTreeNode
+            the_egtreenode_pfd_dom_obj.append(component_egtreenode_programs_dom_obj)
+            break
+        } // if (the_pfd_id && the_pfd_id === config_pfd.Element.ID )
+    } // for (let i=0; i < egtreenode_pfd_doms_obj.length; i++)
+    // console.log('line65',egtreenode_pfd_doms_obj )
+    return doms_obj
+};//async function make_append_egtreenode_programs
+
+// make the EGTreeNode component to be appended to a specific PFD's EGTreeNode in ProjectCollection.External_Objects.ProjectTreeView
+async function make_egtreenode_programs_component() {
+    // load the prototype xml for the target component
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z02_egtreenode_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log('line52', thesrcxmlstr)
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+    let component_egtreenode_programs_dom_obj = $(thesrcxmlstr_cleaned)
+
+    return component_egtreenode_programs_dom_obj
+
+};//async function make_egtreenode_programs(config_pfd)
+
+// configuration of the task components
+async function config_task_function(config_pfd) {
+    let config_task = {}
+
+    //1a. configuration for the element properties for the code task's Element component (the properties of the task)
+    config_task.Element = {}
+    config_task.Element.Label = 'PFD1 p1'
+    config_task.Element.Type = 'TASK'
+    config_task.Element.Container = config_pfd.Element.ID
+    config_task.Element.ID = 'CodeTask-' + mymodules.generateUUID()
+    config_task.Element.CreatedOn = config_pfd.Element.CreatedOn
+    config_task.Element.ModifiedOn = config_pfd.Element.ModifiedOn
+    config_task.Element.ModifiedBy = config_pfd.Element.ModifiedBy
+    config_task.Element.ModifiedByEGID = config_pfd.Element.ModifiedByEGID
+
+    //1b. configuration for the SubmitableElement components that are to be added to ProjectCollection.Elements.Element(PFD).Element(element of the curreant task)
+    // there is nothing to change from the default config
+
+    //1c. configuration for the CodeTask components that are to be added to ProjectCollection.Elements.Element(PFD).Element(element of the curreant task)
+    // there is nothing to change from the default config
+
+    //2. configuration for the process components that are to be added to ProjectCollection.Elements.Element(PFD).Element(element of the current task)
+    config_task.Process = {}
+    config_task.Process.Element = {}
+    config_task.Process.Element.ID = config_task.Element.ID
+
+    //3. configuration for the EGTreeNode components that are to be added to ProjectCollection.External_Objects.EGTreeNode(of the task's parent PFD).EGTreeNode(for wrapping all programs/tasks)
+    config_task.EGTreeNode = {}
+    config_task.EGTreeNode.ElementID = config_task.Element.ID
+    config_task.EGTreeNode.Label = config_task.Element.Label
+
+    //4. for the TaskGraphic components that are to be added to ProjectColletion.External_Objects.ProcessFlowView.Graphics
+    config_task.TaskGraphic = {}
+    config_task.TaskGraphic.ID = mymodules.generateUUID()
+    config_task.TaskGraphic.Label = config_task.Element.Label
+    config_task.TaskGraphic.Element = config_task.Element.ID
+
+    return config_task
+}; //async function config_task_function
 
 // get an array of file names from a folder
 async function getfilenames_from_a_folder(thefolder) {
@@ -79,31 +337,32 @@ async function getfilenames_from_a_folder(thefolder) {
         return d
     });
     return resolved
-} // async function getfiles_from_a_folder
+}; // async function getfiles_from_a_folder
 
 // configuration for the pfd components
 async function config_pfd_function(config_project) {
     let config_pfd = {}
     // config the elemment tags (properties of the pfd)
-    config_pfd.element = {}
-    config_pfd.element.Label = 'PFD1'
-    config_pfd.element.Type = 'CONTAINER'
-    config_pfd.element.Container = config_project.Element.ID
-    config_pfd.element.ID = 'PFD-' + mymodules.generateUUID()
-    config_pfd.element.CreatedOn = config_project.Element.CreatedOn
-    config_pfd.element.ModifiedOn = config_project.Element.ModifiedOn
-    config_pfd.element.ModifiedBy = config_project.Element.ModifiedBy
-    config_pfd.element.ModifiedByEGID = config_project.Element.ModifiedByEGID
+    config_pfd.Element = {}
+    config_pfd.Element.Label = 'PFD1'
+    config_pfd.Element.Type = 'CONTAINER'
+    config_pfd.Element.Container = config_project.Element.ID
+    config_pfd.Element.ID = 'PFD-' + mymodules.generateUUID()
+    config_pfd.Element.CreatedOn = config_project.Element.CreatedOn
+    config_pfd.Element.ModifiedOn = config_project.Element.ModifiedOn
+    config_pfd.Element.ModifiedBy = config_project.Element.ModifiedBy
+    config_pfd.Element.ModifiedByEGID = config_project.Element.ModifiedByEGID
     //config the egtreenode tags
-    config_pfd.egtreenode = {}
-    config_pfd.egtreenode.NodeType = 'NODETYPE_ELEMENT'
-    config_pfd.egtreenode.ElementID = config_pfd.element.ID
-    config_pfd.egtreenode.Label = config_pfd.element.Label
+    config_pfd.EGTreeNode = {}
+    config_pfd.EGTreeNode.NodeType = 'NODETYPE_ELEMENT'
+    config_pfd.EGTreeNode.ElementID = config_pfd.Element.ID
+    config_pfd.EGTreeNode.Label = config_pfd.Element.Label
     //config the properties tags
-    config_pfd.properties = {}
-    config_pfd.properties.ID = config_pfd.element.ID
+    config_pfd.Properties = {}
+    config_pfd.Properties.ID = config_pfd.Element.ID
     return config_pfd
-};//async function config_pdf
+};//async function config_pdf_function
+
 // make and appennd components for pfd
 /* add a process flow (PFD)
 1) within ProjectCollection.Elements,add:
@@ -118,20 +377,20 @@ async function config_pfd_function(config_project) {
         <Properties>...</Properties>
 */
 async function make_append_pfd_component(doms_obj, config_pfd) {
-    // console.log(config_pfd.element)
+    // console.log(config_pfd.Element)
     // make the PFD component to append to ProjectCollection.Elements
-    let component_pfd_dom_obj = await make_pfd_component(config_pfd.element)
+    let component_pfd_dom_obj = await make_pfd_component(config_pfd.Element)
     // console.log('line125', component_pfd_dom_obj.prop('outerHTML'))
     // append the PFD to ProjectCollection.Elements
     $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
 
     // make the egtreenode component to append to ProjectCollection.External_Objects.ProjectTreeView
-    let component_pfd_egtreenode_dom_obj = await make_EGTreeNode(config_pfd.egtreenode)
+    let component_pfd_egtreenode_dom_obj = await make_EGTreeNode(config_pfd.EGTreeNode)
     // append the treenode to ProjectCollection.External_Objects.ProjectTreeView
     $(doms_obj.find('External_Objects').find('ProjectTreeView')[0]).append(component_pfd_egtreenode_dom_obj)
 
     // make the properties component to append to ProjectCollection.External_Objects.ProcessFlowView.Containers 
-    let component_pfd_properties_dom_obj = await make_processflowview_properties(config_pfd.properties)
+    let component_pfd_properties_dom_obj = await make_processflowview_properties(config_pfd.Properties)
     // append it to ProjectCollection.External_Objects.ProcessFlowView.Containers
     $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Containers')[0]).append(component_pfd_properties_dom_obj)
     return doms_obj
@@ -153,13 +412,13 @@ async function make_processflowview_properties(config) {
     if (config.BackgroundColor) { $(dom_obj.find('BackgroundColor')[0]).text(config.BackgroundColor) }
     if (config.Align) { $(dom_obj.find('Align')[0]).text(config.Align) }
     return dom_obj
-} // function make_processflowview_properties
+}; // function make_processflowview_properties
 
 
 // make a EGTreeNode
 async function make_EGTreeNode(config) {
 
-    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c02_pfd_egtreenode_v7.xml'
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z02_egtreenode_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
     // console.log('line147',thesrcxmlstr)
@@ -207,7 +466,7 @@ async function make_pfd_component(config) {
     The properties are standardized for most components
 */
 async function define_element(config) {
-    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___b_element_v7.xml'
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z01_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
     // console.log('line 195', thesrcxmlstr)
@@ -268,7 +527,7 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     // the following is to force line breaking between two tags. 
     // the forced line breakers are with special marks ('___123456___')
     // that way, after identifying the tag names, the target xml will be recovered to the original layout by removing these marked line breakers
-    modified_xmlstr=modified_xmlstr.replace(/\>/g, '>\n___123456___\n')
+    modified_xmlstr = modified_xmlstr.replace(/\>/g, '>\n___123456___\n')
 
     // 2. make dictionaries to map out original tagnames and attributenames
     // read all files in the prototype folder
@@ -277,19 +536,19 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     let filenames_prototypexmlfiles = await getfilenames_from_a_folder(thefolder_prototypexmls)
     // console.log('line274', filenames_prototypexmlfiles)
     // loop for each file in the prototypexml file folder, concat the xml strings in the file
-    let str_all_prototype_xmlfiles='<Table>\n</Table>\n<PFD>\n</PFD>\n'
-    for (let i=0;i<filenames_prototypexmlfiles.length;i++){
+    let str_all_prototype_xmlfiles = '<Table>\n</Table>\n<PFD>\n</PFD>\n'
+    for (let i = 0; i < filenames_prototypexmlfiles.length; i++) {
         let d = filenames_prototypexmlfiles[i]
-        if (d.substr(0, 3) === '___' && d !=='___sample.xml') {
+        if (d.substr(0, 3) === '___' && d !== '___sample.xml') {
             let thesrcxmlfile = thefolder_prototypexmls + '/' + d
             let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
             let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-            thesrcxmlstr=thesrcxmlstr.replace(/\>/g, '>\n')
+            thesrcxmlstr = thesrcxmlstr.replace(/\>/g, '>\n')
             // console.log('line282', thesrcxmlstr)
             // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
             let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
             // console.log('line285',thesrcxmlstr_cleaned )
-            str_all_prototype_xmlfiles=str_all_prototype_xmlfiles+thesrcxmlstr_cleaned
+            str_all_prototype_xmlfiles = str_all_prototype_xmlfiles + thesrcxmlstr_cleaned
             // console.log('line287', str_all_prototype_xmlfiles)
         } // if (d.substr(0, 3) === '___')
     } //filenames_prototypexmlfiles.forEach(d
@@ -321,7 +580,7 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     })
 
     // 6. remove the '\n___123456___\n'
-    modified_xmlstr=modified_xmlstr.replace(/\n___123456___\n/g, '')
+    modified_xmlstr = modified_xmlstr.replace(/\n___123456___\n/g, '')
 
     return modified_xmlstr
 }; //async function cleanup_targetxml()
@@ -444,8 +703,8 @@ function getOriginalAttrNames_dict_crude(thexhmlstr) {
     }) // thexhmlstr_segs.forEach
 
     return orignalAttrnames_dict
-} // function getOriginalTagNames(thexhmlstr)
-;
+}; // function getOriginalTagNames(thexhmlstr)
+
 // get a list of tagnames in original case form
 // it is _crude as it contains tag like strings in submitted code (e.g., '<note!>' in submitted code '/*<note!> the dat set need to be sorted first!*/)
 function getOriginalTagNames_dict_crude(thexhmlstr) {
@@ -512,7 +771,7 @@ function getTagAttrNames(doms) {
         }
     } //for (let i = 1; i< doms_obj.length
     return { tagnames: tagNames_arr, attrnames: attrNames_arr }
-}//
+};// function getTagAttrNames(doms)
 
 // as the function name says....
 function append_cloned_components_of_the_first_dom_found_by_tagname(srcobj, targetobj, theTag) {
