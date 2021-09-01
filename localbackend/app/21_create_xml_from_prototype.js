@@ -1,7 +1,13 @@
 /* To create a project xml from the prototype 
     The prototypes are saved at data/in/prototype/egpv7
-    components of a typical v7 project.xml are saved as individual xml files
-*/
+    components of a typical v7 project.xml are saved as individual xml files (all of utf16le encoding)
+
+    to do:
+    add links
+    add codetask shortcut to external sas files
+    add shortcut to a file
+
+    */
 
 // load custom modules
 const mymodules = require('../../localbackend/app/mytools/mymodules');
@@ -473,8 +479,9 @@ async function make_append_pfd_component(doms_obj, config_pfd) {
     $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
 
     // add the PFD's ID into ProjectCollection.Containers.ID
-    $(doms_obj.find('Containers')[0]).append('<ID></ID>')
-    $(doms_obj.find('Containers').find('ID')[0]).text(config_pfd.Element.ID)
+    $(doms_obj.find('Containers')[0]).append('<ID>'+config_pfd.Element.ID+'</ID>')
+    // console.log('line477', config_pfd)
+    // Note: $(doms_obj.find('Containers').find('ID')[0]).text(config_pfd.Element.ID) is wrong, as it always write the PFD ID into the first ID tag
 
     // make the egtreenode component to append to ProjectCollection.External_Objects.ProjectTreeView
     let component_pfd_egtreenode_dom_obj = await make_EGTreeNode(config_pfd.EGTreeNode)
@@ -483,6 +490,7 @@ async function make_append_pfd_component(doms_obj, config_pfd) {
 
     // make the properties component to append to ProjectCollection.External_Objects.ProcessFlowView.Containers 
     let component_pfd_properties_dom_obj = await make_processflowview_properties(config_pfd.Properties)
+
     // append it to ProjectCollection.External_Objects.ProcessFlowView.Containers
     $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Containers')[0]).append(component_pfd_properties_dom_obj)
 
