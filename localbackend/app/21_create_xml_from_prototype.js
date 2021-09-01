@@ -29,33 +29,49 @@ const __gitzipfile = "data/in/prototype/__git.zip";
     let { doms_obj, thesrcxmlstr_cleaned } = await f01_makeBasicProjectScala(config_project)
     // console.log(thesrcxmlstr_cleaned)
 
-    // 3. add a process flow (PFD)
-    // config the pfd element
-    let pfd_input={}
-    pfd_input.Label = 'PDF1'
-    let config_pfd = await config_pfd_function(config_project, pfd_input)
-    doms_obj = await make_append_pfd_component(doms_obj, config_pfd)
+    // 3. add process flow (PFD)
+    let pdf_arr = [{ 'Label': 'PFD1' }, { 'Label': 'PFD2' }], pfd_input = [], config_pfd = []
+    for (let i = 0; i < pdf_arr.length; i++) {
+        // config the pfd element
+        pfd_input[i] = {}
+        pfd_input[i].Label = pdf_arr[i].Label
+        // console.log('line38', pfd_input[i].Label)
+        config_pfd[i] = await config_pfd_function(config_project, pfd_input[i])
+        // console.log('line40', config_pfd[i])
+        doms_obj = await make_append_pfd_component(doms_obj, config_pfd[i])
+    } // for(let i=0;i<pdf_arr.length;i++)
 
-    // 4. add an EGTreeNode for wrapping all programs/tasks for ProjectTreeView. 
-    // The EGTreeNode is to be added to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
-    // 4a. Configuration of the EGTreeNode    
-    let config_programs = await config_programs_function(config_pfd)
-    // 4b. make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
-    doms_obj = await make_append_egtreenode_programs(doms_obj, config_programs, config_pfd)
 
-    // 5. add a task
-    // 5.1 configuration for the task_component
-    let task_input ={}
-    task_input.Element={}
-    task_input.Element.Label = 'PFD1_p1'
-    task_input.code =`/*PFD1 p1*/
-data a; set b; run;
-`
-    let config_task = await config_task_function(config_pfd, task_input)
-    // console.log('line44', config_task)
-    // 5.2 add task components
-    doms_obj = await make_append_task_component(doms_obj, config_task, newZip)    
+    // 4. add EGTreeNode for wrapping all programs/tasks for ProjectTreeView.
+    let config_programs = []
+    for (let i = 0; i < pdf_arr.length; i++) {
+        // The EGTreeNode is to be added to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+        // 4a. Configuration of the EGTreeNode    
+        config_programs[i] = await config_programs_function(config_pfd[i])
+        // 4b. make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+        doms_obj = await make_append_egtreenode_programs(doms_obj, config_programs[i], config_pfd[i])
+    } // for(let i=0;i<pdf_arr.length;i++)
 
+    // 5. add tasks
+    let task_input_arr = [
+        {
+            Element: { Label: 'PFD1_p1' }, config_pfd: config_pfd[0],
+            code: `/*PFD1 p1*/
+data a; set b; run;`
+        },
+        {
+            Element: { Label: 'PFD2_p1' }, config_pfd: config_pfd[1],
+            code: `/*PFD2 p1*/
+data c; set d; run;`
+        },
+    ]
+    for (let i = 0; i < task_input_arr.length; i++) {
+        // 5.1 configuration for the task_component (indicate the parent PFD, and the task in task_input_arr)
+        let config_task = await config_task_function(task_input_arr[i].config_pfd, task_input_arr[i])
+        // console.log('line44', config_task)
+        // 5.2 add task components
+        doms_obj = await make_append_task_component(doms_obj, config_task, newZip)
+    } // for(let i=0;i<task_input_arr.length;i++)
 
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
     // remove lines only containing spaces and line breakers
@@ -65,7 +81,7 @@ data a; set b; run;
     let thetargetxmlfile = 'data/out/test/' + config_project.Element.Label + '.xml'
     await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
-    // using Buffer to impor the xml with utf16 encoding
+    // using Buffer to import the xml with utf16 encoding
     newZip.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
     // writeZip the newZip instead of the original (theZip)
     await newZip.writeZip("data/out/test/" + config_project.Element.Label + ".egp")
@@ -353,7 +369,7 @@ async function config_task_function(config_pfd, task_input) {
     config_task.Element.Label = task_input.Element.Label//'PFD1_p1'
     config_task.Element.Type = 'TASK'
     config_task.Element.Container = config_pfd.Element.ID
-    config_task.Element.ID = 'CodeTask-' + make_rand_string_by_length(16) 
+    config_task.Element.ID = 'CodeTask-' + make_rand_string_by_length(16)
     config_task.Element.CreatedOn = config_pfd.Element.CreatedOn
     config_task.Element.ModifiedOn = config_pfd.Element.ModifiedOn
     config_task.Element.ModifiedBy = config_pfd.Element.ModifiedBy
@@ -417,7 +433,7 @@ async function config_pfd_function(config_project, pfd_input) {
     config_pfd.Element.Label = pfd_input.Label // 'PFD1'
     config_pfd.Element.Type = 'CONTAINER'
     config_pfd.Element.Container = config_project.Element.ID
-    config_pfd.Element.ID = 'PFD-' + make_rand_string_by_length(16) 
+    config_pfd.Element.ID = 'PFD-' + make_rand_string_by_length(16)
     config_pfd.Element.CreatedOn = config_project.Element.CreatedOn
     config_pfd.Element.ModifiedOn = config_project.Element.ModifiedOn
     config_pfd.Element.ModifiedBy = config_project.Element.ModifiedBy
@@ -448,11 +464,11 @@ async function config_pfd_function(config_project, pfd_input) {
         <Properties>...</Properties>
 */
 async function make_append_pfd_component(doms_obj, config_pfd) {
-    // console.log(config_pfd.Element)
+    // console.log('line461', config_pfd.Element)
 
     // make the PFD component to append to ProjectCollection.Elements
     let component_pfd_dom_obj = await make_pfd_component(config_pfd.Element)
-    // console.log('line125', component_pfd_dom_obj.prop('outerHTML'))
+    // console.log('line465', component_pfd_dom_obj.prop('outerHTML'))
     // append the PFD to ProjectCollection.Elements
     $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
 
@@ -514,10 +530,10 @@ async function make_EGTreeNode(config) {
 
 // make a pfd component (to be appended to ProjectCollection.Elements)
 async function make_pfd_component(config) {
-    // console.log('line 162', config)
+    // console.log('line 527', config)
     // make the pfd element (properties of the pfd)
     let element_pfd_dom_obj = await define_element(config)
-    // console.log('line165', element_pfd_dom_obj.prop('outerHTML'))
+    // console.log('line530', element_pfd_dom_obj.prop('outerHTML'))
     // make the container element of the pfd, this part is fixed for any PFD obj
 
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c01_pfd_containers_v7.xml'
@@ -561,7 +577,7 @@ async function define_element(config) {
         })//config.attrs.forEach
     } //if (config.attrs && config.attrs.length > 0)
     // set properties
-    if (config.Label) { $(theElement_dom_obj.find('label')[0]).text(config.Lable) }
+    if (config.Label) { $(theElement_dom_obj.find('Label')[0]).text(config.Label) }
     if (config.Type) { $(theElement_dom_obj.find('Type')[0]).text(config.Type) }
     if (config.Container) { $(theElement_dom_obj.find('Container')[0]).text(config.Container) }
     if (config.ID) { $(theElement_dom_obj.find('ID')[0]).text(config.ID) }
