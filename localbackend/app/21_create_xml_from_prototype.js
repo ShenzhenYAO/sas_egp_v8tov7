@@ -19,6 +19,9 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 
 (async () => {
 
+    // 0.save the zip as an egp file (must be defined before adding task components. When adding tasks, the SAS code need to be added into the zip)
+    const newZip = new AdmZip()
+
     // 1. make a project collection scala
     let config_project = await config_projectcollection()
 
@@ -38,40 +41,12 @@ const __gitzipfile = "data/in/prototype/__git.zip";
     // 4b. make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
     doms_obj = await make_append_egtreenode_programs(doms_obj, config_programs, config_pfd)
 
-    // 4. add a task
-    // 4.1 configuration for the task_component
+    // 5. add a task
+    // 5.1 configuration for the task_component
     let config_task = await config_task_function(config_pfd)
     // console.log('line44', config_task)
-
-    // 4.2 add task components
-    doms_obj = await make_append_task_component(doms_obj, config_task)
-    // make and append task related components
-    async function make_append_task_component(doms_obj, config_task) {
-        // 1. within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
-        doms_obj = await make_append_task_process_component(doms_obj, config_task)
-
-        // 2. within ProjectCollection.Elements, add a element tag for task (in which multiple tags are encompassed)
-        async function make_append_task_element_component(doms_obj, config_task) {
-            // 1a. make task_element_component
-            async function make_task_element_component(config_task) { };//async function make_task_process_component 
-            // 1b. append task_element_component
-            async function append_task_element_component(doms_obj, config_task) { }; //async function append_task_process_component
-
-            return doms_obj
-        }; // async function make_append_task_element_component  
-
-        // 3. within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
-        doms_obj = await make_append_task_egtreenode_component(doms_obj, config_task)
-
-        //4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic component
-        doms_obj =await make_append_task_taskgraphic_component(doms_obj, config_task)
-        
-
-        // !!! also, need to add the program text and insert into the egp zip
-
-        return doms_obj
-
-    };//async function make_append_task_element_component
+    // 5.2 add task components
+    doms_obj = await make_append_task_component(doms_obj, config_task)    
 
 
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
@@ -82,8 +57,6 @@ const __gitzipfile = "data/in/prototype/__git.zip";
     let thetargetxmlfile = 'data/out/test/' + config_project.Element.Label + '.xml'
     await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
-    // save the zip as an egp file
-    const newZip = new AdmZip()
     // using Buffer to impor the xml with utf16 encoding
     newZip.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
     // writeZip the newZip instead of the original (theZip)
@@ -91,26 +64,95 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 
 })()
 
+// make and append task related components
+async function make_append_task_component(doms_obj, config_task) {
+    // 1. within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
+    doms_obj = await make_append_task_process_component(doms_obj, config_task)
+
+    // 2. within ProjectCollection.Elements, add a element tag for task (in which multiple tags are encompassed)
+    doms_obj = await make_append_task_element_component(doms_obj, config_task)
+
+    // 3. within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
+    doms_obj = await make_append_task_egtreenode_component(doms_obj, config_task)
+
+    // 4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic component
+    doms_obj = await make_append_task_taskgraphic_component(doms_obj, config_task)
+
+    // 5. add the program text and insert into the egp zip
+    let task_sascodestr = config_task.code
+    // Note: the sas code file (code.sas) is of utf-8 encoding. Also, the task xml (EGTask-<...id...>.xml) is also of utf-8. These are different from the project.xml (project.xml is of utf16le encoding)
+    newZip.addFile(config_task.Element.ID + '\\code.sas', Buffer.from(task_sascodestr, "utf-8"))
+
+    return doms_obj
+
+};//async function make_append_task_element_component
+
+// within ProjectCollection.Elements, add a element tag for task (in which multiple tags are encompassed)
+async function make_append_task_element_component(doms_obj, config_task) {
+    // 1. make the Element component and append to ProjectCollection.Elements (Type = "SAS.EG.ProjectElements.CodeTask")
+    let task_element_dom_obj = await make_task_element_component(config_task)
+
+    // 2. append task_element_component
+    $(doms_obj.find('Elements')[0]).append(task_element_dom_obj)
+
+    return doms_obj
+}; // async function make_append_task_element_component
+
+// make the Element component and append to ProjectCollection.Elements (Type = "SAS.EG.ProjectElements.CodeTask")
+async function make_task_element_component(config_task) {
+    // load the prototype xml for the target component
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___e03_task_element_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log('line61', thesrcxmlstr)
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+    let component_dom_obj = $(thesrcxmlstr_cleaned)
+
+    // config the ProjectCollection.Elements.Element(of the task).Element
+    let task_element_dom_obj = $(component_dom_obj.find('Element')[0])
+    if (config_task.Element.Label) { $(task_element_dom_obj.find('Label')[0]).text(config_task.Element.Label) }
+    if (config_task.Element.Container) { $(task_element_dom_obj.find('Container')[0]).text(config_task.Element.Container) }
+    if (config_task.Element.ID) { $(task_element_dom_obj.find('ID')[0]).text(config_task.Element.ID) }
+    if (config_task.Element.CreatedOn) { $(task_element_dom_obj.find('CreatedOn')[0]).text(config_task.Element.CreatedOn) }
+    if (config_task.Element.ModifiedOn) { $(task_element_dom_obj.find('ModifiedOn')[0]).text(config_task.Element.ModifiedOn) }
+    if (config_task.Element.ModifiedBy) { $(task_element_dom_obj.find('ModifiedBy')[0]).text(config_task.Element.ModifiedBy) }
+    if (config_task.Element.ModifiedByEGID) { $(task_element_dom_obj.find('ModifiedByEGID')[0]).text(config_task.Element.ModifiedByEGID) }
+    // could config more... 
+
+    // // config the ProjectCollection.Elements.Element(of the task).SubmitableElement
+    // let task_submitableelement_dom_obj = $(component_dom_obj.find('SubmitableElement')[0])
+    // // could cofig more, e.g., HtmlStyleUrlOverride, SasReportStyleUrlOverride (location of the SAS Home)
+
+    // // config the ProjectCollection.Elements.Element(of the task).CodeTask
+    // let task_codetask_dom_obj = $(component_dom_obj.find('CodeTask')[0])
+    // // could cofig more, e.g., DNA ...
+
+    return component_dom_obj
+
+};//async function make_task_process_component
+
 // to generate a random string of 16 chars (note, it is not a GUID!)
-    //https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-    function make_rand_string_by_length(strlength){
-        let chars= "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return Array(strlength).join().split(',').map(function() { return chars.charAt(Math.floor(Math.random() * chars.length)); }).join('');
-    }; //function make_rand_string_by_length(strlength)
+//https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+function make_rand_string_by_length(strlength) {
+    let chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return Array(strlength).join().split(',').map(function () { return chars.charAt(Math.floor(Math.random() * chars.length)); }).join('');
+}; //function make_rand_string_by_length(strlength)
 
 //within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic component
 async function make_append_task_taskgraphic_component(doms_obj, config_task) {
     // 1a. make task_taskgraphic
     let task_taskgraphic_dom_obj = await make_task_taskgraphic_component(config_task)
     // console.log('line68', task_taskgraphic_dom_obj.prop('outerHTML'))
-    
+
 
     // 1b. append task_taskgraphic components
     // The ProjectColletion.External_Objects.ProcessFlowView.Graphics is not specific by PFD
     // As such, there is no need to loop and find the specific PFD for the task_taskgraphic
-    let the_graphic_dom_obj=$(doms_obj.find('External_Objects').find('ProcessFlowView').find('Graphics')[0])
+    let the_graphic_dom_obj = $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Graphics')[0])
     the_graphic_dom_obj.append(task_taskgraphic_dom_obj)
-    
+
     return doms_obj
 }; // async function make_append_task_taskgraphic_component 
 
@@ -300,10 +342,10 @@ async function config_task_function(config_pfd) {
 
     //1a. configuration for the element properties for the code task's Element component (the properties of the task)
     config_task.Element = {}
-    config_task.Element.Label = 'PFD1 p1'
+    config_task.Element.Label = 'PFD1_p1'
     config_task.Element.Type = 'TASK'
     config_task.Element.Container = config_pfd.Element.ID
-    config_task.Element.ID = 'CodeTask-' + make_rand_string_by_length(16)
+    config_task.Element.ID = 'CodeTask-' + make_rand_string_by_length(16) // '1S6EfHCHugkQjf6N'
     config_task.Element.CreatedOn = config_pfd.Element.CreatedOn
     config_task.Element.ModifiedOn = config_pfd.Element.ModifiedOn
     config_task.Element.ModifiedBy = config_pfd.Element.ModifiedBy
@@ -322,6 +364,7 @@ async function config_task_function(config_pfd) {
 
     //3. configuration for the EGTreeNode components that are to be added to ProjectCollection.External_Objects.EGTreeNode(of the task's parent PFD).EGTreeNode(for wrapping all programs/tasks)
     config_task.EGTreeNode = {}
+    config_task.EGTreeNode.NodeType = 'NODETYPE_ELEMENT'
     config_task.EGTreeNode.ElementID = config_task.Element.ID
     config_task.EGTreeNode.Label = config_task.Element.Label
 
@@ -331,6 +374,12 @@ async function config_task_function(config_pfd) {
     config_task.TaskGraphic.ID = mymodules.generateUUID()
     config_task.TaskGraphic.Label = config_task.Element.Label
     config_task.TaskGraphic.Element = config_task.Element.ID
+
+    // 5. SAS code of the task
+    config_task.code = `
+/*PFD1 p1*/
+data a; set b; run;
+    `
 
     return config_task
 }; //async function config_task_function
@@ -363,7 +412,7 @@ async function config_pfd_function(config_project) {
     config_pfd.Element.Label = 'PFD1'
     config_pfd.Element.Type = 'CONTAINER'
     config_pfd.Element.Container = config_project.Element.ID
-    config_pfd.Element.ID = 'PFD-' + make_rand_string_by_length(16)
+    config_pfd.Element.ID = 'PFD-' + make_rand_string_by_length(16) // 'vlXjGXP8PuTwgTz3'
     config_pfd.Element.CreatedOn = config_project.Element.CreatedOn
     config_pfd.Element.ModifiedOn = config_project.Element.ModifiedOn
     config_pfd.Element.ModifiedBy = config_project.Element.ModifiedBy
@@ -372,6 +421,7 @@ async function config_pfd_function(config_project) {
     config_pfd.EGTreeNode = {}
     config_pfd.EGTreeNode.NodeType = 'NODETYPE_ELEMENT'
     config_pfd.EGTreeNode.ElementID = config_pfd.Element.ID
+    config_pfd.EGTreeNode.Expanded = 'True'
     config_pfd.EGTreeNode.Label = config_pfd.Element.Label
     //config the properties tags
     config_pfd.Properties = {}
@@ -401,6 +451,10 @@ async function make_append_pfd_component(doms_obj, config_pfd) {
     // append the PFD to ProjectCollection.Elements
     $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
 
+    // add the PFD's ID into ProjectCollection.Containers.ID
+    $(doms_obj.find('Containers')[0]).append('<ID></ID>')
+    $(doms_obj.find('Containers').find('ID')[0]).text(config_pfd.Element.ID)
+
     // make the egtreenode component to append to ProjectCollection.External_Objects.ProjectTreeView
     let component_pfd_egtreenode_dom_obj = await make_EGTreeNode(config_pfd.EGTreeNode)
     // append the treenode to ProjectCollection.External_Objects.ProjectTreeView
@@ -410,6 +464,8 @@ async function make_append_pfd_component(doms_obj, config_pfd) {
     let component_pfd_properties_dom_obj = await make_processflowview_properties(config_pfd.Properties)
     // append it to ProjectCollection.External_Objects.ProcessFlowView.Containers
     $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Containers')[0]).append(component_pfd_properties_dom_obj)
+
+
     return doms_obj
 }; //function make_append_pfd_component
 
