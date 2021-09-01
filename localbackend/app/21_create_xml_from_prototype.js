@@ -31,7 +31,9 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 
     // 3. add a process flow (PFD)
     // config the pfd element
-    let config_pfd = await config_pfd_function(config_project)
+    let pfd_input={}
+    pfd_input.Label = 'PDF1'
+    let config_pfd = await config_pfd_function(config_project, pfd_input)
     doms_obj = await make_append_pfd_component(doms_obj, config_pfd)
 
     // 4. add an EGTreeNode for wrapping all programs/tasks for ProjectTreeView. 
@@ -43,10 +45,16 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 
     // 5. add a task
     // 5.1 configuration for the task_component
-    let config_task = await config_task_function(config_pfd)
+    let task_input ={}
+    task_input.Element={}
+    task_input.Element.Label = 'PFD1_p1'
+    task_input.code =`/*PFD1 p1*/
+data a; set b; run;
+`
+    let config_task = await config_task_function(config_pfd, task_input)
     // console.log('line44', config_task)
     // 5.2 add task components
-    doms_obj = await make_append_task_component(doms_obj, config_task)    
+    doms_obj = await make_append_task_component(doms_obj, config_task, newZip)    
 
 
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
@@ -65,7 +73,7 @@ const __gitzipfile = "data/in/prototype/__git.zip";
 })()
 
 // make and append task related components
-async function make_append_task_component(doms_obj, config_task) {
+async function make_append_task_component(doms_obj, config_task, newZip) {
     // 1. within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
     doms_obj = await make_append_task_process_component(doms_obj, config_task)
 
@@ -337,15 +345,15 @@ async function make_egtreenode_programs_component() {
 };//async function make_egtreenode_programs(config_pfd)
 
 // configuration of the task components
-async function config_task_function(config_pfd) {
+async function config_task_function(config_pfd, task_input) {
     let config_task = {}
 
     //1a. configuration for the element properties for the code task's Element component (the properties of the task)
     config_task.Element = {}
-    config_task.Element.Label = 'PFD1_p1'
+    config_task.Element.Label = task_input.Element.Label//'PFD1_p1'
     config_task.Element.Type = 'TASK'
     config_task.Element.Container = config_pfd.Element.ID
-    config_task.Element.ID = 'CodeTask-' + make_rand_string_by_length(16) // '1S6EfHCHugkQjf6N'
+    config_task.Element.ID = 'CodeTask-' + make_rand_string_by_length(16) 
     config_task.Element.CreatedOn = config_pfd.Element.CreatedOn
     config_task.Element.ModifiedOn = config_pfd.Element.ModifiedOn
     config_task.Element.ModifiedBy = config_pfd.Element.ModifiedBy
@@ -370,16 +378,13 @@ async function config_task_function(config_pfd) {
 
     //4. for the TaskGraphic components that are to be added to ProjectColletion.External_Objects.ProcessFlowView.Graphics
     config_task.TaskGraphic = {}
-    // the TaskGraphic ID is different, (it is a true 32 bit GUID)
+    // the TaskGraphic ID is different from the PFD or CodeTask ID (16-bit random strings. A 16-bit string is not a true 32-bit GUID), (it is a true 32 bit GUID)
     config_task.TaskGraphic.ID = mymodules.generateUUID()
     config_task.TaskGraphic.Label = config_task.Element.Label
     config_task.TaskGraphic.Element = config_task.Element.ID
 
     // 5. SAS code of the task
-    config_task.code = `
-/*PFD1 p1*/
-data a; set b; run;
-    `
+    config_task.code = task_input.code
 
     return config_task
 }; //async function config_task_function
@@ -405,14 +410,14 @@ async function getfilenames_from_a_folder(thefolder) {
 }; // async function getfiles_from_a_folder
 
 // configuration for the pfd components
-async function config_pfd_function(config_project) {
+async function config_pfd_function(config_project, pfd_input) {
     let config_pfd = {}
     // config the elemment tags (properties of the pfd)
     config_pfd.Element = {}
-    config_pfd.Element.Label = 'PFD1'
+    config_pfd.Element.Label = pfd_input.Label // 'PFD1'
     config_pfd.Element.Type = 'CONTAINER'
     config_pfd.Element.Container = config_project.Element.ID
-    config_pfd.Element.ID = 'PFD-' + make_rand_string_by_length(16) // 'vlXjGXP8PuTwgTz3'
+    config_pfd.Element.ID = 'PFD-' + make_rand_string_by_length(16) 
     config_pfd.Element.CreatedOn = config_project.Element.CreatedOn
     config_pfd.Element.ModifiedOn = config_project.Element.ModifiedOn
     config_pfd.Element.ModifiedBy = config_project.Element.ModifiedBy
