@@ -7,24 +7,8 @@ var $ = require("jquery")(window);
 
 const srcfolder = 'data/in/prototype/__xml/egpv8/';
 
-(async () => {
-
-  let text = `
-  
-  <ProcessFlowView>
-
-  <Zoom>1</Zoom>
-
-  <Grid>True</Grid>
-
-
-
-  <Layout>False</Layout>
-  `
-  console.log(remove_spaces_linebreakers(text))
-  
-
-
+(async () => {    
+    console.log(make_rand_string_by_length(16))
 })()
 
 
@@ -92,25 +76,6 @@ within ProjectCollection.Elements, add a task component
         </Element>
 
 
-        4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add:
-                <TaskGraphic>
-                    <Type>Task</Type>
-                    <Id>a0452d75-5792-454d-bd1b-ea1c5cb250d0</Id>
-                    <LineWidth>1</LineWidth>
-                    <Fill>false</Fill>
-                    <PosX>24</PosX>
-                    <PosY>12</PosY>
-                    <Width>36</Width>
-                    <Height>36</Height>
-                    <Rotation>0</Rotation>
-                    <Visible>true</Visible>
-                    <Border>false</Border>
-                    <AutoSize>true</AutoSize>
-                    <Removable>true</Removable>
-                    <Child>false</Child>
-                    <Selected>false</Selected>
-                    <Label>pfd1 p1</Label>
-                    <Element>CodeTask-fGud3CP5bdr2Hxot</Element>
-                </TaskGraphic>  
+         
 
 */

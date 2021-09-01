@@ -63,19 +63,14 @@ const __gitzipfile = "data/in/prototype/__git.zip";
         // 3. within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
         doms_obj = await make_append_task_egtreenode_component(doms_obj, config_task)
 
-
-
         //4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic component
-        async function make_append_task_taskgraphic_component(doms_obj, config_task) {
-            // 1a. make task_taskgraphic
-            async function make_task_taskgraphic_component(config_task) { };//async function make_task_process_component 
-            // 1b. append task_taskgraphic components
-            async function append_task_taskgraphic_component(doms_obj, config_task) { }; //async function append_task_process_component
+        doms_obj =await make_append_task_taskgraphic_component(doms_obj, config_task)
+        
 
-            return doms_obj
-        }; // async function make_append_task_taskgraphic_component  
+        // !!! also, need to add the program text and insert into the egp zip
 
         return doms_obj
+
     };//async function make_append_task_element_component
 
 
@@ -95,6 +90,50 @@ const __gitzipfile = "data/in/prototype/__git.zip";
     await newZip.writeZip("data/out/test/" + config_project.Element.Label + ".egp")
 
 })()
+
+// to generate a random string of 16 chars (note, it is not a GUID!)
+    //https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+    function make_rand_string_by_length(strlength){
+        let chars= "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return Array(strlength).join().split(',').map(function() { return chars.charAt(Math.floor(Math.random() * chars.length)); }).join('');
+    }; //function make_rand_string_by_length(strlength)
+
+//within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic component
+async function make_append_task_taskgraphic_component(doms_obj, config_task) {
+    // 1a. make task_taskgraphic
+    let task_taskgraphic_dom_obj = await make_task_taskgraphic_component(config_task)
+    // console.log('line68', task_taskgraphic_dom_obj.prop('outerHTML'))
+    
+
+    // 1b. append task_taskgraphic components
+    // The ProjectColletion.External_Objects.ProcessFlowView.Graphics is not specific by PFD
+    // As such, there is no need to loop and find the specific PFD for the task_taskgraphic
+    let the_graphic_dom_obj=$(doms_obj.find('External_Objects').find('ProcessFlowView').find('Graphics')[0])
+    the_graphic_dom_obj.append(task_taskgraphic_dom_obj)
+    
+    return doms_obj
+}; // async function make_append_task_taskgraphic_component 
+
+//make task_taskgraphic
+async function make_task_taskgraphic_component(config_task) {
+    // load the prototype xml for the target component
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___e02_task_taskgraphic_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log('line57', thesrcxmlstr)
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+    let component_dom_obj = $(thesrcxmlstr_cleaned)
+
+    if (config_task.TaskGraphic.ID) { $(component_dom_obj.find('ID')[0]).text(config_task.TaskGraphic.ID) }
+    if (config_task.TaskGraphic.Label) { $(component_dom_obj.find('Label')[0]).text(config_task.TaskGraphic.Label) }
+    if (config_task.TaskGraphic.Element) { $(component_dom_obj.find('Element')[0]).text(config_task.TaskGraphic.Element) }
+    // could config more... 
+
+    return component_dom_obj
+
+};//async function make_task_process_component
 
 // within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
 async function make_append_task_egtreenode_component(doms_obj, config_task) {
@@ -264,7 +303,7 @@ async function config_task_function(config_pfd) {
     config_task.Element.Label = 'PFD1 p1'
     config_task.Element.Type = 'TASK'
     config_task.Element.Container = config_pfd.Element.ID
-    config_task.Element.ID = 'CodeTask-' + mymodules.generateUUID()
+    config_task.Element.ID = 'CodeTask-' + make_rand_string_by_length(16)
     config_task.Element.CreatedOn = config_pfd.Element.CreatedOn
     config_task.Element.ModifiedOn = config_pfd.Element.ModifiedOn
     config_task.Element.ModifiedBy = config_pfd.Element.ModifiedBy
@@ -288,6 +327,7 @@ async function config_task_function(config_pfd) {
 
     //4. for the TaskGraphic components that are to be added to ProjectColletion.External_Objects.ProcessFlowView.Graphics
     config_task.TaskGraphic = {}
+    // the TaskGraphic ID is different, (it is a true 32 bit GUID)
     config_task.TaskGraphic.ID = mymodules.generateUUID()
     config_task.TaskGraphic.Label = config_task.Element.Label
     config_task.TaskGraphic.Element = config_task.Element.ID
@@ -323,7 +363,7 @@ async function config_pfd_function(config_project) {
     config_pfd.Element.Label = 'PFD1'
     config_pfd.Element.Type = 'CONTAINER'
     config_pfd.Element.Container = config_project.Element.ID
-    config_pfd.Element.ID = 'PFD-' + mymodules.generateUUID()
+    config_pfd.Element.ID = 'PFD-' + make_rand_string_by_length(16)
     config_pfd.Element.CreatedOn = config_project.Element.CreatedOn
     config_pfd.Element.ModifiedOn = config_project.Element.ModifiedOn
     config_pfd.Element.ModifiedBy = config_project.Element.ModifiedBy
@@ -354,6 +394,7 @@ async function config_pfd_function(config_project) {
 */
 async function make_append_pfd_component(doms_obj, config_pfd) {
     // console.log(config_pfd.Element)
+
     // make the PFD component to append to ProjectCollection.Elements
     let component_pfd_dom_obj = await make_pfd_component(config_pfd.Element)
     // console.log('line125', component_pfd_dom_obj.prop('outerHTML'))
@@ -414,8 +455,8 @@ async function make_EGTreeNode(config) {
 async function make_pfd_component(config) {
     // console.log('line 162', config)
     // make the pfd element (properties of the pfd)
-    let element_PFD1_dom_obj = await define_element(config)
-    // console.log('line165', element_PFD1_dom_obj.prop('outerHTML'))
+    let element_pfd_dom_obj = await define_element(config)
+    // console.log('line165', element_pfd_dom_obj.prop('outerHTML'))
     // make the container element of the pfd, this part is fixed for any PFD obj
 
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c01_pfd_containers_v7.xml'
@@ -426,14 +467,14 @@ async function make_pfd_component(config) {
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
 
-    let container_PFD1_dom_obj = $(thesrcxmlstr_cleaned)
+    let container_pfd_dom_obj = $(thesrcxmlstr_cleaned)
     // make the default PFD element (the empty PFD element)
-    let pfd_PFD1_dom_obj = $('<PFD></PFD>')
+    let pfd_pfd_dom_obj = $('<PFD></PFD>')
     // assemble the PFD component to be added to ProjectCollection.Elements
     let component_pfd_dom_obj = $('<Element Type="SAS.EG.ProjectElements.PFD"></Element>')
-    component_pfd_dom_obj.append(element_PFD1_dom_obj)
-    component_pfd_dom_obj.append(container_PFD1_dom_obj)
-    component_pfd_dom_obj.append(pfd_PFD1_dom_obj)
+    component_pfd_dom_obj.append(element_pfd_dom_obj)
+    component_pfd_dom_obj.append(container_pfd_dom_obj)
+    component_pfd_dom_obj.append(pfd_pfd_dom_obj)
 
     return component_pfd_dom_obj
 }; // function make_pfd_component()
@@ -480,7 +521,7 @@ async function config_projectcollection() {
     let config = {}
     config.Element = {}
     config.Element.Label = "__test"
-    config.Element.ID = 'ProjectCollection-' + mymodules.generateUUID()
+    config.Element.ID = 'ProjectCollection-' + make_rand_string_by_length(16)
     // set init time (for the fields like createon, modifiedon,etc)
     // the time serial here is different from the SAS time serial
     // the later is the difference between the date and 1960-01-01
