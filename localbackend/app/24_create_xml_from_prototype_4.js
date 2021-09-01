@@ -2,14 +2,12 @@
     The prototypes are saved at data/in/prototype/egpv7
     components of a typical v7 project.xml are saved as individual xml files (all of utf16le encoding)
 
-    based on localbackend\app\22_create_xml_from_prototype_2.js
+    based on localbackend\app\23_create_xml_from_prototype_3.js
     adding the following:
-    add codetask shortcut to external sas files
-
-    to do:
     add shortcut to a file
-
-    */
+    to do:
+    read from an existing egp v8 and rebuild into a v7 egp with tasks, links, and shortcut to files
+*/
 
 // load custom modules
 const mymodules = require('../../localbackend/app/mytools/mymodules');
@@ -69,6 +67,12 @@ data a; b=1; run;`
             code: `/*PFD1 p2*/
 data c; set a; d=2; run;`
         },
+        {
+            tasktype: 'shortcut',
+            Element: { Label: 'shortcut to sas.sas' }, config_pfd: config_pfd[1],
+            Embedded:'False',
+            DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\sas.sas` } // note: not a good practice to use single backlash, at least it should be wrapped by String.raw``
+        },
     ]
     let config_task = []
     for (let i = 0; i < task_input_arr.length; i++) {
@@ -90,7 +94,7 @@ data c; set a; d=2; run;`
 
         // 6.2 make and append link_component
         doms_obj = await make_append_link_component(doms_obj, config_link)
-        
+
     } // for(let i=0;i<link_input_arr.length;i++)
 
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
@@ -196,11 +200,12 @@ async function make_append_task_component(doms_obj, config_task, newZip) {
     // 4. within ProjectColletion.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic component
     doms_obj = await make_append_task_taskgraphic_component(doms_obj, config_task)
 
-    // 5. add the program text and insert into the egp zip
-    let task_sascodestr = config_task.code
-    // Note: the sas code file (code.sas) is of utf-8 encoding. Also, the task xml (EGTask-<...id...>.xml) is also of utf-8. These are different from the project.xml (project.xml is of utf16le encoding)
-    newZip.addFile(config_task.Element.ID + '\\code.sas', Buffer.from(task_sascodestr, "utf-8"))
-
+    // 5. add the program text and insert into the egp zip (only do it when the config_task.code is not null, e.g., the task is not a shortcut to an exteranl sas program)
+    if (config_task.code && config_task.code !== '') {
+        let task_sascodestr = config_task.code
+        // Note: the sas code file (code.sas) is of utf-8 encoding. Also, the task xml (EGTask-<...id...>.xml) is also of utf-8. These are different from the project.xml (project.xml is of utf16le encoding)
+        newZip.addFile(config_task.Element.ID + '\\code.sas', Buffer.from(task_sascodestr, "utf-8"))
+    } // config_task.code
     return doms_obj
 
 };//async function make_append_task_element_component
@@ -215,6 +220,50 @@ async function make_append_task_element_component(doms_obj, config_task) {
 
     return doms_obj
 }; // async function make_append_task_element_component
+
+// make task_dna (to indicate the location of the shortcut to an external SAS program )
+async function make_task_element_codetask_dna_dna(config_task) {
+    // load the prototype xml for the target component
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___g01_task_dna_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log('line104', thesrcxmlstr)
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+    let component_dom_obj = $(thesrcxmlstr_cleaned)
+
+    // configuration of the DNA component
+    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA){
+        if (config_task.CodeTask.DNA.DNA.Name){$(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name)}
+        if (config_task.CodeTask.DNA.DNA.FullPath){$(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath)}
+    } //if (config_task.CodeTask.DNA.DNA
+
+    // console.log('line276', component_dom_obj.prop('outerHTML'))
+    return component_dom_obj            
+}; // async function make_task_element_codetask_dna_dna
+
+// make task_dna (to indicate the location of the shortcut to an external SAS program )
+async function make_task_element_codetask_dna_dna(config_task) {
+    // load the prototype xml for the target component
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___g01_task_dna_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log('line104', thesrcxmlstr)
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+    let component_dom_obj = $(thesrcxmlstr_cleaned)
+
+    // configuration of the DNA component
+    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA){
+        if (config_task.CodeTask.DNA.DNA.Name){$(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name)}
+        if (config_task.CodeTask.DNA.DNA.FullPath){$(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath)}
+    } //if (config_task.CodeTask.DNA.DNA
+
+    // console.log('line276', component_dom_obj.prop('outerHTML'))
+    return component_dom_obj            
+}; // async function make_task_element_codetask_dna_dna
 
 // make the Element component and append to ProjectCollection.Elements (Type = "SAS.EG.ProjectElements.CodeTask")
 async function make_task_element_component(config_task) {
@@ -244,12 +293,64 @@ async function make_task_element_component(config_task) {
     // // could cofig more, e.g., HtmlStyleUrlOverride, SasReportStyleUrlOverride (location of the SAS Home)
 
     // // config the ProjectCollection.Elements.Element(of the task).CodeTask
-    // let task_codetask_dom_obj = $(component_dom_obj.find('CodeTask')[0])
-    // // could cofig more, e.g., DNA ...
+    // if the task type is shortcut, make DNA components, and insert as textcontent to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
+    // console.log('line253', config_task.tasktype)
+    if (config_task.tasktype && config_task.tasktype === 'shortcut') {
+        // console.log('line255',config_task.CodeTask.DNA.DNA)
+        // 1. make task_dna component
+        let task_element_codetask_dna_dna_doms_obj = await make_task_element_codetask_dna_dna(config_task)
+
+        // 2. Note: unlike other components, the DNA part should be inserted as HTML (not textcontent) to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
+        // Not appended as DOM objects. Ha! for this confusion, we should award a medal to the genius who made it that way! 
+        // 2.1 get the outerHTML of task_element_codetask_dna_dna_doms_obj
+        let dna_outerHTMLstr = task_element_codetask_dna_dna_doms_obj.prop('outerHTML')
+        // console.log('line307',dns_outerHTML)
+        // 2.2 lots of work around here
+        // 2.2.1, use back the original tag names (e.g., use back DNA instead of dna)
+        let dna_tags_dict = {'dna':'DNA','type':'Type','name':'Name', 'version':'Version', 'assembly':'Assembly', 'factory':'Factory', 'fullpath':'FullPath'}
+        Object.keys(dna_tags_dict).forEach(key=>{
+            let originaltag = dna_tags_dict[key]
+            dna_outerHTMLstr = dna_outerHTMLstr.replace('<'+key+'>', '&lt;'+ originaltag + '&gt;')
+            dna_outerHTMLstr = dna_outerHTMLstr.replace('</'+key+'>', '&lt;/'+ originaltag + '&gt;')
+            dna_outerHTMLstr = dna_outerHTMLstr.replace('<'+key+' />', '&lt;'+ originaltag + ' /&gt;')
+        })
+        // console.log('line316', dna_outerHTMLstr)
+        // 3. insert dna_outerHTMLstr as html to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
+        // Note: the differece between html() and text() is that for html, '&lt;' is kept as it was; while
+        // for text(), '&lt;' is converted to '&amp;lt;', which cannot be recognized correctly by SAS EG
+        $(component_dom_obj.find('CodeTask').find('DNA')[0]).html(dna_outerHTMLstr)
+
+        // 4. also, change ProjectCollection.Elements.Element(of the task).CodeTask.Embedded's text to 'False'
+        // that tiny change controls whether the task is a shortcut or with sas code Embedded within the egp file
+        $(component_dom_obj.find('CodeTask').find('Embedded')[0]).text(config_task.CodeTask.Embedded)
+        
+    } // if (config_task.type && config_task.type === 'shortcut')
 
     return component_dom_obj
 
-};//async function make_task_process_component
+};//async function make_task_element_component
+
+// make task_dna (to indicate the location of the shortcut to an external SAS program )
+async function make_task_element_codetask_dna_dna(config_task) {
+    // load the prototype xml for the target component
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___g01_task_dna_v7.xml'
+    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // console.log('line104', thesrcxmlstr)
+
+    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+    let component_dom_obj = $(thesrcxmlstr_cleaned)
+
+    // configuration of the DNA component
+    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA){
+        if (config_task.CodeTask.DNA.DNA.Name){$(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name)}
+        if (config_task.CodeTask.DNA.DNA.FullPath){$(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath)}
+    } //if (config_task.CodeTask.DNA.DNA
+
+    // console.log('line276', component_dom_obj.prop('outerHTML'))
+    return component_dom_obj            
+}; // async function make_task_element_codetask_dna_dna
 
 // to generate a random string of 16 chars (note, it is not a GUID!)
 //https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
@@ -263,7 +364,6 @@ async function make_append_task_taskgraphic_component(doms_obj, config_task) {
     // 1a. make task_taskgraphic
     let task_taskgraphic_dom_obj = await make_task_taskgraphic_component(config_task)
     // console.log('line68', task_taskgraphic_dom_obj.prop('outerHTML'))
-
 
     // 1b. append task_taskgraphic components
     // The ProjectColletion.External_Objects.ProcessFlowView.Graphics is not specific by PFD
@@ -473,7 +573,33 @@ async function config_task_function(config_pfd, task_input) {
     // there is nothing to change from the default config
 
     //1c. configuration for the CodeTask components that are to be added to ProjectCollection.Elements.Element(PFD).Element(element of the curreant task)
-    // there is nothing to change from the default config
+    // For task as shortcut to external sas files, additional <DNA> components should be appended to ProjectCollection.Elements.Element(PFD).Element(element of the curreant task).CodeTask.DNA
+    if (task_input.tasktype && task_input.tasktype === 'shortcut' && task_input.DNA && task_input.DNA.FullPath) {
+        config_task.tasktype=task_input.tasktype
+        config_task.CodeTask = {}
+        config_task.CodeTask.DNA = {}
+        config_task.CodeTask.DNA.DNA = {}
+        // from the fullpath, get the filename (the part after the last \)
+        // console.log('line487', task_input.DNA.FullPath)
+        let fullpath = task_input.DNA.FullPath
+        fullpath = JSON.stringify(fullpath) // to ensure that the single backlash are replaced by \\
+        // the stringify adds additional quotes around the path, the string is now like '"C:\\..."'
+        // the following is to strip these additional quotes
+        if (fullpath.substr(0,1)==='"'){fullpath = fullpath.substring(1)}
+        if (fullpath.substr(fullpath.length-1,1)==='"'){  fullpath =fullpath.substr(0, fullpath.length-1)}
+        // console.log('line489', fullpath)
+        let startpos = fullpath.lastIndexOf('\\')
+        let filename = fullpath.substr(startpos + 1)
+        // console.log('line492', filename)
+        config_task.CodeTask.DNA.DNA.Name = filename
+        config_task.CodeTask.DNA.DNA.FullPath = fullpath
+        // console.log('line495', config_task.CodeTask.DNA.DNA.FullPath)
+
+        // also, set config_task.CodeTask.Embedded to False. That tiny change controls whether the task is
+        // a shortcut, or with SAS code embedded in the current EGP
+        config_task.CodeTask.Embedded = task_input.Embedded
+
+    } // if (task_input.tasktype==='shortcut') 
 
     //2. configuration for the process components that are to be added to ProjectCollection.Elements.Element(PFD).Element(element of the current task)
     config_task.Process = {}
@@ -493,8 +619,10 @@ async function config_task_function(config_pfd, task_input) {
     config_task.TaskGraphic.Label = config_task.Element.Label
     config_task.TaskGraphic.Element = config_task.Element.ID
 
-    // 5. SAS code of the task
-    config_task.code = task_input.code
+    // 5. SAS code of the task (if the task code is specified, i.e., the task is not shortcut to an external sas file)
+    if (task_input.code) {
+        config_task.code = task_input.code
+    } //if (task_input.code)   
 
     return config_task
 }; //async function config_task_function
