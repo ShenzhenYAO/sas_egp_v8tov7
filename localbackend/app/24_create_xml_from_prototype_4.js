@@ -29,6 +29,7 @@ var $ = require("jquery")(window);
 // https://www.npmjs.com/package/adm-zip
 const AdmZip = require('adm-zip');
 const { config } = require('process');
+const { Console } = require('console');
 
 (async () => {
 
@@ -133,32 +134,88 @@ data c; set a; d=2; run;`
         // console.log('line133', config_shortcuttofile)
 
         // 6.2 make and append shortcuttofile_component
-        doms_obj = await make_append_shortcuttofile_component(doms_obj, config_shortcuttofile)
+        doms_obj = await make_append_shortcuttofile_component(doms_obj, config_shortcuttofile[i])
         // make and append shortcuttofile_component
-        async function make_append_shortcuttofile_component(doms_obj, config_shortcuttofile){
-            // 1. make and append the externalfile components
+        async function make_append_shortcuttofile_component(doms_obj, config_shortcuttofile) {
+            // 1. make and append the externalfile components (in ProjectCollection.ExternalFileList, add a ExternalFile component, with children nodes of .Element, and .ExternalFile, )
+            doms_obj = make_append_shortcuttofile_externalfile_component(doms_obj, config_shortcuttofile)
             // make and append the externalfile components
-            async function make_append_shortcuttofile_externalfile_component(doms_obj, config_shortcuttofile){};//async function make_append_shortcuttofile_externalfile_component
+            async function make_append_shortcuttofile_externalfile_component(doms_obj, config_shortcuttofile) {
+                // 1. make shortcuttofile_externalfile_component
+                let shortcuttofile_externalfile_component = await make_shortcuttofile_externalfile_component(doms_obj, config_shortcuttofile)
+                //make shortcuttofile_externalfile_component
+                async function make_shortcuttofile_externalfile_component() {
+                    // load the prototype xml for the target component
+                    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___h01_shortcuttofile_externalfile_v7.xml'
+                    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
+                    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+                    // console.log('line104', thesrcxmlstr)
+
+                    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+                    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
+                    let component_dom_obj = $(thesrcxmlstr_cleaned)
+
+                    // config the ProjectCollection.ExternalFileList.ExternalFile(of this externalfile).Element
+                    let externalfile_element_dom_obj = $(component_dom_obj.find('Element')[0])
+                    // console.log('line160', externalfile_element_dom_obj.prop('outerHTML') )
+                    // console.log('line161', config_shortcuttofile.ExternalFile ); return
+                    if (config_shortcuttofile.ExternalFile.Element.Label) { $(externalfile_element_dom_obj.find('Label')[0]).text(config_shortcuttofile.ExternalFile.Element.Label) }
+                    if (config_shortcuttofile.ExternalFile.Element.Container) { $(externalfile_element_dom_obj.find('Container')[0]).text(config_shortcuttofile.ExternalFile.Element.Container) }
+                    if (config_shortcuttofile.ExternalFile.Element.ID) { $(externalfile_element_dom_obj.find('ID')[0]).text(config_shortcuttofile.ExternalFile.Element.ID) }
+                    if (config_shortcuttofile.ExternalFile.Element.CreatedOn) { $(externalfile_element_dom_obj.find('CreatedOn')[0]).text(config_shortcuttofile.ExternalFile.Element.CreatedOn) }
+                    if (config_shortcuttofile.ExternalFile.Element.ModifiedOn) { $(externalfile_element_dom_obj.find('ModifiedOn')[0]).text(config_shortcuttofile.ExternalFile.Element.ModifiedOn) }
+                    if (config_shortcuttofile.ExternalFile.Element.ModifiedBy) { $(externalfile_element_dom_obj.find('ModifiedBy')[0]).text(config_shortcuttofile.ExternalFile.Element.ModifiedBy) }
+                    if (config_shortcuttofile.ExternalFile.Element.ModifiedByEGID) { $(externalfile_element_dom_obj.find('ModifiedByEGID')[0]).text(config_shortcuttofile.ExternalFile.Element.ModifiedByEGID) }
+                    if (config_shortcuttofile.ExternalFile.Element.InputIDs) { $(externalfile_element_dom_obj.find('InputIDs')[0]).text(config_shortcuttofile.ExternalFile.Element.InputIDs) }
+                    // could config more... 
+
+                    // config the ProjectCollection.Elements.Element(of the link).ExternalFile.ExternalFile
+                    let externalfile_externalfile_dom_obj = $(component_dom_obj.find('ExternalFile')[0])
+                    if (config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID) { $(externalfile_externalfile_dom_obj.find('ShortCutList').find('ShortCutID')[0]).text(config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID) }
+                    if (config_shortcuttofile.ExternalFile.ExternalFile.FileTypeType) { $(externalfile_externalfile_dom_obj.find('FileTypeType')[0]).text(config_shortcuttofile.ExternalFile.ExternalFile.FileTypeType) }
+                    // ProjectCollection.Elements.Element(of the link).ExternalFile.ExternalFile.DNA
+                    let shortcuttofile_externalfile_externalfile_dna_dna_doms_obj = await make_dna(config_shortcuttofile.ExternalFile.ExternalFile.DNA)
+                    
+                    // 2. Note: unlike other components, the DNA part should be inserted as HTML (not textcontent) to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
+                    // Make DNA HTML
+                    let dna_outerHTMLstr = make_dna_html(shortcuttofile_externalfile_externalfile_dna_dna_doms_obj)
+
+                    // 3. insert dna_outerHTMLstr as html to ProjectCollection.ExternalFileList.ExternalFile(of this externalfile).DNA
+                    // Note: the differece between html() and text() is that for html, '&lt;' is kept as it was; while
+                    // for text(), '&lt;' is converted to '&amp;lt;', which cannot be recognized correctly by SAS EG
+                    $(component_dom_obj.find('ExternalFile').find('DNA')[0]).html(dna_outerHTMLstr)
+
+                    // could config more...                   
+
+                    // console.log('line129', component_dom_obj.prop('outerHTML'))
+                    return component_dom_obj
+                };//async function make_shortcuttofile_externalfile_component
+
+                // 2. append the component to ProjectCollection.ExternalFileList
+                $(doms_obj.find('ExternalFileList')[0]).append(shortcuttofile_externalfile_component)
+
+                return doms_obj
+            };//async function make_append_shortcuttofile_externalfile_component
 
             // 2. make and append the element components
             // make and append the element components
-            async function make_append_shortcuttofile_element_component(doms_obj, config_shortcuttofile){};//async function make_append_shortcuttofile_element_component
+            async function make_append_shortcuttofile_element_component(doms_obj, config_shortcuttofile) { };//async function make_append_shortcuttofile_element_component
 
             // 1. make and append the egtreenode components
             // make and append the egtreenode components
-            async function make_append_shortcuttofile_egtreenode_component(doms_obj, config_shortcuttofile){};//async function make_append_shortcuttofile_egtreenode_component
+            async function make_append_shortcuttofile_egtreenode_component(doms_obj, config_shortcuttofile) { };//async function make_append_shortcuttofile_egtreenode_component
 
             // 1. make and append the taskgraphic components
             // make and append the taskgraphic components
-            async function make_append_shortcuttofile_taskgraphic_component(doms_obj, config_shortcuttofile){};//async function make_append_shortcuttofile_taskgraphic_component
+            async function make_append_shortcuttofile_taskgraphic_component(doms_obj, config_shortcuttofile) { };//async function make_append_shortcuttofile_taskgraphic_component
+
+            return doms_obj
 
         }; //async function make_append_shortcuttofile_component(doms_obj, config_shortcuttofile)
     } // for(let i=0;i<shortcuttofile_input_arr.length;i++)
 
 
-
     // 8. add notes
-
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
     // remove lines only containing spaces and line breakers
     let targetxmlstr = remove_spaces_linebreakers(targetxmlstr_cleaned)
@@ -189,9 +246,10 @@ async function config_shortcuttofile_function(shorcuttofile_input) {
     config_shorcuttofile.ExternalFile.Element.ModifiedBy = shorcuttofile_input.config_pfd.Element.ModifiedBy
     config_shorcuttofile.ExternalFile.Element.ModifiedByEGID = shorcuttofile_input.config_pfd.Element.ModifiedByEGID
     // 1b. config for ExternalFile.ExternalFile
-    config_shorcuttofile.ExternalFile.ShortCutList = {}
-    config_shorcuttofile.ExternalFile.ShortCutList.ShortCutID = 'ShortCutToFile-' + make_rand_string_by_length(16)
-    config_shorcuttofile.ExternalFile.FileTypeType = 'Excel' // the tag name has two Type which is obviously an mistake when developping the xml structure
+    config_shorcuttofile.ExternalFile.ExternalFile = {}
+    config_shorcuttofile.ExternalFile.ExternalFile.ShortCutList = {}
+    config_shorcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID = 'ShortCutToFile-' + make_rand_string_by_length(16)
+    config_shorcuttofile.ExternalFile.ExternalFile.FileTypeType = 'Excel' // the tag name has two Type which is obviously an mistake when developping the xml structure
 
     // 1b1. config for DNA
     let fullpath = shorcuttofile_input.DNA.FullPath
@@ -204,16 +262,17 @@ async function config_shortcuttofile_function(shorcuttofile_input) {
     let startpos = fullpath.lastIndexOf('\\')
     let filename = fullpath.substr(startpos + 1)
     config_shorcuttofile.ExternalFile.DNA = {}
-    config_shorcuttofile.ExternalFile.DNA.DNA = {}
-    config_shorcuttofile.ExternalFile.DNA.DNA.Name = filename
-    config_shorcuttofile.ExternalFile.DNA.DNA.FullPath = fullpath
+    config_shorcuttofile.ExternalFile.ExternalFile.DNA = {}
+    config_shorcuttofile.ExternalFile.ExternalFile.DNA.DNA = {}
+    config_shorcuttofile.ExternalFile.ExternalFile.DNA.DNA.Name = filename
+    config_shorcuttofile.ExternalFile.ExternalFile.DNA.DNA.FullPath = fullpath
 
     // 2. config for ProjectCollection.Elements.Element(for the shortcuttofile component, not for the ExternalFile component)
     config_shorcuttofile.ShortCutToFile = {}
     config_shorcuttofile.ShortCutToFile.Element = {}
     // 2a. config for ProjectCollection.Elements.Element(for this shortcuttofileToFile).Element
     config_shorcuttofile.ShortCutToFile.Element.Label = shorcuttofile_input.Element.Label
-    config_shorcuttofile.ShortCutToFile.Element.ID = config_shorcuttofile.ExternalFile.ShortCutList.ShortCutID // already created in step 1
+    config_shorcuttofile.ShortCutToFile.Element.ID = config_shorcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID // already created in step 1
     config_shorcuttofile.ShortCutToFile.Element.CreatedOn = shorcuttofile_input.config_pfd.Element.CreatedOn
     config_shorcuttofile.ShortCutToFile.Element.ModifiedOn = shorcuttofile_input.config_pfd.Element.ModifiedOn
     config_shorcuttofile.ShortCutToFile.Element.ModifiedBy = shorcuttofile_input.config_pfd.Element.ModifiedBy
@@ -234,8 +293,9 @@ async function config_shortcuttofile_function(shorcuttofile_input) {
     config_shorcuttofile.TaskGraphic.ID = mymodules.generateUUID()
     config_shorcuttofile.TaskGraphic.Label = config_shorcuttofile.ShortCutToFile.Element.Label
     config_shorcuttofile.TaskGraphic.Element = config_shorcuttofile.ShortCutToFile.Element.ID
-    return shorcut_input
-};// async function config_shortcuttofile_function(shorcut_input)
+
+    return config_shorcuttofile
+};// async function config_shortcuttofile_function(config_shorcuttofile)
 
 // make and append <Element Type="SAS.EG.ProjectElements.Link"> to ProjectCollection.Elements
 async function make_append_link_component(doms_obj, config_link) {
@@ -347,9 +407,9 @@ async function make_append_task_element_component(doms_obj, config_task) {
 }; // async function make_append_task_element_component
 
 // make task_dna (to indicate the location of the shortcut to an external SAS program )
-async function make_task_element_codetask_dna_dna(config_task) {
+async function make_dna(config) {
     // load the prototype xml for the target component
-    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___g01_task_dna_v7.xml'
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z03_dna_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
     // console.log('line104', thesrcxmlstr)
@@ -359,36 +419,16 @@ async function make_task_element_codetask_dna_dna(config_task) {
     let component_dom_obj = $(thesrcxmlstr_cleaned)
 
     // configuration of the DNA component
-    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA) {
-        if (config_task.CodeTask.DNA.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name) }
-        if (config_task.CodeTask.DNA.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath) }
+    if (config.DNA) {
+        if (config.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config.DNA.Name) }
+        if (config.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config.DNA.FullPath) }
     } //if (config_task.CodeTask.DNA.DNA
 
     // console.log('line276', component_dom_obj.prop('outerHTML'))
     return component_dom_obj
-}; // async function make_task_element_codetask_dna_dna
+}; // async function make_dna
 
-// make task_dna (to indicate the location of the shortcut to an external SAS program )
-async function make_task_element_codetask_dna_dna(config_task) {
-    // load the prototype xml for the target component
-    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___g01_task_dna_v7.xml'
-    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-    // console.log('line104', thesrcxmlstr)
 
-    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
-    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
-    let component_dom_obj = $(thesrcxmlstr_cleaned)
-
-    // configuration of the DNA component
-    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA) {
-        if (config_task.CodeTask.DNA.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name) }
-        if (config_task.CodeTask.DNA.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath) }
-    } //if (config_task.CodeTask.DNA.DNA
-
-    // console.log('line276', component_dom_obj.prop('outerHTML'))
-    return component_dom_obj
-}; // async function make_task_element_codetask_dna_dna
 
 // make the Element component and append to ProjectCollection.Elements (Type = "SAS.EG.ProjectElements.CodeTask")
 async function make_task_element_component(config_task) {
@@ -423,23 +463,12 @@ async function make_task_element_component(config_task) {
     if (config_task.tasktype && config_task.tasktype === 'shortcut') {
         // console.log('line255',config_task.CodeTask.DNA.DNA)
         // 1. make task_dna component
-        let task_element_codetask_dna_dna_doms_obj = await make_task_element_codetask_dna_dna(config_task)
+        let task_element_codetask_dna_dna_doms_obj = await make_dna(config_task.CodeTask.DNA)
 
         // 2. Note: unlike other components, the DNA part should be inserted as HTML (not textcontent) to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
-        // Not appended as DOM objects. Ha! for this confusion, we should award a medal to the genius who made it that way! 
-        // 2.1 get the outerHTML of task_element_codetask_dna_dna_doms_obj
-        let dna_outerHTMLstr = task_element_codetask_dna_dna_doms_obj.prop('outerHTML')
-        // console.log('line307',dns_outerHTML)
-        // 2.2 lots of work around here
-        // 2.2.1, use back the original tag names (e.g., use back DNA instead of dna)
-        let dna_tags_dict = { 'dna': 'DNA', 'type': 'Type', 'name': 'Name', 'version': 'Version', 'assembly': 'Assembly', 'factory': 'Factory', 'fullpath': 'FullPath' }
-        Object.keys(dna_tags_dict).forEach(key => {
-            let originaltag = dna_tags_dict[key]
-            dna_outerHTMLstr = dna_outerHTMLstr.replace('<' + key + '>', '&lt;' + originaltag + '&gt;')
-            dna_outerHTMLstr = dna_outerHTMLstr.replace('</' + key + '>', '&lt;/' + originaltag + '&gt;')
-            dna_outerHTMLstr = dna_outerHTMLstr.replace('<' + key + ' />', '&lt;' + originaltag + ' /&gt;')
-        })
-        // console.log('line316', dna_outerHTMLstr)
+        // Make DNA HTML
+        let dna_outerHTMLstr = make_dna_html(task_element_codetask_dna_dna_doms_obj)
+
         // 3. insert dna_outerHTMLstr as html to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
         // Note: the differece between html() and text() is that for html, '&lt;' is kept as it was; while
         // for text(), '&lt;' is converted to '&amp;lt;', which cannot be recognized correctly by SAS EG
@@ -455,27 +484,25 @@ async function make_task_element_component(config_task) {
 
 };//async function make_task_element_component
 
-// make task_dna (to indicate the location of the shortcut to an external SAS program )
-async function make_task_element_codetask_dna_dna(config_task) {
-    // load the prototype xml for the target component
-    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___g01_task_dna_v7.xml'
-    let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
-    // console.log('line104', thesrcxmlstr)
-
-    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
-    let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
-    let component_dom_obj = $(thesrcxmlstr_cleaned)
-
-    // configuration of the DNA component
-    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA) {
-        if (config_task.CodeTask.DNA.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name) }
-        if (config_task.CodeTask.DNA.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath) }
-    } //if (config_task.CodeTask.DNA.DNA
-
-    // console.log('line276', component_dom_obj.prop('outerHTML'))
-    return component_dom_obj
-}; // async function make_task_element_codetask_dna_dna
+// make DNA HTML
+//Note: unlike other components, the DNA part should be inserted as HTML (not textcontent) to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
+function make_dna_html(dna_dom_obj) {
+    // Not appended as DOM objects. Ha! for this confusion, we should award a medal to the genius who made it that way! 
+    // 2.1 get the outerHTML of task_element_codetask_dna_dna_doms_obj
+    let dna_outerHTMLstr = dna_dom_obj.prop('outerHTML')
+    // console.log('line307',dns_outerHTML)
+    // 2.2 lots of work around here
+    // 2.2.1, use back the original tag names (e.g., use back DNA instead of dna)
+    let dna_tags_dict = { 'dna': 'DNA', 'type': 'Type', 'name': 'Name', 'version': 'Version', 'assembly': 'Assembly', 'factory': 'Factory', 'fullpath': 'FullPath' }
+    Object.keys(dna_tags_dict).forEach(key => {
+        let originaltag = dna_tags_dict[key]
+        dna_outerHTMLstr = dna_outerHTMLstr.replace('<' + key + '>', '&lt;' + originaltag + '&gt;')
+        dna_outerHTMLstr = dna_outerHTMLstr.replace('</' + key + '>', '&lt;/' + originaltag + '&gt;')
+        dna_outerHTMLstr = dna_outerHTMLstr.replace('<' + key + ' />', '&lt;' + originaltag + ' /&gt;')
+    })
+    // console.log('line316', dna_outerHTMLstr)
+    return dna_outerHTMLstr
+}; // function make_dna_html
 
 // to generate a random string of 16 chars (note, it is not a GUID!)
 //https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
@@ -502,7 +529,7 @@ async function make_append_task_taskgraphic_component(doms_obj, config_task) {
 //make task_taskgraphic
 async function make_task_taskgraphic_component(config_task) {
     // load the prototype xml for the target component
-    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___e02_task_taskgraphic_v7.xml'
+    let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z04_taskgraphic_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
     // console.log('line57', thesrcxmlstr)
@@ -523,7 +550,7 @@ async function make_task_taskgraphic_component(config_task) {
 // within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
 async function make_append_task_egtreenode_component(doms_obj, config_task) {
     // 1a. make task_egtreenode_component
-    let task_egtreenode_dom_obj = await make_EGTreeNode(config_task.EGTreeNode)
+    let task_egtreenode_dom_obj = await make_egtreenode(config_task.EGTreeNode)
     // console.log('line69', task_egtreenode_dom_obj.prop('outerHTML'))
     // 1b. append task_egtreenode_component
     // find all PFD EGTreeNode under Elements ProjectColletion.External_Objects.ProjectTreeView
@@ -640,7 +667,7 @@ async function config_programs_function(config_pfd) {
 async function make_append_egtreenode_programs(doms_obj, config_program_egtreenode, config_pfd) {
     // console.log('line221', config_pfd)
     //1. make the EGTreeNode component
-    let component_egtreenode_programs_dom_obj = await make_EGTreeNode(config_program_egtreenode)
+    let component_egtreenode_programs_dom_obj = await make_egtreenode(config_program_egtreenode)
     // console.log('line224', component_egtreenode_programs_dom_obj.prop('outerHTML'))
 
     //2. append the EGTreeNode to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
@@ -825,7 +852,7 @@ async function make_append_pfd_component(doms_obj, config_pfd) {
     // Note: $(doms_obj.find('Containers').find('ID')[0]).text(config_pfd.Element.ID) is wrong, as it always write the PFD ID into the first ID tag
 
     // make the egtreenode component to append to ProjectCollection.External_Objects.ProjectTreeView
-    let component_pfd_egtreenode_dom_obj = await make_EGTreeNode(config_pfd.EGTreeNode)
+    let component_pfd_egtreenode_dom_obj = await make_egtreenode(config_pfd.EGTreeNode)
     // append the treenode to ProjectCollection.External_Objects.ProjectTreeView
     $(doms_obj.find('External_Objects').find('ProjectTreeView')[0]).append(component_pfd_egtreenode_dom_obj)
 
@@ -859,7 +886,7 @@ async function make_processflowview_properties(config) {
 
 
 // make a EGTreeNode
-async function make_EGTreeNode(config) {
+async function make_egtreenode(config) {
 
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z02_egtreenode_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
@@ -875,7 +902,7 @@ async function make_EGTreeNode(config) {
     if (config.Expanded) { $(component_dom_obj.find('Expanded')[0]).text(config.Expanded) }
     if (config.Label) { $(component_dom_obj.find('Label')[0]).text(config.Label) }
     return component_dom_obj
-}; // function make_EGTreeNode()
+}; // function make_egtreenode()
 
 // make a pfd component (to be appended to ProjectCollection.Elements)
 async function make_pfd_component(config) {
