@@ -5,7 +5,16 @@
     based on localbackend\app\23_create_xml_from_prototype_3.js
     adding the following:
     add shortcut to a file
-    to do:
+1) in ProjectCollection.ExternalFileList, add a ExternalFile component, 
+    with children nodes of .Element, and .ExternalFile,  
+    in .ExternalFile.DNA, need to insert (again, as html) file location data
+2) in ProjectCollection.Elements, add an Element component (Type="SAS.EG.ProjectElements.ShortCutToFile")
+    with children nodes of .Element, .SHORTCUT (to indicate the ExternalFile ID defined in step 1), and .ShortCutToFile
+3) in  ProjectCollection.External_Objects.ProjectTreeView, add a EGTreeNode under the parent PFD's EGTreeNode   
+4) in ProjectCollection.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic (TaskGraphic.Element refers to the ShortCutToFile ID defined in step 2)
+
+to do:
+    add notes
     read from an existing egp v8 and rebuild into a v7 egp with tasks, links, and shortcut to files
 */
 
@@ -55,7 +64,7 @@ const { config } = require('process');
         doms_obj = await make_append_egtreenode_programs(doms_obj, config_programs[i], config_pfd[i])
     } // for(let i=0;i<pdf_arr.length;i++)
 
-    // 5. add tasks
+    // 5. add tasks and shortcut to external sas files
     let task_input_arr = [
         {
             Element: { Label: 'PFD1_p1' }, config_pfd: config_pfd[0],
@@ -69,8 +78,9 @@ data c; set a; d=2; run;`
         },
         {
             tasktype: 'shortcut',
-            Element: { Label: 'shortcut to sas.sas' }, config_pfd: config_pfd[1],
-            Embedded:'False',
+            Element: { Label: 'shortcut to sas.sas' },
+            config_pfd: config_pfd[1],
+            Embedded: 'False',
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\sas.sas` } // note: not a good practice to use single backlash, at least it should be wrapped by String.raw``
         },
     ]
@@ -83,7 +93,7 @@ data c; set a; d=2; run;`
         doms_obj = await make_append_task_component(doms_obj, config_task[i], newZip)
     } // for(let i=0;i<task_input_arr.length;i++)
 
-    // 6. add link
+    // 6. add links
     let link_input_arr = [
         { Label: 'p1 to p2', LinkFrom: config_task[0], LinkTo: config_task[1] }
     ]
@@ -96,6 +106,58 @@ data c; set a; d=2; run;`
         doms_obj = await make_append_link_component(doms_obj, config_link)
 
     } // for(let i=0;i<link_input_arr.length;i++)
+
+    // 7. add shortcuts to external files
+    /* 
+    1) in ProjectCollection.ExternalFileList, add a ExternalFile component, 
+    with children nodes of .Element, and .ExternalFile,  
+    in .ExternalFile.DNA, need to insert (again, as html) file location data
+    2) in ProjectCollection.Elements, add an Element component (Type="SAS.EG.ProjectElements.ShortCutToFile")
+        with children nodes of .Element, .SHORTCUT (to indicate the ExternalFile ID defined in step 1), and .ShortCutToFile
+    3) in  ProjectCollection.External_Objects.ProjectTreeView, add a EGTreeNode under the parent PFD's EGTreeNode   
+    4) in ProjectCollection.External_Objects.ProcessFlowView.Graphics, add a TaskGraphic (TaskGraphic.Element refers to the ShortCutToFile ID defined in step 2)
+    */
+    // 7.1 shortcuttofile_input
+    let shortcuttofile_input_arr = [
+        {
+            config_pfd: config_pfd[1],
+            Element: { Label: 'shortcut to thexls.xlsx' },
+            DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\thexls.xlsx` }
+        }
+    ] // shortcuttofile_input_arr
+
+    let config_shortcuttofile = []
+    for (let i = 0; i < shortcuttofile_input_arr.length; i++) {
+        // 6.1 configuration for shortcuttofile_component
+        config_shortcuttofile[i] = await config_shortcuttofile_function(shortcuttofile_input_arr[i])
+        // console.log('line133', config_shortcuttofile)
+
+        // 6.2 make and append shortcuttofile_component
+        doms_obj = await make_append_shortcuttofile_component(doms_obj, config_shortcuttofile)
+        // make and append shortcuttofile_component
+        async function make_append_shortcuttofile_component(doms_obj, config_shortcuttofile){
+            // 1. make and append the externalfile components
+            // make and append the externalfile components
+            async function make_append_shortcuttofile_externalfile_component(doms_obj, config_shortcuttofile){};//async function make_append_shortcuttofile_externalfile_component
+
+            // 2. make and append the element components
+            // make and append the element components
+            async function make_append_shortcuttofile_element_component(doms_obj, config_shortcuttofile){};//async function make_append_shortcuttofile_element_component
+
+            // 1. make and append the egtreenode components
+            // make and append the egtreenode components
+            async function make_append_shortcuttofile_egtreenode_component(doms_obj, config_shortcuttofile){};//async function make_append_shortcuttofile_egtreenode_component
+
+            // 1. make and append the taskgraphic components
+            // make and append the taskgraphic components
+            async function make_append_shortcuttofile_taskgraphic_component(doms_obj, config_shortcuttofile){};//async function make_append_shortcuttofile_taskgraphic_component
+
+        }; //async function make_append_shortcuttofile_component(doms_obj, config_shortcuttofile)
+    } // for(let i=0;i<shortcuttofile_input_arr.length;i++)
+
+
+
+    // 8. add notes
 
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned)
     // remove lines only containing spaces and line breakers
@@ -111,6 +173,69 @@ data c; set a; d=2; run;`
     await newZip.writeZip("data/out/test/" + config_project.Element.Label + ".egp")
 
 })()
+
+// configuration for shortcut to external file
+async function config_shortcuttofile_function(shorcuttofile_input) {
+    let config_shorcuttofile = {}
+
+    //1. config for ProjectCollection.ExternalFileList.ExternalFile
+    config_shorcuttofile.ExternalFile = {}
+    // 1a. config for ExternalFile.Element
+    config_shorcuttofile.ExternalFile.Element = {}
+    config_shorcuttofile.ExternalFile.Element.Label = shorcuttofile_input.Element.Label
+    config_shorcuttofile.ExternalFile.Element.ID = 'ExternalFile-' + make_rand_string_by_length(16)
+    config_shorcuttofile.ExternalFile.Element.CreatedOn = shorcuttofile_input.config_pfd.Element.CreatedOn
+    config_shorcuttofile.ExternalFile.ModifiedOn = shorcuttofile_input.config_pfd.Element.ModifiedOn
+    config_shorcuttofile.ExternalFile.Element.ModifiedBy = shorcuttofile_input.config_pfd.Element.ModifiedBy
+    config_shorcuttofile.ExternalFile.Element.ModifiedByEGID = shorcuttofile_input.config_pfd.Element.ModifiedByEGID
+    // 1b. config for ExternalFile.ExternalFile
+    config_shorcuttofile.ExternalFile.ShortCutList = {}
+    config_shorcuttofile.ExternalFile.ShortCutList.ShortCutID = 'ShortCutToFile-' + make_rand_string_by_length(16)
+    config_shorcuttofile.ExternalFile.FileTypeType = 'Excel' // the tag name has two Type which is obviously an mistake when developping the xml structure
+
+    // 1b1. config for DNA
+    let fullpath = shorcuttofile_input.DNA.FullPath
+    fullpath = JSON.stringify(fullpath) // to ensure that the single backlash are replaced by \\
+    // the stringify adds additional quotes around the path, the string is now like '"C:\\..."'
+    // the following is to strip these additional quotes
+    if (fullpath.substr(0, 1) === '"') { fullpath = fullpath.substring(1) }
+    if (fullpath.substr(fullpath.length - 1, 1) === '"') { fullpath = fullpath.substr(0, fullpath.length - 1) }
+    // console.log('line159', fullpath)
+    let startpos = fullpath.lastIndexOf('\\')
+    let filename = fullpath.substr(startpos + 1)
+    config_shorcuttofile.ExternalFile.DNA = {}
+    config_shorcuttofile.ExternalFile.DNA.DNA = {}
+    config_shorcuttofile.ExternalFile.DNA.DNA.Name = filename
+    config_shorcuttofile.ExternalFile.DNA.DNA.FullPath = fullpath
+
+    // 2. config for ProjectCollection.Elements.Element(for the shortcuttofile component, not for the ExternalFile component)
+    config_shorcuttofile.ShortCutToFile = {}
+    config_shorcuttofile.ShortCutToFile.Element = {}
+    // 2a. config for ProjectCollection.Elements.Element(for this shortcuttofileToFile).Element
+    config_shorcuttofile.ShortCutToFile.Element.Label = shorcuttofile_input.Element.Label
+    config_shorcuttofile.ShortCutToFile.Element.ID = config_shorcuttofile.ExternalFile.ShortCutList.ShortCutID // already created in step 1
+    config_shorcuttofile.ShortCutToFile.Element.CreatedOn = shorcuttofile_input.config_pfd.Element.CreatedOn
+    config_shorcuttofile.ShortCutToFile.Element.ModifiedOn = shorcuttofile_input.config_pfd.Element.ModifiedOn
+    config_shorcuttofile.ShortCutToFile.Element.ModifiedBy = shorcuttofile_input.config_pfd.Element.ModifiedBy
+    config_shorcuttofile.ShortCutToFile.Element.ModifiedByEGID = shorcuttofile_input.config_pfd.Element.ModifiedByEGID
+    // 2b. config the parent ExternalFile ID for ProjectCollection.Elements.Element(for this shortcuttofileToFile).SHORTCUT
+    config_shorcuttofile.ShortCutToFile.SHORTCUT = {}
+    config_shorcuttofile.ShortCutToFile.SHORTCUT.Parent = config_shorcuttofile.ExternalFile.Element.ID
+
+    // 3. config for ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of the parent PFD).EGTreeNode
+    config_shorcuttofile.EGTreeNode = {}
+    config_shorcuttofile.EGTreeNode.NodeType = 'NODETYPE_ELEMENT'
+    config_shorcuttofile.EGTreeNode.ElementID = config_shorcuttofile.ShortCutToFile.Element.ID
+    config_shorcuttofile.EGTreeNode.Expanded = 'True'
+    config_shorcuttofile.EGTreeNode.Label = config_shorcuttofile.ShortCutToFile.Element.Label
+
+    // 4. config for ProjectCollection.External_Objects.ProcessFlowView.Graphics.TaskGraphic
+    config_shorcuttofile.TaskGraphic = {}
+    config_shorcuttofile.TaskGraphic.ID = mymodules.generateUUID()
+    config_shorcuttofile.TaskGraphic.Label = config_shorcuttofile.ShortCutToFile.Element.Label
+    config_shorcuttofile.TaskGraphic.Element = config_shorcuttofile.ShortCutToFile.Element.ID
+    return shorcut_input
+};// async function config_shortcuttofile_function(shorcut_input)
 
 // make and append <Element Type="SAS.EG.ProjectElements.Link"> to ProjectCollection.Elements
 async function make_append_link_component(doms_obj, config_link) {
@@ -234,13 +359,13 @@ async function make_task_element_codetask_dna_dna(config_task) {
     let component_dom_obj = $(thesrcxmlstr_cleaned)
 
     // configuration of the DNA component
-    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA){
-        if (config_task.CodeTask.DNA.DNA.Name){$(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name)}
-        if (config_task.CodeTask.DNA.DNA.FullPath){$(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath)}
+    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA) {
+        if (config_task.CodeTask.DNA.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name) }
+        if (config_task.CodeTask.DNA.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath) }
     } //if (config_task.CodeTask.DNA.DNA
 
     // console.log('line276', component_dom_obj.prop('outerHTML'))
-    return component_dom_obj            
+    return component_dom_obj
 }; // async function make_task_element_codetask_dna_dna
 
 // make task_dna (to indicate the location of the shortcut to an external SAS program )
@@ -256,13 +381,13 @@ async function make_task_element_codetask_dna_dna(config_task) {
     let component_dom_obj = $(thesrcxmlstr_cleaned)
 
     // configuration of the DNA component
-    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA){
-        if (config_task.CodeTask.DNA.DNA.Name){$(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name)}
-        if (config_task.CodeTask.DNA.DNA.FullPath){$(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath)}
+    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA) {
+        if (config_task.CodeTask.DNA.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name) }
+        if (config_task.CodeTask.DNA.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath) }
     } //if (config_task.CodeTask.DNA.DNA
 
     // console.log('line276', component_dom_obj.prop('outerHTML'))
-    return component_dom_obj            
+    return component_dom_obj
 }; // async function make_task_element_codetask_dna_dna
 
 // make the Element component and append to ProjectCollection.Elements (Type = "SAS.EG.ProjectElements.CodeTask")
@@ -307,12 +432,12 @@ async function make_task_element_component(config_task) {
         // console.log('line307',dns_outerHTML)
         // 2.2 lots of work around here
         // 2.2.1, use back the original tag names (e.g., use back DNA instead of dna)
-        let dna_tags_dict = {'dna':'DNA','type':'Type','name':'Name', 'version':'Version', 'assembly':'Assembly', 'factory':'Factory', 'fullpath':'FullPath'}
-        Object.keys(dna_tags_dict).forEach(key=>{
+        let dna_tags_dict = { 'dna': 'DNA', 'type': 'Type', 'name': 'Name', 'version': 'Version', 'assembly': 'Assembly', 'factory': 'Factory', 'fullpath': 'FullPath' }
+        Object.keys(dna_tags_dict).forEach(key => {
             let originaltag = dna_tags_dict[key]
-            dna_outerHTMLstr = dna_outerHTMLstr.replace('<'+key+'>', '&lt;'+ originaltag + '&gt;')
-            dna_outerHTMLstr = dna_outerHTMLstr.replace('</'+key+'>', '&lt;/'+ originaltag + '&gt;')
-            dna_outerHTMLstr = dna_outerHTMLstr.replace('<'+key+' />', '&lt;'+ originaltag + ' /&gt;')
+            dna_outerHTMLstr = dna_outerHTMLstr.replace('<' + key + '>', '&lt;' + originaltag + '&gt;')
+            dna_outerHTMLstr = dna_outerHTMLstr.replace('</' + key + '>', '&lt;/' + originaltag + '&gt;')
+            dna_outerHTMLstr = dna_outerHTMLstr.replace('<' + key + ' />', '&lt;' + originaltag + ' /&gt;')
         })
         // console.log('line316', dna_outerHTMLstr)
         // 3. insert dna_outerHTMLstr as html to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
@@ -323,7 +448,7 @@ async function make_task_element_component(config_task) {
         // 4. also, change ProjectCollection.Elements.Element(of the task).CodeTask.Embedded's text to 'False'
         // that tiny change controls whether the task is a shortcut or with sas code Embedded within the egp file
         $(component_dom_obj.find('CodeTask').find('Embedded')[0]).text(config_task.CodeTask.Embedded)
-        
+
     } // if (config_task.type && config_task.type === 'shortcut')
 
     return component_dom_obj
@@ -343,13 +468,13 @@ async function make_task_element_codetask_dna_dna(config_task) {
     let component_dom_obj = $(thesrcxmlstr_cleaned)
 
     // configuration of the DNA component
-    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA){
-        if (config_task.CodeTask.DNA.DNA.Name){$(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name)}
-        if (config_task.CodeTask.DNA.DNA.FullPath){$(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath)}
+    if (config_task.CodeTask && config_task.CodeTask.DNA && config_task.CodeTask.DNA.DNA) {
+        if (config_task.CodeTask.DNA.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config_task.CodeTask.DNA.DNA.Name) }
+        if (config_task.CodeTask.DNA.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config_task.CodeTask.DNA.DNA.FullPath) }
     } //if (config_task.CodeTask.DNA.DNA
 
     // console.log('line276', component_dom_obj.prop('outerHTML'))
-    return component_dom_obj            
+    return component_dom_obj
 }; // async function make_task_element_codetask_dna_dna
 
 // to generate a random string of 16 chars (note, it is not a GUID!)
@@ -575,7 +700,7 @@ async function config_task_function(config_pfd, task_input) {
     //1c. configuration for the CodeTask components that are to be added to ProjectCollection.Elements.Element(PFD).Element(element of the curreant task)
     // For task as shortcut to external sas files, additional <DNA> components should be appended to ProjectCollection.Elements.Element(PFD).Element(element of the curreant task).CodeTask.DNA
     if (task_input.tasktype && task_input.tasktype === 'shortcut' && task_input.DNA && task_input.DNA.FullPath) {
-        config_task.tasktype=task_input.tasktype
+        config_task.tasktype = task_input.tasktype
         config_task.CodeTask = {}
         config_task.CodeTask.DNA = {}
         config_task.CodeTask.DNA.DNA = {}
@@ -585,8 +710,8 @@ async function config_task_function(config_pfd, task_input) {
         fullpath = JSON.stringify(fullpath) // to ensure that the single backlash are replaced by \\
         // the stringify adds additional quotes around the path, the string is now like '"C:\\..."'
         // the following is to strip these additional quotes
-        if (fullpath.substr(0,1)==='"'){fullpath = fullpath.substring(1)}
-        if (fullpath.substr(fullpath.length-1,1)==='"'){  fullpath =fullpath.substr(0, fullpath.length-1)}
+        if (fullpath.substr(0, 1) === '"') { fullpath = fullpath.substring(1) }
+        if (fullpath.substr(fullpath.length - 1, 1) === '"') { fullpath = fullpath.substr(0, fullpath.length - 1) }
         // console.log('line489', fullpath)
         let startpos = fullpath.lastIndexOf('\\')
         let filename = fullpath.substr(startpos + 1)

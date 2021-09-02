@@ -9,15 +9,6 @@ const srcfolder = 'data/in/prototype/__xml/egpv8/';
 
 (async () => { 
 
-    // load the prototype xml for the target component
-    let str1 = 'C:\\Users\\Z70\\Desktop\\sas.sas'
-    let str2 = JSON.stringify(str1)
-    let str3,str4
-    if (str2.substr(0,1)==='"'){
-     str3 = str2.substring(1)}
-     if (str3.substr(str3.length-1,1)==='"'){ 
-     str4 =str3.substr(0, str3.length-1)}
-    console.log(str1, str2, str3, str4)
 
 })()
 
