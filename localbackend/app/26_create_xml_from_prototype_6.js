@@ -2,14 +2,7 @@
     The prototypes are saved at data/in/prototype/egpv7
     components of a typical v7 project.xml are saved as individual xml files (all of utf16le encoding)
 
-    based on localbackend\app\24_create_xml_from_prototype_4.js
-    adding note components
-
-    1. Make an Element for the note and append to ProjectCollection.Elements,     
-    2. Make an EGTreeNode and append to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode (of the parent PFD)
-    3. Make an NoteGraphic and append to ProjectCollection.External_Objects.ProcessFlowView.Graphics
-    
-    to do:
+    based on localbackend\app\25_create_xml_from_prototype_5.js
     read from an existing egp v8 and rebuild into a v7 egp with tasks, links, and shortcut to files
 */
 
