@@ -1048,40 +1048,33 @@ async function make_append_task_egtreenode_component(doms_obj, config_task) {
     let task_egtreenode_dom_obj = await make_egtreenode(config_task.EGTreeNode)
     // console.log('line69', task_egtreenode_dom_obj.prop('outerHTML'))
     // 1b. append task_egtreenode_component
-    // find all PFD EGTreeNode under Elements ProjectColletion.External_Objects.ProjectTreeView
-    let egtreenode_pfd_doms_obj = $(doms_obj.find('External_Objects').find('ProjectTreeView').find('EGTreeNode'))
-    // loop for each of such EGTreeNode elements, and identify the one with the same PFD ID as in config_task.Element.Container
-    let break_i_loop = 0
-    for (let i = 0; i < egtreenode_pfd_doms_obj.length; i++) {
-        let the_egtreenode_pfd_dom_obj = $(egtreenode_pfd_doms_obj[i])
-        // get the textcontent of .ElementID tag of the_egtreenode_pfd_dom_obj
-        let the_egtreenode_pfd_elementid_dom_obj = $(the_egtreenode_pfd_dom_obj.find('ElementID')[0])
-        let the_pfd_id = the_egtreenode_pfd_elementid_dom_obj.text()
-        // compare the_pfd_id with the pfd id in config_task.Element.Container (config_task.Element.Container)
-        if (the_pfd_id && the_pfd_id === config_task.Element.Container) {
-            // identify the EGTreeNode for programs under the identified PFD EGTreeNode
-            let egtreenode_program_egtreenode_pfd_doms_obj = $(the_egtreenode_pfd_dom_obj.find('EGTreeNode'))
-            // console.log('line84', egtreenode_program_egtreenode_pfd_doms_obj.prop('outerHTML'))
-            // loop for each of such EGTreeNode elements, and identify the program EGTreeNode, i.e. the one with NoteType.text() = 'NODETYPE_PROGRAMFOLDER' and Label.text()='Programs'
-            for (let j = 0; j < egtreenode_program_egtreenode_pfd_doms_obj.length; j++) {
-                let the_egtreenode_program_dom_obj = $(egtreenode_program_egtreenode_pfd_doms_obj[j])
-                // console.log('line88', the_egtreenode_program_dom_obj)
-                let nodetype_the_egtreenode_dom_obj = $(the_egtreenode_program_dom_obj.find('NodeType')[0])
-                let nodetypetext_the_egtreenode_dom_obj = nodetype_the_egtreenode_dom_obj.text()
-                let label_the_egtreenode_dom_obj = $(the_egtreenode_program_dom_obj.find('Label')[0])
-                let labeltext_the_egtreenode_dom_obj = label_the_egtreenode_dom_obj.text()
-                if (nodetypetext_the_egtreenode_dom_obj === 'NODETYPE_PROGRAMFOLDER' && labeltext_the_egtreenode_dom_obj === 'Programs') {
-                    // append the task_egtreenode_dom_obj to the current the_egtreenode_dom_obj
-                    the_egtreenode_program_dom_obj.append(task_egtreenode_dom_obj)
-                    break_i_loop = 1
-                    break
-                } //if (nodetypetext_the_egtreenode_dom_obj === '' && labeltext_the_egtreenode_dom_obj === '')
-            }//  for (let j = 0; j < the_egtreenode_program_egtreenode_pfd_doms_obj.length; j++)
-            if (break_i_loop === 1) { break }
-        } // if (the_pfd_id && the_pfd_id === config_pfd.Element.ID )
-    } // for (let i=0; i < egtreenode_pfd_doms_obj.length; i++)
+    // find the parent PFD's EGTreeNode under Elements ProjectColletion.External_Objects.ProjectTreeView
+    let egtreenode_pfd_dom_obj = get_egtreenode_of_pfd_by_pfdid(doms_obj, config_task.Element.Container)
+    // find the EGTreeNode for Programs within the parent PFD's EGTreeNode
+    let the_egtreenode_program_dom_obj = get_egtreenode_of_program_in_a_egtreenode_of_pfd(egtreenode_pfd_dom_obj)
+    // append the task EGTreeNode to the EGTreeNode for Programs
+    the_egtreenode_program_dom_obj.append(task_egtreenode_dom_obj)
     return doms_obj
 }; // async function make_append_task_egtreenode_component  
+
+// find the EGTreeNode for Programs within EGTreeNode of a specified parent PFD's 
+function get_egtreenode_of_program_in_a_egtreenode_of_pfd(egtreenode_pfd_dom_obj) {
+    // within egtreenode_pfd_dom_obj, find the first EGTreeNode of which the .NoteType's textcontent is 'NODETYPE_PROGRAMFOLDER'
+    let egtreenode_program_egtreenode_pfd_doms_obj = $(egtreenode_pfd_dom_obj.find('EGTreeNode'))
+    // loop for each of such EGTreeNode elements, and identify the program EGTreeNode, i.e. the one with NoteType.text() = 'NODETYPE_PROGRAMFOLDER' and Label.text()='Programs'
+    for (let j = 0; j < egtreenode_program_egtreenode_pfd_doms_obj.length; j++) {
+        let the_egtreenode_program_dom_obj = $(egtreenode_program_egtreenode_pfd_doms_obj[j])
+        // console.log('line88', the_egtreenode_program_dom_obj)
+        let nodetype_the_egtreenode_dom_obj = $(the_egtreenode_program_dom_obj.find('NodeType')[0])
+        let nodetypetext = nodetype_the_egtreenode_dom_obj.text()
+        // let label_the_egtreenode_dom_obj = $(the_egtreenode_program_dom_obj.find('Label')[0])
+        // let labeltext = label_the_egtreenode_dom_obj.text()
+        if (nodetypetext === 'NODETYPE_PROGRAMFOLDER') {
+            // append the task_egtreenode_dom_obj to the current the_egtreenode_dom_obj
+            return the_egtreenode_program_dom_obj
+        } //if (nodetypetext_the_egtreenode_dom_obj === '' && labeltext_the_egtreenode_dom_obj === '')
+    }//  for (let j = 0; j < the_egtreenode_program_egtreenode_pfd_doms_obj.length; j++)
+}; //function get_egtreenode_of_programs_in_a_egtreenode_of_pfd(egtreenode_pfd_dom_obj)
 
 //within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
 async function make_append_task_process_component(doms_obj, config_task) {
