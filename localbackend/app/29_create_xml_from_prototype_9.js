@@ -2,16 +2,16 @@
     The prototypes are saved at data/in/prototype/egpv7
     components of a typical v7 project.xml are saved as individual xml files (all of utf16le encoding)
 
-    based on localbackend\app\27_create_xml_from_prototype_7.js
-    Modify the shortcuttofile input structure (making it consistent with other components: change to: .Element is for ShortCut while .ExternalFile is for ExternalFile)
+    based on localbackend\app\28_create_xml_from_prototype_8.js
+    Independent of mymodules (all functions are included in this file instead of importing from other files)
 
     2. add order list
     3. add report 
     4. add shortcuttodata
 */
 
-// load custom modules
-const mymodules = require('../../localbackend/app/mytools/mymodules');
+// // do not load custom modules
+// const mymodules = require('../../localbackend/app/mytools/mymodules');
 
 // jsdom and jquery must be used together
 const jsdom = require("jsdom");
@@ -32,14 +32,49 @@ const thesrczip_v8 = new AdmZip(thev8EGP);
 
 (async () => {
     // option 1: convert a v8 egp to v7
-    await convert_egp_v8_to_v7();
+    // await convert_egp_v8_to_v7();
 
     // or option2: manually make a v7 egp
-    // await make_v7_egp_manually()
+    await make_v7_egp_manually()
 })()
 
 /**common tools*************************************** */
+// save to local file
+async function saveLocalTxtFile(thetxtstr, targettxtfile, encoding) {
+    encoding = encoding || 'utf-8' // by default using utf-8
+    let fs = require('fs');
+    // use writeFileSync instead of writeFile to avoid async problems
+    fs.writeFileSync(targettxtfile, thetxtstr, encoding, function (err) {
+        if (err) { console.log(err); }
+    });
+}; // saveLocalTxtFile
 
+// randomly generate a non-repeating id
+//https://bl.ocks.org/adamfeuer/042bfa0dde0059e2b288
+function generateUUID() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return uuid;
+}; // function generateUUID()
+
+// read text from a local file
+async function readtxt(thetextfile, encode) {
+    if (encode === undefined) {
+        encode = 'utf8'
+    }
+    let fs = require('fs'), data;
+    try {
+        data = fs.readFileSync(thetextfile, encode);
+        // console.log(data.toString());    
+    } catch (e) {
+        console.log('Error:', e.stack);
+    }
+    return data
+}; // async function readtxt(thetextfile, encode)
 /**common tools*************************************** */
 
 /***functions to convert egp v8 to v7 ******************************************** */
@@ -529,7 +564,8 @@ async function convert_egp_v8_to_v7() {
 
     // // save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
     let thetargetv8xmlfile = 'data/out/do_not_git/projectxml_src_egpv8.xml'
-    await mymodules.saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
+    // await mymodules.saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
+    await saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
 
     // 2. from the source v8 egp file, get settings for the Project from the v8 egp file
     let config_project_v8 = await get_project_config_from_src_v8_egp(doms_obj_v8)
@@ -579,7 +615,8 @@ async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
     // console.log(targetxmlstr)
     targetxmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + targetxmlstr
     let thetargetxmlfile = 'data/out/do_not_git/projectxml_converted_egpv7.xml'
-    await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
+    // await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
+    await saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
     // using Buffer to import the xml with utf16 encoding
     targetzip_v7.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
@@ -639,7 +676,8 @@ async function make_v7_egp_manually() {
                 ID: 'CodeTask-' + make_rand_string_by_length(16)
             },
             config_pfd: config_pfd[0],
-            TaskGraphic: { ID: mymodules.generateUUID() },
+            // TaskGraphic: { ID: mymodules.generateUUID() },
+            TaskGraphic: { ID: generateUUID() },
             code: `/*PFD1 p1*/
 data a; b=1; run;`
         },
@@ -649,7 +687,7 @@ data a; b=1; run;`
                 ID: 'CodeTask-' + make_rand_string_by_length(16)
             },
             config_pfd: config_pfd[0],
-            TaskGraphic: { ID: mymodules.generateUUID() },
+            TaskGraphic: { ID: generateUUID() },
             code: `/*PFD1 p2*/
 data c; set a; d=2; run;`
         },
@@ -659,7 +697,7 @@ data c; set a; d=2; run;`
                 ID: 'CodeTask-' + make_rand_string_by_length(16)
             },
             config_pfd: config_pfd[1],
-            TaskGraphic: { ID: mymodules.generateUUID() },
+            TaskGraphic: { ID: generateUUID() },
             Embedded: 'False',
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\sas.sas` } // note: not a good practice to use single backlash, at least it should be wrapped by String.raw``
         },
@@ -680,14 +718,14 @@ data c; set a; d=2; run;`
             config_pfd: config_pfd[0],
             Element: { Label: 'shortcut to thexls.xlsx', ID: 'ShortCutToFile-' + make_rand_string_by_length(16) },
             ExternalFile: { FileTypeType: 'Excel', ID: 'ExternalFile-' + make_rand_string_by_length(16) },
-            TaskGraphic: { ID: mymodules.generateUUID() },
+            TaskGraphic: { ID: generateUUID() },
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\thexls.xlsx` }
         },
         {
             config_pfd: config_pfd[1],
             Element: { Label: 'shortcut to Thai Green Curry _ RecipeTin Eats', ID: 'ShortCutToFile-' + make_rand_string_by_length(16) },
             ExternalFile: { FileTypeType: 'PDF', ID: 'ExternalFile-' + make_rand_string_by_length(16) },
-            TaskGraphic: { ID: mymodules.generateUUID() },
+            TaskGraphic: { ID: generateUUID() },
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\Thai Green Curry _ RecipeTin Eats.pdf` }
         }
     ] // shortcuttofile_input_arr
@@ -715,7 +753,7 @@ data c; set a; d=2; run;`
                 'Text': String.raw` This is a note with <tag>, ampersand sign &, line breaker \n and /*comments*/
 like data f; set g; run;`},
             'Note': { 'Collapsed': 'True' },
-            'NoteGraphic': { 'ID': mymodules.generateUUID() } // use ID instead of .Id although the original tag is Id. Although the origina Tag Id is later changed to ID, it does not affect SAS recognizing it.
+            'NoteGraphic': { 'ID': generateUUID() } // use ID instead of .Id although the original tag is Id. Although the origina Tag Id is later changed to ID, it does not affect SAS recognizing it.
         },
     ]
     let config_note = []
@@ -735,13 +773,13 @@ like data f; set g; run;`},
             Element: { Label: 'egtask1', ID: 'EGTask-' + make_rand_string_by_length(16) },
             // EGTask: { Task_CLSID: '660ed464-dab4-48ad-a1d9-452148b2cffe' },
             config_pfd: config_pfd[0],
-            TaskGraphic: { ID: mymodules.generateUUID() },
+            TaskGraphic: { ID: generateUUID() },
             xmlstr: String.raw`<Settings version="7.1" source="&amp;RemoteTargetPath./statindins.sas7bdat" destination="&amp;localDataPath" resolveMacro="true" overwrite="true" fixCRLF="true" direction="DOWN" />`
         },
         {
             Element: { Label: 'egtask2', ID: 'EGTask-' + make_rand_string_by_length(16) },
             config_pfd: config_pfd[0],
-            TaskGraphic: { ID: mymodules.generateUUID() },
+            TaskGraphic: { ID: generateUUID() },
             xmlstr: String.raw`<Settings version="7.1" source="&amp;RemoteTargetPath./statindins.sas7bdat" destination="&amp;localDataPath" resolveMacro="true" overwrite="true" fixCRLF="true" direction="DOWN" />`
         }
     ]
@@ -777,7 +815,8 @@ like data f; set g; run;`},
     // console.log(targetxmlstr)
     targetxmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + targetxmlstr
     let thetargetxmlfile = 'data/out/' + config_project.Element.Label + '.xml'
-    await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
+    // await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
+    await saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
     // using Buffer to import the xml with utf16 encoding
     targetzip_v7.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
@@ -905,7 +944,8 @@ async function make_egtask_element_component(config_egtask) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___k01_egtask_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    // let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line61', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -954,7 +994,7 @@ async function make_egtask_process_component(config_egtask) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z05_process_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line57', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1007,7 +1047,7 @@ async function make_notegraphic_component(config) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___j02_note_notegraphic_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line177', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1101,7 +1141,7 @@ async function make_note_element_component(config_note) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___j01_note_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line104', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1297,7 +1337,7 @@ async function make_shortcuttofile_element_component(config_shortcuttofile) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___h02_shortcuttofile_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line104', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1345,7 +1385,7 @@ async function make_shortcuttofile_externalfile_component(config_shortcuttofile)
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___h01_shortcuttofile_externalfile_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line104', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1411,7 +1451,7 @@ async function make_link_component(config_link) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___f01_link_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line104', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1508,7 +1548,7 @@ async function make_dna_component(config) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z03_dna_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line104', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1530,7 +1570,7 @@ async function make_task_element_component(config_task) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___e03_task_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line61', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1626,7 +1666,7 @@ async function make_taskgraphic_component(config) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z04_taskgraphic_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line57', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1716,7 +1756,7 @@ async function make_task_process_component(config_task) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z05_process_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line57', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1791,7 +1831,7 @@ async function make_egtreenode_programs_component() {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z02_egtreenode_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line52', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1977,7 +2017,7 @@ async function make_processflowview_properties(config) {
 
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c03_pfd_properties_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line147', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -1996,7 +2036,7 @@ async function make_egtreenode(config) {
 
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z02_egtreenode_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line147',thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -2020,7 +2060,7 @@ async function make_pfd_component(config) {
 
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c01_pfd_containers_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line171', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -2044,7 +2084,7 @@ async function make_pfd_component(config) {
 async function define_element(config) {
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z01_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line 195', thesrcxmlstr)
 
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -2118,7 +2158,7 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
         if (d.substr(0, 3) === '___' && d !== '___sample.xml') {
             let thesrcxmlfile = thefolder_prototypexmls + '/' + d
             let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-            let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+            let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
             thesrcxmlstr = thesrcxmlstr.replace(/\>/g, '>\n')
             // console.log('line282', thesrcxmlstr)
             // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
@@ -2174,7 +2214,7 @@ async function init_v7_doms_obj(config) {
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___a_projectcollection_v7.xml'
     // read the xml into a dom object
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await mymodules.readtxt(thesrcxmlfile, encoding);
+    let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line1616', thesrcxmlstr.substr(0, 100))
 
     // 2.remove the head '<?xml version="1.0" encoding="utf-16"?>'
