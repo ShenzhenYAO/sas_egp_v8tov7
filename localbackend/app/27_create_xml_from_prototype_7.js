@@ -25,14 +25,16 @@ const { config } = require('process');
 // const { Console } = require('console');
 
 const thev8EGP = "data/in/sample_a_v8.egp";
-const targetv7zip = new AdmZip()
+const targetzip_v7 = new AdmZip()
+// make a zip instance of the thesrc v8 egp file
+const thesrczip_v8 = new AdmZip(thev8EGP)
 
 // get xml script and v8_doms_obj from a src egp
-async function get_xml_from_v8_egp(thev8EGP) {
+async function get_xml_from_v8_egp(thesrczip_v8) {
+
     //*** read the v8 egp data */
     // based on 01 extract_projectxml_from_egp.js, and 12_convert_xml_v8_to_v7.js
-    // 1. make a zip instance of the thesrc v8 egp file
-    const thesrczip_v8 = new AdmZip(thev8EGP)
+
     // 2. read the script of project.xml from thesrczip
     let thesrcxmlfile_v8 = 'project.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
@@ -54,77 +56,357 @@ async function get_project_config_from_src_v8_egp(v8_doms_obj) {
     // define the tags of project settings in the v8 egp file
     let tags_str = 'Label,ID,CreatedOn,ModifiedOn, ModifiedBy, ModifiedByEGID'
     let tags_arr = tags_str.split(',').map(tagname => tagname.trim()) // make an array of tag names
-    tags_arr.forEach(tagname => { config_project.Element[tagname] = project_element_dom_obj.find(tagname).text() })
+    tags_arr.forEach(tagname => { config_project.Element[tagname] = $(project_element_dom_obj.find(tagname)[0]).text() })
     // console.log('line74', config_project)
     return config_project
 };//async function get_project_config_from_src_v8_egp
 
 // get settings from the Project from the v8 doms_obj
-async function get_elements_pfd_doms_obj(doms_obj) {
+async function get_element_doms_obj_by_type(doms_obj, type_attr) {
     // a1. identify the PFD elements in ProjectCollection.Elements
     let elements_doms_obj = $(doms_obj.find('Elements').find('Element'))
     // console.log('line85', elements_doms_obj)
-    let pfd_elements_doms_obj = []
+    let elements_of_the_type_doms_obj = []
     for (let i = 0; i < elements_doms_obj.length; i++) {
-        if ($(elements_doms_obj[i]).attr('Type') === 'SAS.EG.ProjectElements.ProcessFlowContainer') {
-            pfd_elements_doms_obj.push(elements_doms_obj[i])
+        if ($(elements_doms_obj[i]).attr('Type') === type_attr) {
+            elements_of_the_type_doms_obj.push(elements_doms_obj[i])
         } // if 
     } //for (let i =0; i<elements_doms_obj.length;i++)
     // console.log('line92', $(pfd_elements_doms_obj[0]).find('Element').find('Label').text())
-    return pfd_elements_doms_obj
-};//async function get_elements_pfd_doms_obj()
+    return elements_of_the_type_doms_obj
+};//async function get_element_doms_obj_by_type(doms_obj, type_attr)
+
+// use the element id (i.e., a task id) to find the correponding TaskGraphic in doms_obj_v8
+function get_task_or_note_graphic_dom_by_id_v8(doms_obj, elementid, task_or_note_graphic) {
+    // unlike EG v7, in EG v8, the TaskGraphic tags are placed separately according to the parent PFD
+    // however, the following find all TaskGraphic tags regardless of under which PFD
+    let the_doms = $(doms_obj.find('External_Objects').find('ProcessFlowControlManager').find('ProcessFlowControlState').find('GraphicObjects').find(task_or_note_graphic))
+    for (let i = 0; i < the_doms.length; i++) {
+        let the_dom_obj = $(the_doms[i])
+        // console.log('190:', $(the_dom_obj.find('Element')[0]).text())
+        if ($(the_dom_obj.find('Element')[0]).text() === elementid) { return $(the_dom_obj) }
+    } //for (let i =0; i < the_doms.length; i++)
+}; //function get_task_or_note_graphic_dom_by_id
+
+// converting PFDs from v8 egp to v7
+async function convert_pfd_v8_to_v7(doms_obj_v8, config_project_v8, doms_obj_v7) {
+    // 3a. get settings from the Project from the v8 doms_obj
+    let type_attr_pfd = 'SAS.EG.ProjectElements.ProcessFlowContainer'
+    let pfd_elements_doms_obj_v8 = await get_element_doms_obj_by_type(doms_obj_v8, type_attr_pfd)
+    let pfd_input_arr = []
+    pfd_elements_doms_obj_v8.forEach(d => {
+        // get the Label and ID from each pfd Element.Element
+        let label = $($(d).find("Element").find("Label")[0]).text()
+        let id = $($(d).find("Element").find("ID")[0]).text()
+        pfd_input_arr.push({ Label: label, ID: id })
+    })
+    // 3b. get configuration of a pfd element
+    let pfd_input = [], config_pfd = []
+    for (let i = 0; i < pfd_input_arr.length; i++) {
+        // config the pfd element
+        pfd_input[i] = {}
+        pfd_input[i].Label = pfd_input_arr[i].Label
+        pfd_input[i].ID = pfd_input_arr[i].ID
+        // console.log('line38', pfd_input[i].Label)
+        config_pfd[i] = await config_pfd_function(config_project_v8, pfd_input[i])
+        // console.log('line40', config_pfd[i])
+        doms_obj_v7 = await make_append_pfd_component(doms_obj_v7, config_pfd[i])
+    } // for(let i=0;i<pfd_input_arr.length;i++)
+
+    return { config_pfd: config_pfd, result_doms_obj_add_PFD: doms_obj_v7 }
+};//async function convert_pfd_v8_to_v7
+
+// Add EGTreeNode for wrapping all programs/tasks for ProjectTreeView.
+async function add_egtreenode_program_v8_to_v7(doms_obj_v7, config_pfd) {
+    let config_programs = []
+    for (let i = 0; i < config_pfd.length; i++) {
+        // The EGTreeNode is to be added to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+        // 4a. Configuration of the EGTreeNode    
+        config_programs[i] = await config_programs_function(config_pfd[i])
+        // 4b. make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+        doms_obj = await make_append_egtreenode_programs(doms_obj_v7, config_programs[i], config_pfd[i])
+    } // for(let i=0;i<pfd_input_arr.length;i++)
+
+    return { config_programs: config_programs, result_doms_obj_add_EGTreeNode_program: doms_obj }
+}; //async function add_egtreenode_program_v8_to_v7
+
+// converting CodeTask components and files from v8 to v7
+async function convert_task_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
+    // from doms_obj_v8, find Elements.Element components with Type="SAS.EG.ProjectElements.CodeTask"
+    let type_attr_task = 'SAS.EG.ProjectElements.CodeTask'
+    let task_elements_doms_obj_v8 = await get_element_doms_obj_by_type(doms_obj_v8, type_attr_task)
+    let task_input_arr = []
+    // console.log('line134', task_elements_doms_obj_v8)
+
+    // loop for each task_element found from the v8 egp
+    for (let i = 0; i < task_elements_doms_obj_v8.length; i++) {
+        let d = task_elements_doms_obj_v8[i]
+        // get the Label and ID from each pfd Element.Element
+        let task_config = {}, task_config_element = {}, config_parent_pfd, code, Embedded, DNA = {}, TaskGraphic = {}
+        // get the task Element's Element.Label and .ID
+        task_config_element.Label = $($(d).find("Element").find("Label")[0]).text()
+        task_config_element.ID = $($(d).find("Element").find("ID")[0]).text()
+
+        // get the parent PFD of the task element
+        let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
+        // according to the parent pfd id, find the configuration of that pfd
+        config_pfd.forEach(d => {
+            if (d.Element.ID === the_parent_pfdid) { config_parent_pfd = d }
+        }) // config_pfd.forEach(d=>{...}
+
+        // get the .CodeTask.Embedded's textconent (to indicate whether the task is embedded or a shortcut to an external .sas program)
+        Embedded = $($(d).find("CodeTask").find("Embedded")[0]).text()
+        // if Embedded = 'False', get the element's .DNA.FullPath's textcontent
+        if (Embedded && Embedded === 'False') {
+            // unlike manual input of DNA's fullpath, here the html within a DNA is directly copied and saved to input.DNA.html
+            // later, DNA.html will be directly input (in make_task_element_component()) into the DNA component (as html()) in the doms_obj_v7
+            DNA.html = $($(d).find("CodeTask").find("DNA")[0]).html() // DNA.html is with ampersand symbols
+            // console.log('line164', DNA.html)
+        } // if (Embedded && Embedded === 'False')
+        else {// else copy the embedded sas code file (code.sas) from the v8 epg's code.sas in the folder named by the task's ID
+            // Note: this is different from manually config code for embedded tasks.
+            // When manually configured, the sas code string is input to task_input_arr[i].code 
+            //  later in make_append_task_component(), the code is saved as a code.sas file
+            // When not manually configured (get config from a src v8 egp), the sas code of the original v8 egp is directly imported and saved as a code.sas in the target v7 egp
+            // read code text from the srcv8zip
+            let codefile = task_config_element.ID + '/code.sas' // Note: use /, not \, not \\!
+            let task_sascodestr = await thesrczip_v8.readAsText(codefile, "utf-8");
+            // console.log('line191', task_sascodestr)
+            // add as a file into targetzip_v7
+            // addFile to zip can use \\ or / but not \
+            targetzip_v7.addFile(task_config_element.ID + '/code.sas', Buffer.from(task_sascodestr, "utf-8"))
+        }// else copy the sas code from the v8 epg's folder named by the task's ID
+
+        // get the TaskGraphic.PosX, PosY setting (these set the position of the task icon in the PFD view)
+        // use the task id (task_config_element.ID), find the correponding TaskGraphic in doms_obj_v8
+        let the_taskgraphic_dom_obj = get_task_or_note_graphic_dom_by_id_v8(doms_obj_v8, task_config_element.ID, 'TaskGraphic')
+        // console.log('line182', the_taskgraphic_dom_obj.prop('outerHTML'))
+        TaskGraphic.ID = $(the_taskgraphic_dom_obj.find('ID')[0]).text()
+        TaskGraphic.PosX = $(the_taskgraphic_dom_obj.find('PosX')[0]).text()
+        TaskGraphic.PosY = $(the_taskgraphic_dom_obj.find('PosY')[0]).text()
+
+        task_config = {
+            Element: task_config_element,
+            config_pfd: config_parent_pfd,
+            Embedded: Embedded,
+            DNA: DNA,
+            TaskGraphic: TaskGraphic
+        }
+        task_input_arr.push(task_config)
+    } //for (let i = 0; i < task_elements_doms_obj_v8.length; i++)
+    // console.log('line204', task_input_arr)
+
+    // loop for each item in task_input_arr and make task elements into the target egp's xml
+    let config_task = []
+    for (let i = 0; i < task_input_arr.length; i++) {
+        // 5.1 configuration for the task_component (indicate the parent PFD, and the task in task_input_arr)
+        config_task[i] = await config_task_function(task_input_arr[i].config_pfd, task_input_arr[i])
+        // console.log('line44', config_task)
+        // 5.2 add task components
+        doms_obj_v7 = await make_append_task_component(doms_obj_v7, config_task[i])
+    } // for(let i=0;i<task_input_arr.length;i++)
+
+    return { config_task: config_task, result_doms_obj_add_task: doms_obj_v7 }
+};//async function convert_task_v8_to_v7
+
+// converting ShortCutToFile components and files from v8 to v7
+async function convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
+
+    let shortcuttofile_input_arr = []
+    let config_shortcuttofile = []
+
+    // from doms_obj_v8, find Elements.Element components with Type="SAS.EG.ProjectElements.ShortCutToFile"
+    let type_attr_shortcuttofile = 'SAS.EG.ProjectElements.ShortCutToFile'
+    let shortcuttofile_elements_doms_obj_v8 = await get_element_doms_obj_by_type(doms_obj_v8, type_attr_shortcuttofile)
+    // console.log('251:', shortcuttofile_elements_doms_obj_v8)
+
+    // loop for each shortcuttofile element found from the v8 egp
+    for (let i = 0; i < shortcuttofile_elements_doms_obj_v8.length; i++) {
+
+        let d = shortcuttofile_elements_doms_obj_v8[i]
+        // get the Label and ID from each pfd Element.Element
+        let shortcuttofile_config = {}, shortcuttofile_config_element = {}, config_parent_pfd, Element = {}, ExternalFile = {}, DNA = {}, TaskGraphic = {}
+        // get the shortcuttofile Element's Element.Label and .ID
+        shortcuttofile_config_element.Label = $($(d).find("Element").find("Label")[0]).text()
+        shortcuttofile_config_element.ID = $($(d).find("Element").find("ID")[0]).text()
+
+        // get the parent PFD of the shortcuttofile element
+        let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
+        // according to the parent pfd id, find the configuration of that pfd
+        config_pfd.forEach(d => {
+            if (d.Element.ID === the_parent_pfdid) { config_parent_pfd = d }
+        }) // config_pfd.forEach(d=>{...}
+
+        // Identify the ExternalFile component of which the ShortCutID = shortcuttofile_config_element.ID
+        let ExternalFile_doms_obj = $(doms_obj_v8.find('ExternalFileList > ExternalFile')) // find ExternalFileList's direct children with tag of ExternalFile
+        // console.log('274:', ExternalFile_doms)
+        // loop to identify the ExternalFile of which the .ExternalFile.ShortCutList.ShortCutID = shortcuttofile_config_element.ID
+        let the_externalfile_dom_obj
+        for (j = 0; j < ExternalFile_doms_obj.length; j++) {
+            let ShortCutID = $($(ExternalFile_doms_obj[i]).find('ExternalFile > ShortCutList > ShortCutID')[0]).text()
+            // console.log('278:', ShortCutID, shortcuttofile_config_element.ID)
+            if (ShortCutID === shortcuttofile_config_element.ID) {
+                the_externalfile_dom_obj = $(ExternalFile_doms_obj[j])
+                // console.log ('282:', the_externalfile_dom_obj)
+                break
+            }
+        } // for (j=0;j<ExternalFile_doms_obj.length;j++)
+        // get the externalfile settings
+        // ExternalFile's Label and ID. Note: the shortcuttofile_input_arr is different from task_input_arr.
+        // It's .Element is for .ExternalFile, not for Elements.Element of the ShortCutToFile 
+        Element.Label = $(the_externalfile_dom_obj.find('Element > Label')[0]).text()
+        Element.ID = $(the_externalfile_dom_obj.find('Element > ID')[0]).text()
+        // console.log('290', Element)
+        ExternalFile.FileTypeType = $(the_externalfile_dom_obj.find('ExternalFile > FileTypeType')[0]).text()
+        ExternalFile.ShortCutList = {}
+        ExternalFile.ShortCutList.ShortCutID = shortcuttofile_config_element.ID
+        // console.log('290', ExternalFile)
+
+        DNA.html = $(the_externalfile_dom_obj.find('ExternalFile > DNA')[0]).html()
+
+        // get the TaskGraphic.PosX, PosY setting (these set the position of the shortcuttofile icon in the PFD view)
+        // use the shortcuttofile id (shortcuttofile_config_element.ID), find the correponding TaskGraphic in doms_obj_v8
+        let the_taskgraphic_dom_obj = get_task_or_note_graphic_dom_by_id_v8(doms_obj_v8, shortcuttofile_config_element.ID, 'TaskGraphic')
+        // console.log('line182', the_taskgraphic_dom_obj.prop('outerHTML'))
+        TaskGraphic.ID = $(the_taskgraphic_dom_obj.find('ID')[0]).text()
+        TaskGraphic.PosX = $(the_taskgraphic_dom_obj.find('PosX')[0]).text()
+        TaskGraphic.PosY = $(the_taskgraphic_dom_obj.find('PosY')[0]).text()
+
+        shortcuttofile_config = {
+            Element: Element,
+            config_pfd: config_parent_pfd,
+            TaskGraphic: TaskGraphic,
+            ExternalFile: ExternalFile,
+            DNA: DNA
+        }
+        shortcuttofile_input_arr.push(shortcuttofile_config)
+    } //for (let i = 0; i < shortcuttofile_elements_doms_obj_v8.length; i++)
+    // console.log('316:', shortcuttofile_input_arr)
+
+    // loop for each item in shortcuttofile_input_arr and make shortcuttofile elements into the target egp's xml
+
+    for (let i = 0; i < shortcuttofile_input_arr.length; i++) {
+        // 5.1 configuration for the shortcuttofile_component (indicate the parent PFD, and the shortcuttofile in shortcuttofile_input_arr)
+        config_shortcuttofile[i] = await config_shortcuttofile_function(shortcuttofile_input_arr[i])
+        // console.log('323:', config_shortcuttofile)
+        // 5.2 add shortcuttofile components
+        doms_obj_v7 = await make_append_shortcuttofile_component(doms_obj_v7, config_shortcuttofile[i])
+    } // for(let i=0;i<shortcuttofile_input_arr.length;i++)
+
+    return { config_shortcuttofile: config_shortcuttofile, result_doms_obj_add_shortcuttofile: doms_obj_v7 }
+};//async function convert_shortcuttofile_v8_to_v7
+// converting note components and files from v8 to v7
+async function convert_note_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
+
+    let note_input_arr = []
+    let config_note = []
+
+    // from doms_obj_v8, find Elements.Element components with Type="SAS.EG.ProjectElements.Note"
+    let type_attr_note = 'SAS.EG.ProjectElements.Note'
+    let note_elements_doms_obj_v8 = await get_element_doms_obj_by_type(doms_obj_v8, type_attr_note)
+    // console.log('251:', note_elements_doms_obj_v8)
+
+    // loop for each note element found from the v8 egp
+    for (let i = 0; i < note_elements_doms_obj_v8.length; i++) {
+        let note_config = {}, config_parent_pfd, Element = {}, TextElement = {}, Note = {}, NoteGraphic = {}
+        let d = note_elements_doms_obj_v8[i]
+
+        //1. get the configuration of the parent PFD of the note element
+        let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
+        // according to the parent pfd id, find the configuration of that pfd
+        config_pfd.forEach(d => {
+            if (d.Element.ID === the_parent_pfdid) { config_parent_pfd = d }
+        }) // config_pfd.forEach(d=>{...}
+
+        //2.get the note Element's Element.Label and .ID
+        Element.Label = $($(d).find("Element").find("Label")[0]).text()
+        Element.ID = $($(d).find("Element").find("ID")[0]).text()
+
+        //3. Element (of the note).TextElement.Text
+        TextElement.Text = $($(d).find("TextElement > Text")[0]).html()
+
+        //4. Element (of the note).Note.Collapse
+        Note.Collapsed = $($(d).find("Note > Collapsed")[0]).text()
+
+        //5. External_Object.ProcessFlowView.Graphics.NoteGraphic
+        // get the NoteGraphic.PosX, PosY setting (these set the position of the note icon in the PFD view)
+        // use the note id (note_config_element.ID), find the correponding NoteGraphic in doms_obj_v8
+        let the_notegraphic_dom_obj = get_task_or_note_graphic_dom_by_id_v8(doms_obj_v8, Element.ID, 'NoteGraphic')
+        NoteGraphic.Id = $(the_notegraphic_dom_obj.find('ID')[0]).text()
+        NoteGraphic.PosX = $(the_notegraphic_dom_obj.find('PosX')[0]).text()
+        NoteGraphic.PosY = $(the_notegraphic_dom_obj.find('PosY')[0]).text()
+        NoteGraphic.Collapsed = $(the_notegraphic_dom_obj.find('Collapsed')[0]).text()
+        NoteGraphic.WidthExpanded = $(the_notegraphic_dom_obj.find('WidthExpanded')[0]).text()
+        NoteGraphic.HeightExpanded = $(the_notegraphic_dom_obj.find('HeightExpanded')[0]).text()
+
+        note_config = {
+            config_pfd: config_parent_pfd,
+            Element: Element,
+            TextElement: TextElement,
+            Note: Note,
+            NoteGraphic: NoteGraphic
+        }
+        note_input_arr.push(note_config)
+    } //for (let i = 0; i < note_elements_doms_obj_v8.length; i++)
+    // console.log('316:', note_input_arr)
+
+    // loop for each item in note_input_arr and make note elements into the target egp's xml
+
+    for (let i = 0; i < note_input_arr.length; i++) {
+        // configuration for the note_component (indicate the parent PFD, and the note in note_input_arr)
+        config_note[i] = await config_note_function(note_input_arr[i])
+        // console.log('397:', config_note)
+        // add note components
+        doms_obj_v7 = await make_append_note_component(doms_obj_v7, config_note[i])
+    } // for(let i=0;i<note_input_arr.length;i++)
+
+    return { config_note: config_note, result_doms_obj_add_note: doms_obj_v7 }
+};//async function convert_note_v8_to_v7
 
 (async () => {
 
     // 1. get xml script and v8_doms_obj from a src egp
-    let { doms_obj_v8, theoriginsrcxmlstr_v8 } = await get_xml_from_v8_egp(thev8EGP)
+    let { doms_obj_v8, theoriginsrcxmlstr_v8 } = await get_xml_from_v8_egp(thesrczip_v8)
     // console.log('line33', thesrcxmlstr_v8.substr(0, 100), v8_doms_obj.prop('outerHTML'))
 
     // save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
     let thetargetv8xmlfile = 'data/out/__testv8.xml'
     await mymodules.saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
 
-    // 2.0 from the source v8 egp file, get the settings for:
-    // 2.0a get settings for the Project from the v8 egp file
+    // 2. from the source v8 egp file, get settings for the Project from the v8 egp file
     let config_project_v8 = await get_project_config_from_src_v8_egp(doms_obj_v8)
     // change the project label to '__testv7' (this is for testing only)
     config_project_v8.Element.Label = '__testv7'
-    // 2.0b initiate a v7 doms obj, and apply project configuations from the source v8 file
+    // initiate a v7 doms obj, and apply project configuations from the source v8 file
     let { doms_obj_v7, thesrcxmlstr_v7 } = await init_v7_doms_obj(config_project_v8)
     // console.log ('line76', doms_obj_v7.find('Element').prop('outerHTML') )
 
-    // 2.1 PFDs
-    // a. get settings from the Project from the v8 doms_obj
-    let pfd_elements_doms_obj_v8 = await get_elements_pfd_doms_obj(doms_obj_v8) 
-    let pfd_arr =[]   
-    pfd_elements_doms_obj_v8.forEach(d=>{
-        // get the Label and ID from each pfd Element.Element
-        let label = $(d).find("Element").find("Label").text()
-        let id = $(d).find("Element").find("ID").text()
-        pfd_arr.push ({Label: label, ID:id})
-    })
-    // b. get configuration of a pfd element
-    let pfd_input = [], config_pfd = []
-    for (let i = 0; i < pfd_arr.length; i++) {
-        // config the pfd element
-        pfd_input[i] = {}
-        pfd_input[i].Label = pfd_arr[i].Label
-        // console.log('line38', pfd_input[i].Label)
-        config_pfd[i] = await config_pfd_function(config_project_v8, pfd_input[i])
-        // console.log('line40', config_pfd[i])
-        doms_obj_v7 = await make_append_pfd_component(doms_obj_v7, config_pfd[i])
-    } // for(let i=0;i<pfd_arr.length;i++)
+    // 3 converting PFDs from v8 egp to v7
+    let { config_pfd, result_doms_obj_add_PFD } = await convert_pfd_v8_to_v7(doms_obj_v8, config_project_v8, doms_obj_v7)
+    doms_obj_v7 = result_doms_obj_add_PFD
 
+    // 4. add EGTreeNode for wrapping all programs/tasks for ProjectTreeView.
+    let { config_programs, result_doms_obj_add_EGTreeNode_program } = await add_egtreenode_program_v8_to_v7(doms_obj_v7, config_pfd)
+    doms_obj_v7 = result_doms_obj_add_EGTreeNode_program
 
+    // 5. converting CodeTask components and files from v8 to v7
+    let { config_task, result_doms_obj_add_task } = await convert_task_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7)
+    doms_obj_v7 = result_doms_obj_add_task
 
+    // 6 shortcuts to external files
+    let { config_shortcuttofile, result_doms_obj_add_shortcuttofile } = await convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7)
+    doms_obj_v7 = result_doms_obj_add_shortcuttofile
 
-    // 2.2 CodeTasks for embedded SAS programs, and CodeTasks for shortcut to external SAS programs
-    // 2.3 shortcuts to external files
-    // 2.4 notes
-    // 2.5 EG tasks
-    // 2.6 links between componets (e.g., betwen CodeTasks, or a Codetask and a note)
+    // 7 converting note components and files from v8 to v7
+    let { config_note, result_doms_obj_add_note } = await convert_note_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7)
+    doms_obj_v7 = result_doms_obj_add_note
 
-    write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project_v8, targetv7zip)
+    // 8 EG tasks
+    stop here!!! should be based on convert_task_v8_to_v7
+
+    // 9 links between componets (e.g., betwen CodeTasks, or a Codetask and a note)
+
+    write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project_v8)
 
 
     //**** part 2, make the v7 egp */
@@ -133,7 +415,7 @@ async function get_elements_pfd_doms_obj(doms_obj) {
 })()
 
 // cleanup the target xlm and write to the target v7 egp
-async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project, targetv7zip) {
+async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
 
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj_v7, thesrcxmlstr_v7)
     // remove lines only containing spaces and line breakers
@@ -144,9 +426,9 @@ async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project, tar
     await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
     // using Buffer to import the xml with utf16 encoding
-    targetv7zip.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
-    // writeZip the targetv7zip instead of the original (theZip)
-    await targetv7zip.writeZip("data/out/" + config_project.Element.Label + ".egp")
+    targetzip_v7.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
+    // writeZip the targetzip_v7 instead of the original (theZip)
+    await targetzip_v7.writeZip("data/out/" + config_project.Element.Label + ".egp")
 
 };//async function write_to_v7_egp
 
@@ -162,44 +444,61 @@ async function make_v7_egp() {
     // console.log(thesrcxmlstr_cleaned)
     let doms_obj = doms_obj_v7, thesrcxmlstr_cleaned = thesrcxmlstr_v7
     // 3. add process flow (PFD)
-    // let pfd_arr = [{ 'Label': 'PFD1' }], pfd_input = [], config_pfd = []
-    let pfd_arr = [{ 'Label': 'PFD1' }, { 'Label': 'PFD2' }], pfd_input = [], config_pfd = []
-    for (let i = 0; i < pfd_arr.length; i++) {
+    // let pfd_input_arr = [{ 'Label': 'PFD1' }], pfd_input = [], config_pfd = []
+    let pfd_input_arr = [{ Label: 'PFD1', ID: 'PFD-' + make_rand_string_by_length(16) },
+    { Label: 'PFD2', ID: 'PFD-' + make_rand_string_by_length(16) }
+    ]
+    let pfd_input = [], config_pfd = []
+    for (let i = 0; i < pfd_input_arr.length; i++) {
         // config the pfd element
         pfd_input[i] = {}
-        pfd_input[i].Label = pfd_arr[i].Label
+        pfd_input[i].Label = pfd_input_arr[i].Label
+        pfd_input[i].ID = pfd_input_arr[i].ID
         // console.log('line38', pfd_input[i].Label)
         config_pfd[i] = await config_pfd_function(config_project, pfd_input[i])
         // console.log('line40', config_pfd[i])
         doms_obj = await make_append_pfd_component(doms_obj, config_pfd[i])
-    } // for(let i=0;i<pfd_arr.length;i++)
+    } // for(let i=0;i<pfd_input_arr.length;i++)
 
     // 4. add EGTreeNode for wrapping all programs/tasks for ProjectTreeView.
     let config_programs = []
-    for (let i = 0; i < pfd_arr.length; i++) {
+    for (let i = 0; i < pfd_input_arr.length; i++) {
         // The EGTreeNode is to be added to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
         // 4a. Configuration of the EGTreeNode    
         config_programs[i] = await config_programs_function(config_pfd[i])
         // 4b. make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
         doms_obj = await make_append_egtreenode_programs(doms_obj, config_programs[i], config_pfd[i])
-    } // for(let i=0;i<pfd_arr.length;i++)
+    } // for(let i=0;i<pfd_input_arr.length;i++)
 
     // 5. add tasks / shortcut to external sas files
     let task_input_arr = [
         {
-            Element: { Label: 'PFD1_p1' }, config_pfd: config_pfd[0],
+            Element: {
+                Label: 'PFD1_p1',
+                ID: 'CodeTask-' + make_rand_string_by_length(16)
+            },
+            config_pfd: config_pfd[0],
+            TaskGraphic: { ID: mymodules.generateUUID() },
             code: `/*PFD1 p1*/
 data a; b=1; run;`
         },
         {
-            Element: { Label: 'PFD1_p2' }, config_pfd: config_pfd[0],
+            Element: {
+                Label: 'PFD1_p2',
+                ID: 'CodeTask-' + make_rand_string_by_length(16)
+            },
+            config_pfd: config_pfd[0],
+            TaskGraphic: { ID: mymodules.generateUUID() },
             code: `/*PFD1 p2*/
 data c; set a; d=2; run;`
         },
         {
-            tasktype: 'shortcut',
-            Element: { Label: 'shortcut to sas.sas' },
+            Element: {
+                Label: 'shortcut to sas.sas',
+                ID: 'CodeTask-' + make_rand_string_by_length(16)
+            },
             config_pfd: config_pfd[1],
+            TaskGraphic: { ID: mymodules.generateUUID() },
             Embedded: 'False',
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\sas.sas` } // note: not a good practice to use single backlash, at least it should be wrapped by String.raw``
         },
@@ -210,7 +509,7 @@ data c; set a; d=2; run;`
         config_task[i] = await config_task_function(task_input_arr[i].config_pfd, task_input_arr[i])
         // console.log('line44', config_task)
         // 5.2 add task components
-        doms_obj = await make_append_task_component(doms_obj, config_task[i], targetv7zip)
+        doms_obj = await make_append_task_component(doms_obj, config_task[i], targetzip_v7)
     } // for(let i=0;i<task_input_arr.length;i++)
 
 
@@ -219,14 +518,16 @@ data c; set a; d=2; run;`
     let shortcuttofile_input_arr = [
         {
             config_pfd: config_pfd[0],
-            Element: { Label: 'shortcut to thexls.xlsx' },
-            ExternalFile: { FileTypeType: 'Excel' },
+            Element: { Label: 'shortcut to thexls.xlsx', ID: 'ExternalFile-' + make_rand_string_by_length(16) },
+            ExternalFile: { FileTypeType: 'Excel', ShortCutList: { ShortCutID: 'ShortCutToFile-' + make_rand_string_by_length(16) } },
+            TaskGraphic: { ID: mymodules.generateUUID() },
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\thexls.xlsx` }
         },
         {
             config_pfd: config_pfd[1],
-            Element: { Label: 'shortcut to Thai Green Curry _ RecipeTin Eats' },
-            ExternalFile: { FileTypeType: 'PDF' },
+            Element: { Label: 'shortcut to Thai Green Curry _ RecipeTin Eats', ID: 'ExternalFile-' + make_rand_string_by_length(16) },
+            ExternalFile: { FileTypeType: 'PDF', ShortCutList: { ShortCutID: 'ShortCutToFile-' + make_rand_string_by_length(16) } },
+            TaskGraphic: { ID: mymodules.generateUUID() },
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\Thai Green Curry _ RecipeTin Eats.pdf` }
         }
     ] // shortcuttofile_input_arr
@@ -254,7 +555,7 @@ data c; set a; d=2; run;`
                 'Text': String.raw` This is a note with <tag>, ampersand sign &, line breaker \n and /*comments*/
 like data f; set g; run;`},
             'Note': { 'Collapsed': 'True' },
-            'NoteGraphic': { 'Id': mymodules.generateUUID() }
+            'NoteGraphic': { 'Id': mymodules.generateUUID() } // although the Tag Id is later changed to ID, it does not affect SAS recognizing it.
         },
     ]
     let config_note = []
@@ -271,14 +572,16 @@ like data f; set g; run;`},
     // Such CLSID looks like a 32 bit GUID, but it has specific rules, and cannot be generated by mymodules.generateUUID(), or the alternative function 'uuid4()' (attached at the end of this program)
     let egtask_input_arr = [
         {
-            Element: { Label: 'egtask1' },
+            Element: { Label: 'egtask1', ID: 'EGTask-' + make_rand_string_by_length(16) },
             // EGTask: { Task_CLSID: '660ed464-dab4-48ad-a1d9-452148b2cffe' },
             config_pfd: config_pfd[0],
+            TaskGraphic: { ID: mymodules.generateUUID() },
             xmlstr: String.raw`<Settings version="7.1" source="&amp;RemoteTargetPath./statindins.sas7bdat" destination="&amp;localDataPath" resolveMacro="true" overwrite="true" fixCRLF="true" direction="DOWN" />`
         },
         {
-            Element: { Label: 'egtask2' },
+            Element: { Label: 'egtask2', ID: 'EGTask-' + make_rand_string_by_length(16) },
             config_pfd: config_pfd[0],
+            TaskGraphic: { ID: mymodules.generateUUID() },
             xmlstr: String.raw`<Settings version="7.1" source="&amp;RemoteTargetPath./statindins.sas7bdat" destination="&amp;localDataPath" resolveMacro="true" overwrite="true" fixCRLF="true" direction="DOWN" />`
         }
     ]
@@ -288,12 +591,15 @@ like data f; set g; run;`},
         config_egtask[i] = await config_egtask_function(egtask_input_arr[i].config_pfd, egtask_input_arr[i])
         // console.log('line181', config_egtask[i])
         // 2 add task components
-        doms_obj = await make_append_egtask_component(doms_obj, config_egtask[i], targetv7zip)
+        doms_obj = await make_append_egtask_component(doms_obj, config_egtask[i], targetzip_v7)
     } // for(let i=0;i<task_input_arr.length;i++)
 
     // 9. add links
     let link_input_arr = [
-        { Label: 'p1 to p2', LinkFrom: config_task[0], LinkTo: config_task[1] }
+        {
+            Label: 'p1 to p2', ID: 'Link-' + make_rand_string_by_length(16),
+            LinkFrom: config_task[0], LinkTo: config_task[1]
+        }
     ]
     for (let i = 0; i < link_input_arr.length; i++) {
         // 6.1 configuration for link_component
@@ -314,13 +620,13 @@ like data f; set g; run;`},
     await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
     // using Buffer to import the xml with utf16 encoding
-    targetv7zip.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
-    // writeZip the targetv7zip instead of the original (theZip)
-    await targetv7zip.writeZip("data/out/" + config_project.Element.Label + ".egp")
+    targetzip_v7.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
+    // writeZip the targetzip_v7 instead of the original (theZip)
+    await targetzip_v7.writeZip("data/out/" + config_project.Element.Label + ".egp")
 }; // async function make_v7_egp
 
 // make and append egtask related components
-async function make_append_egtask_component(doms_obj, config_egtask, targetv7zip) {
+async function make_append_egtask_component(doms_obj, config_egtask, targetzip_v7) {
     // // 1. within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the egtaskID
     doms_obj = await make_append_egtask_process_component(doms_obj, config_egtask)
 
@@ -338,7 +644,7 @@ async function make_append_egtask_component(doms_obj, config_egtask, targetv7zip
         // console.log('line218', config_egtask.xmlstr)
         let egtask_xmlstr = config_egtask.xmlstr
         // Note: the sas code file (code.sas) is of utf-8 encoding. Also, the egtask xml (EGegtask-<...id...>.xml) is also of utf-8. These are different from the project.xml (project.xml is of utf16le encoding)
-        targetv7zip.addFile(config_egtask.Element.ID + '\\' + config_egtask.Element.ID + '.xml', Buffer.from(egtask_xmlstr, "utf-8"))
+        targetzip_v7.addFile(config_egtask.Element.ID + '\\' + config_egtask.Element.ID + '.xml', Buffer.from(egtask_xmlstr, "utf-8"))
     } // config_egtask.code
 
     return doms_obj
@@ -355,7 +661,7 @@ async function config_egtask_function(config_pfd, egtask_input) {
     config_egtask.Element.Type = 'TASK'
     // console.log('line811',config_pfd)
     config_egtask.Element.Container = config_pfd.Element.ID
-    config_egtask.Element.ID = 'EGTask-' + make_rand_string_by_length(16)
+    config_egtask.Element.ID = egtask_input.Element.ID
     config_egtask.Element.CreatedOn = config_pfd.Element.CreatedOn
     config_egtask.Element.ModifiedOn = config_pfd.Element.ModifiedOn
     config_egtask.Element.ModifiedBy = config_pfd.Element.ModifiedBy
@@ -382,7 +688,7 @@ async function config_egtask_function(config_pfd, egtask_input) {
     //4. for the TaskGraphic components that are to be added to ProjectColletion.External_Objects.ProcessFlowView.Graphics
     config_egtask.TaskGraphic = {}
     // the TaskGraphic ID is different from the PFD or CodeTask ID (16-bit random strings. A 16-bit string is not a true 32-bit GUID), (it is a true 32 bit GUID)
-    config_egtask.TaskGraphic.ID = mymodules.generateUUID()
+    config_egtask.TaskGraphic.ID = config_egtask.TaskGraphic.ID
     config_egtask.TaskGraphic.Label = config_egtask.Element.Label
     config_egtask.TaskGraphic.Element = config_egtask.Element.ID
 
@@ -550,6 +856,11 @@ async function make_notegraphic_component(config) {
     if (config.Label) { $(component_dom_obj.find('Label')[0]).text(config.Label) }
     if (config.Element) { $(component_dom_obj.find('Element')[0]).text(config.Element) }
     if (config.Collapsed) { $(component_dom_obj.find('Collapsed')[0]).text(config.Collapsed) }
+
+    if (config.PosX) { $(component_dom_obj.find('PosX')[0]).text(config.PosX) }
+    if (config.PosY) { $(component_dom_obj.find('PosY')[0]).text(config.PosY) }
+    if (config.WidthExpanded) { $(component_dom_obj.find('WidthExpanded')[0]).text(config.WidthExpanded) }
+    if (config.HeightExpanded) { $(component_dom_obj.find('HeightExpanded')[0]).text(config.HeightExpanded) }
     // could config more... 
 
     return component_dom_obj
@@ -588,10 +899,15 @@ async function config_note_function(note_input) {
 
     // 3. config for ProjectCollection.External_Objects.ProcessFlowView.Graphics.NoteGraphic
     config_note.NoteGraphic = {}
-    config_note.NoteGraphic.Id = config_note.NoteGraphic.Id // the tag name <Id> is different from the <ID> tag in other components. SAS EG really need to be more standardized in naming the tags!
+    config_note.NoteGraphic.Id = note_input.NoteGraphic.Id // the tag name <Id> is different from the <ID> tag in other components. SAS EG really need to be more standardized in naming the tags! Although for this one SAS can recognize it even changed from Id to ID
     config_note.NoteGraphic.Label = config_note.Element.Element.Label
     config_note.NoteGraphic.Element = config_note.Element.Element.ID
     config_note.NoteGraphic.Collapsed = note_input.Note.Collapsed ? note_input.Note.Collapsed.toLowerCase() : 'false' // keep consistent with the Collpased setting in Note component (but in lower case here)
+    config_note.NoteGraphic.PosX = note_input.NoteGraphic.PosX
+    config_note.NoteGraphic.PosY = note_input.NoteGraphic.PosY
+    config_note.NoteGraphic.WidthExpanded = note_input.NoteGraphic.WidthExpanded
+    config_note.NoteGraphic.HeightExpanded = note_input.NoteGraphic.HeightExpanded
+    
     return config_note
 };// async function config_note_function(config_note)
 
@@ -650,7 +966,7 @@ async function make_note_element_component(config_note) {
         let note_text = config_note.Element.TextElement.Text
         // let note_text_convert_to_ampersandsymbols = convert_string_to_ampersand_symbols(note_text)
         // $(element_textelement_dom_obj.find('Text')[0]).text(note_text_convert_to_ampersandsymbols) 
-        $(element_textelement_dom_obj.find('Text')[0]).text(note_text)
+        $(element_textelement_dom_obj.find('Text')[0]).text(note_text) // note_text contains ampersand_symbols, use text() to convert symbols (e.g., &lt;&gt; to <>)
     } // if (config_note.Element.TextElement.Text) { 
     // could config more...                   
 
@@ -686,52 +1002,55 @@ async function make_append_shortcuttofile_component(doms_obj, config_shortcuttof
 }; //async function make_append_shortcuttofile_component(doms_obj, config_shortcuttofile)
 
 // configuration for shortcut to external file
-async function config_shortcuttofile_function(shorcuttofile_input) {
+async function config_shortcuttofile_function(shortcuttofile_input) {
     let config_shortcuttofile = {}
 
     //1. config for ProjectCollection.ExternalFileList.ExternalFile
     config_shortcuttofile.ExternalFile = {}
     // 1a. config for ExternalFile.Element
     config_shortcuttofile.ExternalFile.Element = {}
-    config_shortcuttofile.ExternalFile.Element.Label = shorcuttofile_input.Element.Label
-    config_shortcuttofile.ExternalFile.Element.ID = 'ExternalFile-' + make_rand_string_by_length(16)
-    config_shortcuttofile.ExternalFile.Element.CreatedOn = shorcuttofile_input.config_pfd.Element.CreatedOn
-    config_shortcuttofile.ExternalFile.Element.ModifiedOn = shorcuttofile_input.config_pfd.Element.ModifiedOn
-    config_shortcuttofile.ExternalFile.Element.ModifiedBy = shorcuttofile_input.config_pfd.Element.ModifiedBy
-    config_shortcuttofile.ExternalFile.Element.ModifiedByEGID = shorcuttofile_input.config_pfd.Element.ModifiedByEGID
+    config_shortcuttofile.ExternalFile.Element.Label = shortcuttofile_input.Element.Label
+    config_shortcuttofile.ExternalFile.Element.ID = shortcuttofile_input.Element.ID
+    config_shortcuttofile.ExternalFile.Element.CreatedOn = shortcuttofile_input.config_pfd.Element.CreatedOn
+    config_shortcuttofile.ExternalFile.Element.ModifiedOn = shortcuttofile_input.config_pfd.Element.ModifiedOn
+    config_shortcuttofile.ExternalFile.Element.ModifiedBy = shortcuttofile_input.config_pfd.Element.ModifiedBy
+    config_shortcuttofile.ExternalFile.Element.ModifiedByEGID = shortcuttofile_input.config_pfd.Element.ModifiedByEGID
     // 1b. config for ExternalFile.ExternalFile
     config_shortcuttofile.ExternalFile.ExternalFile = {}
     config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList = {}
-    config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID = 'ShortCutToFile-' + make_rand_string_by_length(16)
-    config_shortcuttofile.ExternalFile.ExternalFile.FileTypeType = shorcuttofile_input.ExternalFile.FileTypeType // the tag name has two Type which is obviously a mistake when developping the xml structure
+    config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID = shortcuttofile_input.ExternalFile.ShortCutList.ShortCutID
+    config_shortcuttofile.ExternalFile.ExternalFile.FileTypeType = shortcuttofile_input.ExternalFile.FileTypeType // the tag name has two Type which is obviously a mistake when developping the xml structure
 
     // 1b1. config for DNA
-    let fullpath = shorcuttofile_input.DNA.FullPath
-    fullpath = JSON.stringify(fullpath) // to ensure that the single backlash are replaced by \\
-    // the stringify adds additional quotes around the path, the string is now like '"C:\\..."'
-    // the following is to strip these additional quotes
-    if (fullpath.substr(0, 1) === '"') { fullpath = fullpath.substring(1) }
-    if (fullpath.substr(fullpath.length - 1, 1) === '"') { fullpath = fullpath.substr(0, fullpath.length - 1) }
-    // console.log('line159', fullpath)
-    let startpos = fullpath.lastIndexOf('\\')
-    let filename = fullpath.substr(startpos + 1)
-    config_shortcuttofile.ExternalFile.DNA = {}
     config_shortcuttofile.ExternalFile.ExternalFile.DNA = {}
-    config_shortcuttofile.ExternalFile.ExternalFile.DNA.DNA = {}
-    config_shortcuttofile.ExternalFile.ExternalFile.DNA.DNA.Name = filename
-    config_shortcuttofile.ExternalFile.ExternalFile.DNA.DNA.FullPath = fullpath
+    if (shortcuttofile_input.DNA && shortcuttofile_input.DNA.html) { // use DNA.html if it exists (converting from v8)
+        config_shortcuttofile.ExternalFile.ExternalFile.DNA.html = shortcuttofile_input.DNA.html
+    } else if (shortcuttofile_input.DNA && shortcuttofile_input.DNA.FullPath) { // this is when externalfile components are manually imported
+        let fullpath = shortcuttofile_input.DNA.FullPath
+        fullpath = JSON.stringify(fullpath) // to ensure that the single backlash are replaced by \\
+        // the stringify adds additional quotes around the path, the string is now like '"C:\\..."'
+        // the following is to strip these additional quotes
+        if (fullpath.substr(0, 1) === '"') { fullpath = fullpath.substring(1) }
+        if (fullpath.substr(fullpath.length - 1, 1) === '"') { fullpath = fullpath.substr(0, fullpath.length - 1) }
+        // console.log('line159', fullpath)
+        let startpos = fullpath.lastIndexOf('\\')
+        let filename = fullpath.substr(startpos + 1)
+        config_shortcuttofile.ExternalFile.ExternalFile.DNA.DNA = {}
+        config_shortcuttofile.ExternalFile.ExternalFile.DNA.DNA.Name = filename
+        config_shortcuttofile.ExternalFile.ExternalFile.DNA.DNA.FullPath = fullpath
+    }// if (shortcuttofile_input.DNA && shortcuttofile_input.DNA.FullPath)
 
     // 2. config for ProjectCollection.Elements.Element(for the shortcuttofile component, not for the ExternalFile component)
     config_shortcuttofile.Element = {}
     config_shortcuttofile.Element.Element = {}
     // 2a. config for ProjectCollection.Elements.Element(for this shortcuttofileToFile).Element
-    config_shortcuttofile.Element.Element.Label = shorcuttofile_input.Element.Label
+    config_shortcuttofile.Element.Element.Label = shortcuttofile_input.Element.Label
     config_shortcuttofile.Element.Element.ID = config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID // already created in step 1
-    config_shortcuttofile.Element.Element.Container = shorcuttofile_input.config_pfd.Element.ID
-    config_shortcuttofile.Element.Element.CreatedOn = shorcuttofile_input.config_pfd.Element.CreatedOn
-    config_shortcuttofile.Element.Element.ModifiedOn = shorcuttofile_input.config_pfd.Element.ModifiedOn
-    config_shortcuttofile.Element.Element.ModifiedBy = shorcuttofile_input.config_pfd.Element.ModifiedBy
-    config_shortcuttofile.Element.Element.ModifiedByEGID = shorcuttofile_input.config_pfd.Element.ModifiedByEGID
+    config_shortcuttofile.Element.Element.Container = shortcuttofile_input.config_pfd.Element.ID
+    config_shortcuttofile.Element.Element.CreatedOn = shortcuttofile_input.config_pfd.Element.CreatedOn
+    config_shortcuttofile.Element.Element.ModifiedOn = shortcuttofile_input.config_pfd.Element.ModifiedOn
+    config_shortcuttofile.Element.Element.ModifiedBy = shortcuttofile_input.config_pfd.Element.ModifiedBy
+    config_shortcuttofile.Element.Element.ModifiedByEGID = shortcuttofile_input.config_pfd.Element.ModifiedByEGID
     // 2b. config the parent ExternalFile ID for ProjectCollection.Elements.Element(for this shortcuttofileToFile).SHORTCUT
     config_shortcuttofile.Element.Element.SHORTCUT = {}
     config_shortcuttofile.Element.Element.SHORTCUT.Parent = config_shortcuttofile.ExternalFile.Element.ID
@@ -745,7 +1064,7 @@ async function config_shortcuttofile_function(shorcuttofile_input) {
 
     // 4. config for ProjectCollection.External_Objects.ProcessFlowView.Graphics.TaskGraphic
     config_shortcuttofile.TaskGraphic = {}
-    config_shortcuttofile.TaskGraphic.ID = mymodules.generateUUID()
+    config_shortcuttofile.TaskGraphic.ID = shortcuttofile_input.TaskGraphic.ID
     config_shortcuttofile.TaskGraphic.Label = config_shortcuttofile.Element.Element.Label
     config_shortcuttofile.TaskGraphic.Element = config_shortcuttofile.Element.Element.ID
 
@@ -893,7 +1212,11 @@ async function make_shortcuttofile_externalfile_component(config_shortcuttofile)
 
     // 2. Note: unlike other components, the DNA part should be inserted as HTML (not textcontent) to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
     // Make DNA HTML
+
     let dna_outerHTMLstr = make_dna_html(shortcuttofile_externalfile_externalfile_dna_dna_doms_obj)
+    if (config_shortcuttofile.ExternalFile.ExternalFile.DNA.html) { // if the config contains DNA.html, use it directly. These are copied from a v8 epg file
+        dna_outerHTMLstr = config_shortcuttofile.ExternalFile.ExternalFile.DNA.html
+    } //if (config_shortcuttofile.ExternalFile.ExternalFile.DNA.html)
 
     // 3. insert dna_outerHTMLstr as html to ProjectCollection.ExternalFileList.ExternalFile(of this externalfile).DNA
     // Note: the differece between html() and text() is that for html, '&lt;' is kept as it was; while
@@ -964,7 +1287,7 @@ async function config_link_function(link_input) {
     config_link.Element.Label = link_input.Label//'p1 to p2'
     config_link.Element.Type = 'LINK'
     config_link.Element.Container = link_input.LinkFrom.Element.Container
-    config_link.Element.ID = 'Link-' + make_rand_string_by_length(16)
+    config_link.Element.ID = link_input.ID
     config_link.Element.CreatedOn = link_input.LinkFrom.Element.CreatedOn
     config_link.Element.ModifiedOn = link_input.LinkFrom.Element.ModifiedOn
     config_link.Element.ModifiedBy = link_input.LinkFrom.Element.ModifiedBy
@@ -981,7 +1304,7 @@ async function config_link_function(link_input) {
 }; //async function config_link_function(link_input)
 
 // make and append task related components
-async function make_append_task_component(doms_obj, config_task, targetv7zip) {
+async function make_append_task_component(doms_obj, config_task, targetzip_v7) {
     // 1. within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
     doms_obj = await make_append_task_process_component(doms_obj, config_task)
 
@@ -998,7 +1321,7 @@ async function make_append_task_component(doms_obj, config_task, targetv7zip) {
     if (config_task.code && config_task.code !== '') {
         let task_sascodestr = config_task.code
         // Note: the sas code file (code.sas) is of utf-8 encoding. Also, the task xml (EGTask-<...id...>.xml) is also of utf-8. These are different from the project.xml (project.xml is of utf16le encoding)
-        targetv7zip.addFile(config_task.Element.ID + '\\code.sas', Buffer.from(task_sascodestr, "utf-8"))
+        targetzip_v7.addFile(config_task.Element.ID + '\\code.sas', Buffer.from(task_sascodestr, "utf-8"))
     } // config_task.code
     return doms_obj
 
@@ -1027,11 +1350,11 @@ async function make_dna_component(config) {
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
     let component_dom_obj = $(thesrcxmlstr_cleaned)
 
-    // configuration of the DNA component
-    if (config.DNA) {
+    // set the DNA contents (for task shortcut to external .sas files)
+    if (config.DNA) {// else if config.DNA is defined, set the .name and .fullpath. These are manually configured tasks (shortcuts to external .sas file)
         if (config.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config.DNA.Name) }
         if (config.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config.DNA.FullPath) }
-    } //if (config_task.CodeTask.DNA.DNA
+    } //if (config.html)
 
     // console.log('line276', component_dom_obj.prop('outerHTML'))
     return component_dom_obj
@@ -1066,25 +1389,25 @@ async function make_task_element_component(config_task) {
 
     // // config the ProjectCollection.Elements.Element(of the task).CodeTask
     // if the task type is shortcut, make DNA components, and insert as textcontent to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
-    // console.log('line253', config_task.tasktype)
-    if (config_task.tasktype && config_task.tasktype === 'shortcut') {
+    // console.log('line253', config_task.Embedded)
+    if (config_task.Embedded && config_task.Embedded === 'False') {
         // console.log('line255',config_task.CodeTask.DNA.DNA)
         // 1. make task_dna component
         let task_element_codetask_dna_dna_doms_obj = await make_dna_component(config_task.CodeTask.DNA)
-
         // 2. Note: unlike other components, the DNA part should be inserted as HTML (not textcontent) to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
         // Make DNA HTML
         let dna_outerHTMLstr = make_dna_html(task_element_codetask_dna_dna_doms_obj)
-
+        if (config_task.CodeTask.DNA.html) { // if the config contains DNA.html, use it directly. These are copied from a v8 epg file
+            dna_outerHTMLstr = config_task.CodeTask.DNA.html
+        } //if (config_task.CodeTask.DNA.html)
+        // console.log('line1188', dna_outerHTMLstr) 
         // 3. insert dna_outerHTMLstr as html to ProjectCollection.Elements.Element(of the task).CodeTask.DNA
         // Note: the differece between html() and text() is that for html, '&lt;' is kept as it was; while
         // for text(), '&lt;' is converted to '&amp;lt;', which cannot be recognized correctly by SAS EG
         $(component_dom_obj.find('CodeTask').find('DNA')[0]).html(dna_outerHTMLstr)
-
         // 4. also, change ProjectCollection.Elements.Element(of the task).CodeTask.Embedded's text to 'False'
         // that tiny change controls whether the task is a shortcut or with sas code Embedded within the egp file
         $(component_dom_obj.find('CodeTask').find('Embedded')[0]).text(config_task.CodeTask.Embedded)
-
     } // if (config_task.type && config_task.type === 'shortcut')
 
     return component_dom_obj
@@ -1150,6 +1473,9 @@ async function make_taskgraphic_component(config) {
     if (config.Element) { $(component_dom_obj.find('Element')[0]).text(config.Element) }
     // could config more... 
 
+    if (config.PosX) { $(component_dom_obj.find('PosX')[0]).text(config.PosX) }
+    if (config.PosY) { $(component_dom_obj.find('PosY')[0]).text(config.PosY) }
+
     return component_dom_obj
 
 };//async function make_task_process_component
@@ -1171,7 +1497,7 @@ async function make_append_task_egtreenode_component(doms_obj, config_task) {
 
 // find the EGTreeNode for Programs within EGTreeNode of a specified parent PFD's 
 function get_egtreenode_of_program_in_a_egtreenode_of_pfd(egtreenode_pfd_dom_obj) {
-    // within egtreenode_pfd_dom_obj, find the first EGTreeNode of which the .NoteType's textcontent is 'NODETYPE_PROGRAMFOLDER'
+    // within egtreenode_pfd_dom_obj, find the first EGTreeNode of which the .NodeType's textcontent is 'NODETYPE_PROGRAMFOLDER'
     let egtreenode_program_egtreenode_pfd_doms_obj = $(egtreenode_pfd_dom_obj.find('EGTreeNode'))
     // loop for each of such EGTreeNode elements, and identify the program EGTreeNode, i.e. the one with NoteType.text() = 'NODETYPE_PROGRAMFOLDER' and Label.text()='Programs'
     for (let j = 0; j < egtreenode_program_egtreenode_pfd_doms_obj.length; j++) {
@@ -1321,7 +1647,7 @@ async function config_task_function(config_pfd, task_input) {
     config_task.Element.Type = 'TASK'
     // console.log('line811',config_pfd)
     config_task.Element.Container = config_pfd.Element.ID
-    config_task.Element.ID = 'CodeTask-' + make_rand_string_by_length(16)
+    config_task.Element.ID = task_input.Element.ID
     config_task.Element.CreatedOn = config_pfd.Element.CreatedOn
     config_task.Element.ModifiedOn = config_pfd.Element.ModifiedOn
     config_task.Element.ModifiedBy = config_pfd.Element.ModifiedBy
@@ -1332,32 +1658,39 @@ async function config_task_function(config_pfd, task_input) {
 
     //1c. configuration for the CodeTask components that are to be added to ProjectCollection.Elements.Element(PFD).Element(element of the curreant task)
     // For task as shortcut to external sas files, additional <DNA> components should be appended to ProjectCollection.Elements.Element(PFD).Element(element of the curreant task).CodeTask.DNA
-    if (task_input.tasktype && task_input.tasktype === 'shortcut' && task_input.DNA && task_input.DNA.FullPath) {
-        config_task.tasktype = task_input.tasktype
+    if (task_input.Embedded && task_input.Embedded === 'False' && task_input.DNA) {
+        config_task.Embedded = task_input.Embedded
         config_task.CodeTask = {}
         config_task.CodeTask.DNA = {}
-        config_task.CodeTask.DNA.DNA = {}
-        // from the fullpath, get the filename (the part after the last \)
-        // console.log('line487', task_input.DNA.FullPath)
-        let fullpath = task_input.DNA.FullPath
-        fullpath = JSON.stringify(fullpath) // to ensure that the single backlash are replaced by \\
-        // the stringify adds additional quotes around the path, the string is now like '"C:\\..."'
-        // the following is to strip these additional quotes
-        if (fullpath.substr(0, 1) === '"') { fullpath = fullpath.substring(1) }
-        if (fullpath.substr(fullpath.length - 1, 1) === '"') { fullpath = fullpath.substr(0, fullpath.length - 1) }
-        // console.log('line489', fullpath)
-        let startpos = fullpath.lastIndexOf('\\')
-        let filename = fullpath.substr(startpos + 1)
-        // console.log('line492', filename)
-        config_task.CodeTask.DNA.DNA.Name = filename
-        config_task.CodeTask.DNA.DNA.FullPath = fullpath
-        // console.log('line495', config_task.CodeTask.DNA.DNA.FullPath)
+
+        // if the config contains DNA.html, use it directly. These are copied from a v8 epg file
+        if (task_input.DNA.html) {
+            config_task.CodeTask.DNA.html = task_input.DNA.html
+        } else if (task_input.DNA.FullPath) {
+            // if there is no DNA.html but DNA.FullPath, set DNA.Name and .FullPath. These are manually configured tasks
+            config_task.CodeTask.DNA.DNA = {}
+            // from the fullpath, get the filename (the part after the last \)
+            // console.log('line487', task_input.DNA.FullPath)
+            let fullpath = task_input.DNA.FullPath
+            fullpath = JSON.stringify(fullpath) // to ensure that the single backlash are replaced by \\
+            // the stringify adds additional quotes around the path, the string is now like '"C:\\..."'
+            // the following is to strip these additional quotes
+            if (fullpath.substr(0, 1) === '"') { fullpath = fullpath.substring(1) }
+            if (fullpath.substr(fullpath.length - 1, 1) === '"') { fullpath = fullpath.substr(0, fullpath.length - 1) }
+            // console.log('line489', fullpath)
+            let startpos = fullpath.lastIndexOf('\\')
+            let filename = fullpath.substr(startpos + 1)
+            // console.log('line492', filename)
+            config_task.CodeTask.DNA.DNA.Name = filename
+            config_task.CodeTask.DNA.DNA.FullPath = fullpath
+        }// if(task_input.DNA.html) else ...
+        // console.log('line1474', config_task.CodeTask.DNA)
 
         // also, set config_task.CodeTask.Embedded to False. That tiny change controls whether the task is
         // a shortcut, or with SAS code embedded in the current EGP
         config_task.CodeTask.Embedded = task_input.Embedded
 
-    } // if (task_input.tasktype==='shortcut') 
+    } //  if (task_input.Embedded && task_input.Embedded ...)
 
     //2. configuration for the process components that are to be added to ProjectCollection.Elements.Element(PFD).Element(element of the current task)
     config_task.Process = {}
@@ -1373,9 +1706,12 @@ async function config_task_function(config_pfd, task_input) {
     //4. for the TaskGraphic components that are to be added to ProjectColletion.External_Objects.ProcessFlowView.Graphics
     config_task.TaskGraphic = {}
     // the TaskGraphic ID is different from the PFD or CodeTask ID (16-bit random strings. A 16-bit string is not a true 32-bit GUID), (it is a true 32 bit GUID)
-    config_task.TaskGraphic.ID = mymodules.generateUUID()
+    config_task.TaskGraphic.ID = task_input.TaskGraphic.ID
     config_task.TaskGraphic.Label = config_task.Element.Label
     config_task.TaskGraphic.Element = config_task.Element.ID
+
+    if (task_input.TaskGraphic.PosX) { config_task.TaskGraphic.PosX = task_input.TaskGraphic.PosX }
+    if (task_input.TaskGraphic.PosY) { config_task.TaskGraphic.PosY = task_input.TaskGraphic.PosY }
 
     // 5. SAS code of the task (if the task code is specified, i.e., the task is not shortcut to an external sas file)
     if (task_input.code) {
@@ -1413,7 +1749,7 @@ async function config_pfd_function(config_project, pfd_input) {
     config_pfd.Element.Label = pfd_input.Label // 'PFD1'
     config_pfd.Element.Type = 'CONTAINER'
     config_pfd.Element.Container = config_project.Element.ID
-    config_pfd.Element.ID = 'PFD-' + make_rand_string_by_length(16)
+    config_pfd.Element.ID = pfd_input.ID
     config_pfd.Element.CreatedOn = config_project.Element.CreatedOn
     config_pfd.Element.ModifiedOn = config_project.Element.ModifiedOn
     config_pfd.Element.ModifiedBy = config_project.Element.ModifiedBy
