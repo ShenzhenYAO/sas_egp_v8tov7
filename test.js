@@ -9,7 +9,5 @@ const srcfolder = 'data/in/prototype/__xml/egpv8/';
 
 (async () => { 
 
-    let filename_dict = get_filename(filename_with_path)
-    console.log(filename_dict)
 })()
 

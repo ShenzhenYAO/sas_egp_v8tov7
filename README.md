@@ -4,11 +4,7 @@ https://jsonformatter.org/xml-viewer
 
 Remaining issues:
 
-1. Link is not shown in PFD
-2. shortcut is not shown in PFD
-compare the diff between converted and real v7
-
-3. memory heap out issue
+memory heap out issue
 if heap out of memory, simply enlarge size:
  node --max-old-space-size=50000 localbackend/app/01_extract_projectxml_from_egp.js
 
