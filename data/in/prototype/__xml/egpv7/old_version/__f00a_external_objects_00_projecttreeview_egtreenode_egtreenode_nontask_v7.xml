@@ -1,0 +1,64 @@
+<!-- an EGTreeNode element in ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.
+    This is to display the non-task node in the tree view panel.
+-->
+<!-- Note !!! such EGTreeNode is unique for v7, no such tag in v8.
+Within the EGTreeNode, there should be four tags for properties. The setting is similar to
+setting values for the EGVersion elements of process flows (in __f00 v7): 
+When converting from v8 to v7:
+    1. In ProjectCollection.Elements find elements
+        ProjectCollection.Elements.Element and push each into an array (nontask array) if the type is in the following list:
+        SAS.EG.ProjectElements.ShortCutToFile, SAS.EG.ProjectElements.ShortCutToData,
+        SAS.EG.ProjectElements.EGTask, and SAS.EG.ProjectElements.Note.
+        Also, push the elements with type = SAS.EG.ProjectElements.CodeTask to a separate array (the task array).The tasks are displayed separately under a folder called "Programs").
+        ( SAS.EG.ProjectElements.Log, and SAS.EG.ProjectElements.Code are not to be displayed in tree view.
+
+        Not sure if other types exists and should be excluded... 
+
+    1. For both the nontask and task array, keep three fields for each element in the array
+        { 
+            ID: the element id from ProjectCollection.Elements.Element.Element.ID,
+            Label: the element label from ProjectCollection.Elements.Element.Element.Label,
+            Type: the attribute type of the ProjectCollection.Elements.Element.Element
+        }
+
+    2. The nontask array is like: 
+       [{ 
+            ID: ShortCutToFile-frOMCUhUHcJWJKeO,
+            Label: a.xlsx,
+            Type: SAS.EG.ProjectElements.ShortCutToFile
+
+        },
+        { 
+            ID: EGTask-jMEojoEY4vOJ6ZPA,
+            Label: customized task copy file,
+            Type: SAS.EG.ProjectElements.EGTask
+
+        }]
+
+    3. Make a list of ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode for the v7 file,
+        each from an element in the nontask array.
+        for each of the ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode.EGTreeNode,
+        set the following tag:
+        1) <NodeType>NODETYPE_ELEMENT</NodeType> (fixed value)
+        2) set the innerText of the tag ElementID as the ID property from the element of the new array
+        (e.g., <ElementID>ShortCutToFile-frOMCUhUHcJWJKeO</ElementID>)
+        3) set the innerText of the tag Label as the Label property from the elment of the new array
+        (e.g., <Label>pfd1</Label>)
+        4) Search for the element in the  
+            v8 file's ProjectCollection.External_Objects.OpenProjectView.TreeItem 
+            whereby the property ID matches the ID property from the element 
+            of the new array. 
+            For such a TreeItem Element, get the attribute IsExpanded, change from lower case
+            to proper case (e.g., 'true' to 'True'), and set as innerText of the tag Expanded.
+        (e.g., <Expanded>True</Expanded>) 
+    -->
+<EGTreeNode>
+    <!-- <NodeType>NODETYPE_ELEMENT</NodeType> -->
+    <NodeType>input__NodeType</NodeType>
+    <!-- <ElementID>ShortCutToFile-frOMCUhUHcJWJKeO</ElementID> -->
+    <ElementID>input__ElementID</ElementID>
+    <!-- <Expanded>False</Expanded> -->
+    <Expanded>input_Expanded</Expanded>
+    <!-- <Label>xls.xlsx</Label> -->
+    <Label>input__Label</Label>
+</EGTreeNode>

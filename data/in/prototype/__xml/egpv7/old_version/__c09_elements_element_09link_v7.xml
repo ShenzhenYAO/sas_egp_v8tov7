@@ -1,0 +1,29 @@
+<!-- an element within ProjectCollection.Elements, with the type of Link -->
+<Element Type="SAS.EG.ProjectElements.Link">
+    <Element>
+        <Label>input__elementLabel</Label>
+        <Type>LINK</Type>
+        <Container>input__PFDID</Container>
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs>
+            input__list_InputID
+                        <!-- input a list of InputIDs, e.g., CodeTaskIDs, prototyep from ???.xml -->
+        </InputIDs>
+    </Element>
+    <Log>
+        <!-- <Parent>CodeTask-eFeFyI2IrkNJmU7j</Parent> -->
+        <Parent>input__ParentID</Parent>
+        <!-- <LinkFrom>CodeTask-eFeFyI2IrkNJmU7j</LinkFrom> -->
+        <LinkFrom>input__LinkFromCodeTaskID</LinkFrom>
+        <!-- <LinkTo>CodeTask-cRIArx6TeBFFoe9Z</LinkTo> -->
+        <LinkTo>input__LinkToCodeTaskID</LinkTo>
+    </Log>
+</Element>
+
+        

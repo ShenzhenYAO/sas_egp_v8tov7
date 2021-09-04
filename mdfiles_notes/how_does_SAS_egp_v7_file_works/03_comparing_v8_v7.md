@@ -1,0 +1,20 @@
+Unique in V8
+
+ProjectCollection.ShowProjectLogWarningMessage
+ProjectCollection.RemoveOlderProjectLogItems
+ProjectCollection.ExportProjectLogThenClear
+ProjectCollection.ProjectLogExportFilename
+ProjectCollection.ProjectLogExportLocation
+ProjectCollection.ProjectLogMaxSize
+ProjectCollection.ClearProjectLogOnExit
+
+Unique in V7
+
+for PFD elements, the ContainerElement.ContainerType ('ProcessFlow'):
+ProjectCollection.Elements.Element[x].ContainerElement 
+ProjectCollection.Elements.Element[x].ContainerElement.ContainerType
+
+ProjectCollection.GitSourceControl
+
+
+SWAP

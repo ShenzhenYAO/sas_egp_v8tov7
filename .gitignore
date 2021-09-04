@@ -1,6 +1,4 @@
 node_modules/
 data/in/do_not_git/
-data/out/
-data/try/
+data/out/do_not_git/
 localbackend/.env
-data/

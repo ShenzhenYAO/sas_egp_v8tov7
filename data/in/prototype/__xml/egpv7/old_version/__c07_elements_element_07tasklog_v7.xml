@@ -1,0 +1,26 @@
+<!-- an element within ProjectCollection.Elements, with the type of Log (Task Log) -->
+<Element Type="SAS.EG.ProjectElements.Log">
+    <Element>
+        <Label>input__elementLabel</Label>
+        <Type>LOG</Type>
+        <Container>input__PFDID</Container>
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs>
+            input__list_InputID
+            <!-- input a list of InputIDs, e.g., CodeTaskIDs, prototyep from ???.xml -->
+        </InputIDs>
+    </Element>
+    <Log>
+        <Parent>input__parentID</Parent>
+        <LineSize>input__LineSize</LineSize>
+        <PageSize>input__PageSize</PageSize>
+        <Portrait>input__Portrait</Portrait>
+        <ConditionParent />
+    </Log>
+</Element>

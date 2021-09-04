@@ -1,0 +1,118 @@
+<!-- an element within ProjectCollection.Elements, with the type of CodeTask (not including short cut to SAS code files) -->
+<Element Type="SAS.EG.ProjectElements.CodeTask">
+    <Element>
+        <Label>input__elementLabel</Label>
+        <Type>TASK</Type>
+        <Container>input__PFDID</Container>
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs />
+    </Element>
+    <SubmitableElement>
+        <!-- <UseGlobalOptions>True</UseGlobalOptions> -->
+        <UseGlobalOptions>input__UseGlobalOptions</UseGlobalOptions>
+        <!-- <Server>Local</Server> -->
+        <Server>input__Server</Server>
+        <!-- <HASERROR>False</HASERROR> -->
+        <HASERROR>input__HASERROR</HASERROR>
+        <!-- <HASWARNING>False</HASWARNING> -->
+        <HASWARNING>input__HASWARNING</HASWARNING>
+        <!-- <HtmlActiveOverride>false</HtmlActiveOverride> -->
+        <HtmlActiveOverride>input__HtmlActiveOverride</HtmlActiveOverride>
+        <!-- <RtfActiveOverride>false</RtfActiveOverride> -->
+        <RtfActiveOverride>input__RtfActiveOverride</RtfActiveOverride>
+        <!-- <PdfActiveOverride>false</PdfActiveOverride> -->
+        <PdfActiveOverride>input__PdfActiveOverride</PdfActiveOverride>
+        <!-- <SasReportActiveOverride>true</SasReportActiveOverride> -->
+        <SasReportActiveOverride>input__SasReportActiveOverride</SasReportActiveOverride>
+        <!-- <ListingActiveOverride>false</ListingActiveOverride> -->
+        <ListingActiveOverride>input__ListingActiveOverride</ListingActiveOverride>
+        <!-- <PowerpointActiveOverride>false</PowerpointActiveOverride> -->
+        <PowerpointActiveOverride>input__PowerpointActiveOverride</PowerpointActiveOverride>
+        <!-- <ExcelActiveOverride>false</ExcelActiveOverride> -->
+        <ExcelActiveOverride>input__ExcelActiveOverride</ExcelActiveOverride>
+        <!-- <AutoDisplayActiveOverride>true</AutoDisplayActiveOverride> -->
+        <AutoDisplayActiveOverride>input__AutoDisplayActiveOverride</AutoDisplayActiveOverride>
+        <!-- <PdfStyleOverride>Pearl</PdfStyleOverride> -->
+        <PdfStyleOverride>input__PdfStyleOverride</PdfStyleOverride>
+        <!-- <RtfStyleOverride>RTF</RtfStyleOverride> -->
+        <RtfStyleOverride>input__RtfStyleOverride</RtfStyleOverride>
+        <!-- <HtmlStyleNameOverride>HtmlBlue</HtmlStyleNameOverride> -->
+        <HtmlStyleNameOverride>input__HtmlStyleNameOverride</HtmlStyleNameOverride>
+        <!-- <HtmlStyleCategoryOverride>BuiltIn</HtmlStyleCategoryOverride> -->
+        <HtmlStyleCategoryOverride>input__HtmlStyleCategoryOverride</HtmlStyleCategoryOverride>
+        <!-- <HtmlStyleUrlOverride>F:\Program Files\SASHome\SASEnterpriseGuide\7.1\Styles\HtmlBlue.css</HtmlStyleUrlOverride> -->
+        <HtmlStyleUrlOverride>input__HtmlStyleUrlOverride</HtmlStyleUrlOverride>
+        <!-- <SasReportStyleNameOverride>HtmlBlue</SasReportStyleNameOverride> -->
+        <SasReportStyleNameOverride>input__SasReportStyleNameOverride</SasReportStyleNameOverride>
+        <!-- <SasReportStyleCategoryOverride>BuiltIn</SasReportStyleCategoryOverride> -->
+        <SasReportStyleCategoryOverride>input__SasReportStyleCategoryOverride</SasReportStyleCategoryOverride>
+        <!-- <SasReportStyleUrlOverride>F:\Program Files\SASHome\SASEnterpriseGuide\7.1\Styles\HtmlBlue.css</SasReportStyleUrlOverride> -->
+        <SasReportStyleUrlOverride>input__SasReportStyleUrlOverride</SasReportStyleUrlOverride>
+        <!-- <PowerpointStyleOverride>PowerPointLight</PowerpointStyleOverride> -->
+        <PowerpointStyleOverride>input__PowerpointStyleOverride</PowerpointStyleOverride>
+        <!-- <ExcelStyleOverride>Excel</ExcelStyleOverride> -->
+        <ExcelStyleOverride>input__ExcelStyleOverride</ExcelStyleOverride>
+        <!-- <GraphDeviceOverride>Png</GraphDeviceOverride> -->
+        <GraphDeviceOverride>input__GraphDeviceOverride</GraphDeviceOverride>
+        <!-- <UseProjectSubmitOptions>true</UseProjectSubmitOptions> -->
+        <UseProjectSubmitOptions>input__UseProjectSubmitOptions</UseProjectSubmitOptions>
+        <!-- <SubmitToGrid>false</SubmitToGrid> -->
+        <SubmitToGrid>input__SubmitToGrid</SubmitToGrid>
+        <!-- <QueueSubmitsForServer>true</QueueSubmitsForServer> -->
+        <QueueSubmitsForServer>input__QueueSubmitsForServer</QueueSubmitsForServer>
+        <!-- <ActionOnError>StopCurrentBranch</ActionOnError> -->
+        <ActionOnError>input__ActionOnError</ActionOnError>
+        <!-- <ExpectedOutputDataList /> -->
+        <ExpectedOutputDataList>
+            input__list_DataDescriptor
+            <!-- input__list_DataDescriptor, prototype from .xml  -->
+        </ExpectedOutputDataList >
+        <!-- <Parameters /> -->
+        <Parameters>input__Parameters</Parameters>
+        <!-- <ExecutionTimeSpan>PT0.3378045S</ExecutionTimeSpan> -->
+        <ExecutionTimeSpan>input__ExecutionTimeSpan</ExecutionTimeSpan>
+        <JobRecipe>
+            <JobRecipe>
+                <!-- <log>Log-PnBrVaOkTciONclO</log> -->
+                <log>input__logID</log>
+                <!-- <code>Code-KtgYEOok4RfPaxkg</code> -->
+                <code>input__codeID</code>
+                <!-- <OutputDataList> -->
+                <!-- <ID>ShortCutToData-7t9kkoBjusSTYIt3</ID> -->
+                <!-- </OutputDataList> -->
+                <OutputDataList>
+                    input__list_OutputDataID
+                    <!-- input a list of OutputDataID, prototype from __c04b_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_outputdatalist_id_v7.xml -->
+                </OutputDataList>
+                <!-- <ODSResultsList> -->
+                <!-- <ID>ODSResult-MRRcL5RxnQVFIxpf</ID> -->
+                <!-- <ID>ODSResult-wTgpOsgwuVuqWPVM</ID> -->
+                <!-- </ODSResultsList> -->
+                <ODSResultsList>
+                    input__list_ODSResultID
+                    <!-- input a list of ODSResultID, prototype from __c04c_elements_element_04codetask_submitableelement_jobrecipe_jobrecipe_odsresultslist_id_v7.xml -->
+                </ODSResultsList>
+            </JobRecipe>
+        </JobRecipe>
+    </SubmitableElement>
+    <CodeTask>
+        <IncludeWrapper>input__IncludeWrapper</IncludeWrapper>
+        <Embedded>input__Embedded</Embedded>
+        <DNA>
+            <DNA>
+                <Type>input__DNAType</Type>
+                <Name>input__DNAName</Name>
+                <Version>input_DNAVersion</Version>
+                <Assembly />
+                <Factory />
+                <FullPath>input_DNAFullPath</FullPath>
+            </DNA>
+        </DNA>
+    </CodeTask>
+</Element>

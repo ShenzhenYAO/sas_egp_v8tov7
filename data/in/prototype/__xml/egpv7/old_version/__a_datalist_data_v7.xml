@@ -1,0 +1,51 @@
+<!-- a data element within ProjectCollection.DataList -->
+<Data>
+    <Element>
+        <!-- <Label>A</Label> -->
+        <Label>input__elementLabel</Label>
+        <Type>DATA</Type>
+        <Container />
+        <!-- <ID>Data-iE6Dmbd8xLpOSgU8</ID> -->
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs />
+    </Element>
+    <Data>
+        <ShortCutList>
+            <!-- <ShortCutID>ShortCutToData-dGoyvIraA6lVr3jS</ShortCutID>,source: the corresponding shortCutToDataUID in  -->
+            <ShortCutID>input__ShortCutToDataUID</ShortCutID>
+        </ShortCutList>
+        <DataModel>
+            <!-- <Server>Local</Server> -->
+            <Server>input__Server</Server>
+            <!-- <ActiveDataSource>WORKA</ActiveDataSource> -->
+            <ActiveDataSource>input__ActiveDataSource</ActiveDataSource>
+            <!-- <DisplayName>A</DisplayName> -->
+            <DisplayName>input__DisplayName</DisplayName>
+            <!-- <Table>A</Table> -->
+            <Table>input__DataLabel</Table>
+            <RawActiveDataSourceState>
+                <DNA>
+                    <Type>Dataset</Type>
+                    <Name>input__DataLabel</Name>
+                    <Version>input__DNAVersion</Version>
+                    <Assembly>SAS.EG.SDS.Model</Assembly>
+                    <Factory>SAS.EG.SDS.Model.Creator</Factory>
+                    <!-- <ParentName>WORK</ParentName> -->
+                    <ParentName>input__LibName</ParentName>
+                    <Server>input__Server</Server>
+                    <Library>input__LibName</Library>
+                </DNA>
+            </RawActiveDataSourceState>
+            <DataSourceState>input__ActiveDataSource</DataSourceState>
+            <TableState>input__DataLabel</TableState>
+            <!-- <MemberType>Dataset</MemberType> -->
+            <MemberType>input_MemberType</MemberType>
+        </DataModel>
+    </Data>
+</Data>

@@ -1,0 +1,34 @@
+<!-- an element within ProjectCollection.Elements, with the type of PFContainer -->
+<!-- Note!!! the type ="SAS.EG.ProjectElements.PFD" is unique in v7, in v7 type = "SAS.EG.ProjectElements.ProcessFlowContainer" -->
+<Element Type="SAS.EG.ProjectElements.PFD">
+    <Element>
+        <Label>input_elementLabel</Label>
+        <Type>CONTAINER</Type>
+        <Container>input__projectCollectionID</Container>
+        <!-- <ID>PFD-GirXDnE4Mj4CHrI5</ID> -->
+        <ID>input__elementID</ID>
+        <!-- <CreatedOn>637641110505125505</CreatedOn> -->
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <!-- <ModifiedOn>637641895014616482</ModifiedOn> -->
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
+        <!-- <ModifiedBy>Z70</ModifiedBy> -->
+        <ModifiedBy>input__userName</ModifiedBy>
+        <!-- <ModifiedByEGID>Z70</ModifiedByEGID> -->
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <!-- <ModifiedByEGVer>7.100.5.6226</ModifiedByEGVer> -->
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs />
+    </Element>
+    <!-- Note !!!, the following tag 'ContainerElement' is unique in v7  -->
+    <ContainerElement>
+        <ContainerType>ProcessFlow</ContainerType>
+    </ContainerElement>
+    <PFD>
+        input__list_Process
+        <!-- insert a list of Process elements with CodeTask IDs (each from __c01a_elements_element_01forpfd_pfd_process_v7.xml)-->
+    </PFD>
+</Element>
+
+
+

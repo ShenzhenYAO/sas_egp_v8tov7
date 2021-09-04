@@ -1,0 +1,39 @@
+<!-- an element within ProjectCollection.Elements, with the type of last submitted task code -->
+<Element Type="SAS.EG.ProjectElements.Code">
+    <Element>
+        <Label>input__elementLabel</Label>
+        <Type>CODE</Type>
+        <Container>input__PFDID</Container>
+        <ID>input__elementID</ID>
+        <CreatedOn>input__createTimeSerial</CreatedOn>
+        <ModifiedOn>input__modifiedTimeSerial</ModifiedOn>
+        <ModifiedBy>input__userName</ModifiedBy>
+        <ModifiedByEGID>input__userID</ModifiedByEGID>
+        <ModifiedByEGVer>input__ModifiedByEGVer</ModifiedByEGVer>
+        <HasSerializationError>input__HasSerializationError</HasSerializationError>
+        <InputIDs>
+            input__list_InputID
+            <!-- input a list of InputIDs, e.g., CodeTaskIDs, prototyep from ???.xml -->
+        </InputIDs>
+    </Element>
+    <TextElement>
+        <!-- the following innerText of text tag is submitted SAS code -->
+        <Text>input__Text</Text>
+        <ReadOnly>input__ReadOnly</ReadOnly>
+        <DefExt>input__DefExt</DefExt>
+    </TextElement>
+    <Code>
+        <!-- the following parent tag is for codetask ID -->
+        <Parent>input__Parent</Parent>
+        <Libref_Code />
+        <BeginAppCode>input__BeginAppCode</BeginAppCode>
+        <BeginUserCode />
+        <!-- the following innerText of TaskCode tag is submitted SAS code -->
+        <TaskCode>input__TaskCode</TaskCode>
+        <EndUserCode />
+        <EndAppCode>input__EndAppCode</EndAppCode>
+        <LibrefCl_Code />
+        <MacroAssign_Code>input__MacroAssign_Code</MacroAssign_Code>
+        <MacroUnassign_Code>input__MacroUnassign_Code</MacroUnassign_Code>
+    </Code>
+</Element>
