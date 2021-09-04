@@ -2,13 +2,12 @@
     The prototypes are saved at data/in/prototype/egpv7
     components of a typical v7 project.xml are saved as individual xml files (all of utf16le encoding)
 
-    based on localbackend\app\26_create_xml_from_prototype_6.js
-    1. read from an existing egp v8 and rebuild into a v7 egp with tasks, links, and shortcut to files
-    ... the following are optional (as I usually do not use them)
-    to do
-    
+    based on localbackend\app\27_create_xml_from_prototype_7.js
+    Modify the shortcuttofile input structure (making it consistent with other components: change to: .Element is for ShortCut while .ExternalFile is for ExternalFile)
+
     2. add order list
     3. add report 
+    4. add shortcuttodata
 */
 
 // load custom modules
