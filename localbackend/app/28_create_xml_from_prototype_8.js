@@ -224,10 +224,10 @@ async function convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj
 
         let d = shortcuttofile_elements_doms_obj_v8[i]
         // get the Label and ID from each pfd Element.Element
-        let shortcuttofile_config = {}, shortcuttofile_config_element = {}, config_parent_pfd, Element = {}, ExternalFile = {}, DNA = {}, TaskGraphic = {}
-        // get the shortcuttofile Element's Element.Label and .ID
-        shortcuttofile_config_element.Label = $($(d).find("Element").find("Label")[0]).text()
-        shortcuttofile_config_element.ID = $($(d).find("Element").find("ID")[0]).text()
+        let shortcuttofile_config = {}, config_parent_pfd, Element = {}, ExternalFile = {}, DNA = {}, TaskGraphic = {}
+        // get the shortcuttofile Element's Element.Label and .ID (these are the shortcutLabel shortcutID)
+        Element.Label = $($(d).find("Element").find("Label")[0]).text()
+        Element.ID = $($(d).find("Element").find("ID")[0]).text()
 
         // get the parent PFD of the shortcuttofile element
         let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
@@ -244,28 +244,26 @@ async function convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj
         for (j = 0; j < ExternalFile_doms_obj.length; j++) {
             let ShortCutID = $($(ExternalFile_doms_obj[i]).find('ExternalFile > ShortCutList > ShortCutID')[0]).text()
             // console.log('278:', ShortCutID, shortcuttofile_config_element.ID)
-            if (ShortCutID === shortcuttofile_config_element.ID) {
+            if (ShortCutID === Element.ID) {
                 the_externalfile_dom_obj = $(ExternalFile_doms_obj[j])
                 // console.log ('282:', the_externalfile_dom_obj)
                 break
             }
         } // for (j=0;j<ExternalFile_doms_obj.length;j++)
         // get the externalfile settings
-        // ExternalFile's Label and ID. Note: the shortcuttofile_input_arr is different from task_input_arr.
+        // ExternalFile's Label and ID. Note: 
         // It's .Element is for .ExternalFile, not for Elements.Element of the ShortCutToFile 
-        Element.Label = $(the_externalfile_dom_obj.find('Element > Label')[0]).text()
-        Element.ID = $(the_externalfile_dom_obj.find('Element > ID')[0]).text()
+        ExternalFile.Label = $(the_externalfile_dom_obj.find('Element > Label')[0]).text()
+        ExternalFile.ID = $(the_externalfile_dom_obj.find('Element > ID')[0]).text()
         // console.log('290', Element)
         ExternalFile.FileTypeType = $(the_externalfile_dom_obj.find('ExternalFile > FileTypeType')[0]).text()
-        ExternalFile.ShortCutList = {}
-        ExternalFile.ShortCutList.ShortCutID = shortcuttofile_config_element.ID
         // console.log('290', ExternalFile)
 
         DNA.html = $(the_externalfile_dom_obj.find('ExternalFile > DNA')[0]).html()
 
         // get the TaskGraphic.PosX, PosY setting (these set the position of the shortcuttofile icon in the PFD view)
         // use the shortcuttofile id (shortcuttofile_config_element.ID), find the correponding TaskGraphic in doms_obj_v8
-        let the_taskgraphic_dom_obj = get_task_or_note_graphic_dom_by_id_v8(doms_obj_v8, shortcuttofile_config_element.ID, 'TaskGraphic')
+        let the_taskgraphic_dom_obj = get_task_or_note_graphic_dom_by_id_v8(doms_obj_v8, Element.ID, 'TaskGraphic')
         // console.log('line182', the_taskgraphic_dom_obj.prop('outerHTML'))
         TaskGraphic.ID = $(the_taskgraphic_dom_obj.find('ID')[0]).text()
         TaskGraphic.PosX = $(the_taskgraphic_dom_obj.find('PosX')[0]).text()
@@ -513,7 +511,7 @@ async function convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7) {
     let { config_pfd, result_doms_obj_add_PFD } = await convert_pfd_v8_to_v7(doms_obj_v8, config_project_v8, doms_obj_v7)
     doms_obj_v7 = result_doms_obj_add_PFD
 
-    // 4. add EGTreeNode for wrapping all programs/tasks for ProjectTreeView.
+    // 4. add EGTreeNode for wrapping all programs/tasks for ProjectTreeView. (it is named add_ as there is no egtrenode in v8)
     let { config_programs, result_doms_obj_add_EGTreeNode_program } = await add_egtreenode_program_v8_to_v7(doms_obj_v7, config_pfd)
     doms_obj_v7 = result_doms_obj_add_EGTreeNode_program
 
@@ -537,10 +535,10 @@ async function convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7) {
     let { config_link, result_doms_obj_add_link } = await convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7)
     doms_obj_v7 = result_doms_obj_add_link
 
-    // write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project_v8)
+    write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project_v8)
 
     //**** part 2, make the v7 egp */
-    await make_v7_egp_manually()
+    // await make_v7_egp_manually()
 
 })()
 
