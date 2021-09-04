@@ -24,10 +24,20 @@ const { config } = require('process');
 // const { Console } = require('console');
 
 const thev8EGP = "data/in/sample_a_v8.egp";
-const targetzip_v7 = new AdmZip()
+// const thev8EGP = "data/in/do_not_git/v8 and v7 samples/sample3_v8.egp";
+const targetzip_v7 = new AdmZip();
 // make a zip instance of the thesrc v8 egp file
-const thesrczip_v8 = new AdmZip(thev8EGP)
+const thesrczip_v8 = new AdmZip(thev8EGP);
 
+(async () => {
+    // convert a v8 egp to v7
+    await convert_egp_v8_to_v7();
+
+    // manually make a v7 egp
+    // await make_v7_egp_manually()
+})()
+
+/***functions to convert egp v8 to v7 ******************************************** */
 // get xml script and v8_doms_obj from a src egp
 async function get_xml_from_v8_egp(thesrczip_v8) {
 
@@ -489,20 +499,20 @@ async function convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7) {
     return { config_link: config_link, result_doms_obj_add_link: doms_obj_v7 }
 };//async function convert_link_v8_to_v7
 
-(async () => {
-
+// convert a v8 egp file to v7
+async function convert_egp_v8_to_v7() {
     // 1. get xml script and v8_doms_obj from a src egp
     let { doms_obj_v8, theoriginsrcxmlstr_v8 } = await get_xml_from_v8_egp(thesrczip_v8)
     // console.log('line33', thesrcxmlstr_v8.substr(0, 100), v8_doms_obj.prop('outerHTML'))
 
-    // save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
-    let thetargetv8xmlfile = 'data/out/__testv8.xml'
+    // // save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
+    let thetargetv8xmlfile = 'data/out/do_not_git/projectxml_src_egpv8.xml'
     await mymodules.saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
 
     // 2. from the source v8 egp file, get settings for the Project from the v8 egp file
     let config_project_v8 = await get_project_config_from_src_v8_egp(doms_obj_v8)
-    // change the project label to '__testv7' (this is for testing only)
-    config_project_v8.Element.Label = '__testv7'
+    // // change the project label to '__testv7' (this is for testing only)
+    // config_project_v8.Element.Label = '__testv7'
     // initiate a v7 doms obj, and apply project configuations from the source v8 file
     let { doms_obj_v7, thesrcxmlstr_v7 } = await init_v7_doms_obj(config_project_v8)
     // console.log ('line76', doms_obj_v7.find('Element').prop('outerHTML') )
@@ -536,11 +546,7 @@ async function convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7) {
     doms_obj_v7 = result_doms_obj_add_link
 
     write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project_v8)
-
-    //**** part 2, make the v7 egp */
-    // await make_v7_egp_manually()
-
-})()
+}; //async function convert_v8_to_v7
 
 // cleanup the target xlm and write to the target v7 egp
 async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
@@ -550,16 +556,19 @@ async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
     let targetxmlstr = remove_spaces_linebreakers(targetxmlstr_cleaned)
     // console.log(targetxmlstr)
     targetxmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + targetxmlstr
-    let thetargetxmlfile = 'data/out/' + config_project.Element.Label + '.xml'
+    let thetargetxmlfile = 'data/out/do_not_git/projectxml_converted_egpv7.xml'
     await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
     // using Buffer to import the xml with utf16 encoding
     targetzip_v7.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
     // writeZip the targetzip_v7 instead of the original (theZip)
-    await targetzip_v7.writeZip("data/out/" + config_project.Element.Label + ".egp")
+    await targetzip_v7.writeZip("data/out/do_not_git/" + config_project.Element.Label + "_tov7.egp")
 
 };//async function write_to_v7_egp
+/***functions to convert egp v8 to v7 ******************************************** */
 
+
+/***functions to maually create a v7 egp ******************************************** */
 //make the v7 egp
 async function make_v7_egp_manually() {
     // 0.save the zip as an egp file (must be defined before adding task components. When adding tasks, the SAS code need to be added into the zip)
@@ -646,7 +655,7 @@ data c; set a; d=2; run;`
         {
             config_pfd: config_pfd[0],
             Element: { Label: 'shortcut to thexls.xlsx', ID: 'ShortCutToFile-' + make_rand_string_by_length(16) },
-            ExternalFile: { FileTypeType: 'Excel', ID: 'ExternalFile-' + make_rand_string_by_length(16)},
+            ExternalFile: { FileTypeType: 'Excel', ID: 'ExternalFile-' + make_rand_string_by_length(16) },
             TaskGraphic: { ID: mymodules.generateUUID() },
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\thexls.xlsx` }
         },
@@ -750,7 +759,7 @@ like data f; set g; run;`},
     targetzip_v7.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
     // writeZip the targetzip_v7 instead of the original (theZip)
     await targetzip_v7.writeZip("data/out/" + config_project.Element.Label + ".egp")
-}; // async function make_v7_egp
+}; // async function make_v7_manually.egp
 
 // make and append egtask related components
 async function make_append_egtask_component(doms_obj, config_egtask, targetzip_v7) {
@@ -1174,7 +1183,7 @@ async function config_shortcuttofile_function(shortcuttofile_input) {
     config_shortcuttofile.Element.Element = {}
     // 2a. config for ProjectCollection.Elements.Element(for this shortcuttofileToFile).Element
     config_shortcuttofile.Element.Element.Label = shortcuttofile_input.Element.Label
-    config_shortcuttofile.Element.Element.ID = shortcuttofile_input.Element.ID 
+    config_shortcuttofile.Element.Element.ID = shortcuttofile_input.Element.ID
     config_shortcuttofile.Element.Element.Container = shortcuttofile_input.config_pfd.Element.ID
     config_shortcuttofile.Element.Element.CreatedOn = shortcuttofile_input.config_pfd.Element.CreatedOn
     config_shortcuttofile.Element.Element.ModifiedOn = shortcuttofile_input.config_pfd.Element.ModifiedOn
