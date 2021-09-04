@@ -33,7 +33,7 @@ const thesrczip_v8 = new AdmZip(thev8EGP);
 (async () => {
     // option 1: convert a v8 egp to v7
     await convert_egp_v8_to_v7();
-    
+
     // or option2: manually make a v7 egp
     // await make_v7_egp_manually()
 })()
@@ -71,6 +71,22 @@ async function get_project_config_from_src_v8_egp(v8_doms_obj) {
     return config_project
 };//async function get_project_config_from_src_v8_egp
 
+// get a dict of path, name, and extention name of a file
+// Note: the full path string of the file must be give as String.raw``
+// let filename_with_path = String.raw`data\in\prototype\__xml/egpv7\__egtask_example.xml`
+function get_filename(filename_with_path) {
+    // console.log(filename_with_path)
+    // convert backslash to slash
+    filename_with_path = filename_with_path.replace(/\\/g, '/')
+    // console.log(filename_with_path)
+    let startpos_slash = filename_with_path.lastIndexOf('/')
+    let filename_with_ext = filename_with_path.substr(startpos_slash + 1)
+    let startpos_dot = filename_with_ext.lastIndexOf('.')
+    let path = filename_with_path.substring(0, startpos_slash)
+    let name = filename_with_ext.substring(0, startpos_dot)
+    let ext = filename_with_ext.substr(startpos_dot + 1)
+    return { path: path, name: name, ext: ext }
+}
 // get settings from the Project from the v8 doms_obj
 async function get_element_doms_obj_by_type(doms_obj, type_attr) {
     // a1. identify the PFD elements in ProjectCollection.Elements
@@ -564,7 +580,9 @@ async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
     // using Buffer to import the xml with utf16 encoding
     targetzip_v7.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
     // writeZip the targetzip_v7 instead of the original (theZip)
-    await targetzip_v7.writeZip("data/out/do_not_git/" + config_project.Element.Label + "_tov7.egp")
+    let target_filename = get_filename(thev8EGP).name
+    // await targetzip_v7.writeZip("data/out/do_not_git/" + config_project.Element.Label + "_tov7.egp")
+    await targetzip_v7.writeZip("data/out/do_not_git/" + target_filename + "_tov7.egp")
 
 };//async function write_to_v7_egp
 /***functions to convert egp v8 to v7 ******************************************** */
