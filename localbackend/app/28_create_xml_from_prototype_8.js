@@ -540,7 +540,7 @@ async function convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7) {
     // write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project_v8)
 
     //**** part 2, make the v7 egp */
-    await make_v7_egp()
+    await make_v7_egp_manually()
 
 })()
 
@@ -563,7 +563,7 @@ async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
 };//async function write_to_v7_egp
 
 //make the v7 egp
-async function make_v7_egp() {
+async function make_v7_egp_manually() {
     // 0.save the zip as an egp file (must be defined before adding task components. When adding tasks, the SAS code need to be added into the zip)
 
     // 1. make a project collection scala
@@ -642,21 +642,20 @@ data c; set a; d=2; run;`
         doms_obj = await make_append_task_component(doms_obj, config_task[i], targetzip_v7)
     } // for(let i=0;i<task_input_arr.length;i++)
 
-
     // 6. add shortcuts to external files
     // 6.1 shortcuttofile_input
     let shortcuttofile_input_arr = [
         {
             config_pfd: config_pfd[0],
-            Element: { Label: 'shortcut to thexls.xlsx', ID: 'ExternalFile-' + make_rand_string_by_length(16) },
-            ExternalFile: { FileTypeType: 'Excel', ShortCutList: { ShortCutID: 'ShortCutToFile-' + make_rand_string_by_length(16) } },
+            Element: { Label: 'shortcut to thexls.xlsx', ID: 'ShortCutToFile-' + make_rand_string_by_length(16) },
+            ExternalFile: { FileTypeType: 'Excel', ID: 'ExternalFile-' + make_rand_string_by_length(16)},
             TaskGraphic: { ID: mymodules.generateUUID() },
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\thexls.xlsx` }
         },
         {
             config_pfd: config_pfd[1],
-            Element: { Label: 'shortcut to Thai Green Curry _ RecipeTin Eats', ID: 'ExternalFile-' + make_rand_string_by_length(16) },
-            ExternalFile: { FileTypeType: 'PDF', ShortCutList: { ShortCutID: 'ShortCutToFile-' + make_rand_string_by_length(16) } },
+            Element: { Label: 'shortcut to Thai Green Curry _ RecipeTin Eats', ID: 'ShortCutToFile-' + make_rand_string_by_length(16) },
+            ExternalFile: { FileTypeType: 'PDF', ID: 'ExternalFile-' + make_rand_string_by_length(16) },
             TaskGraphic: { ID: mymodules.generateUUID() },
             DNA: { FullPath: String.raw`C:\Users\Z70\Desktop\Thai Green Curry _ RecipeTin Eats.pdf` }
         }
@@ -1142,7 +1141,7 @@ async function config_shortcuttofile_function(shortcuttofile_input) {
     // 1a. config for ExternalFile.Element
     config_shortcuttofile.ExternalFile.Element = {}
     config_shortcuttofile.ExternalFile.Element.Label = shortcuttofile_input.Element.Label
-    config_shortcuttofile.ExternalFile.Element.ID = shortcuttofile_input.Element.ID
+    config_shortcuttofile.ExternalFile.Element.ID = shortcuttofile_input.ExternalFile.ID
     config_shortcuttofile.ExternalFile.Element.CreatedOn = shortcuttofile_input.config_pfd.Element.CreatedOn
     config_shortcuttofile.ExternalFile.Element.ModifiedOn = shortcuttofile_input.config_pfd.Element.ModifiedOn
     config_shortcuttofile.ExternalFile.Element.ModifiedBy = shortcuttofile_input.config_pfd.Element.ModifiedBy
@@ -1150,7 +1149,7 @@ async function config_shortcuttofile_function(shortcuttofile_input) {
     // 1b. config for ExternalFile.ExternalFile
     config_shortcuttofile.ExternalFile.ExternalFile = {}
     config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList = {}
-    config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID = shortcuttofile_input.ExternalFile.ShortCutList.ShortCutID
+    config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID = shortcuttofile_input.Element.ID
     config_shortcuttofile.ExternalFile.ExternalFile.FileTypeType = shortcuttofile_input.ExternalFile.FileTypeType // the tag name has two Type which is obviously a mistake when developping the xml structure
 
     // 1b1. config for DNA
@@ -1177,7 +1176,7 @@ async function config_shortcuttofile_function(shortcuttofile_input) {
     config_shortcuttofile.Element.Element = {}
     // 2a. config for ProjectCollection.Elements.Element(for this shortcuttofileToFile).Element
     config_shortcuttofile.Element.Element.Label = shortcuttofile_input.Element.Label
-    config_shortcuttofile.Element.Element.ID = config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID // already created in step 1
+    config_shortcuttofile.Element.Element.ID = shortcuttofile_input.Element.ID 
     config_shortcuttofile.Element.Element.Container = shortcuttofile_input.config_pfd.Element.ID
     config_shortcuttofile.Element.Element.CreatedOn = shortcuttofile_input.config_pfd.Element.CreatedOn
     config_shortcuttofile.Element.Element.ModifiedOn = shortcuttofile_input.config_pfd.Element.ModifiedOn
