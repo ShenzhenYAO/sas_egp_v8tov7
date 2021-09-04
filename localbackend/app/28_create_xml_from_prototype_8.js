@@ -23,17 +23,18 @@ const AdmZip = require('adm-zip');
 const { config } = require('process');
 // const { Console } = require('console');
 
+const targetzip_v7 = new AdmZip();
+
 const thev8EGP = "data/in/sample_a_v8.egp";
 // const thev8EGP = "data/in/do_not_git/v8 and v7 samples/sample3_v8.egp";
-const targetzip_v7 = new AdmZip();
 // make a zip instance of the thesrc v8 egp file
 const thesrczip_v8 = new AdmZip(thev8EGP);
 
 (async () => {
-    // convert a v8 egp to v7
+    // option 1: convert a v8 egp to v7
     await convert_egp_v8_to_v7();
-
-    // manually make a v7 egp
+    
+    // or option2: manually make a v7 egp
     // await make_v7_egp_manually()
 })()
 
@@ -501,6 +502,7 @@ async function convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7) {
 
 // convert a v8 egp file to v7
 async function convert_egp_v8_to_v7() {
+
     // 1. get xml script and v8_doms_obj from a src egp
     let { doms_obj_v8, theoriginsrcxmlstr_v8 } = await get_xml_from_v8_egp(thesrczip_v8)
     // console.log('line33', thesrcxmlstr_v8.substr(0, 100), v8_doms_obj.prop('outerHTML'))
