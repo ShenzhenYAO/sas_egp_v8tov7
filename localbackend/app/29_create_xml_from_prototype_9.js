@@ -36,7 +36,7 @@ const thesrczip_v8 = new AdmZip(thev8EGP);
     // await convert_egp_v8_to_v7();
 
     // or option2: manually make a v7 egp
-    await make_v7_egp_manually()
+    await make_v7_egp_manually();
 })()
 
 /**common tools*************************************** */
@@ -81,18 +81,16 @@ async function readtxt(thetextfile, encode) {
 /***functions to convert egp v8 to v7 ******************************************** */
 // get xml script and v8_doms_obj from a src egp
 async function get_xml_from_v8_egp(thesrczip_v8) {
-
     //*** read the v8 egp data */
     // based on 01 extract_projectxml_from_egp.js, and 12_convert_xml_v8_to_v7.js
-
-    // 2. read the script of project.xml from thesrczip
+    // 1. read the script of project.xml from thesrczip
     let thesrcxmlfile_v8 = 'project.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr_v8 = await thesrczip_v8.readAsText(thesrcxmlfile_v8, encoding); // 'utf-16' type is called 'utf16le'
-    // 3. remove the head line '<encoding="utf-16"?>', and clean the srcxml ()
+    // 2. remove the head line '<encoding="utf-16"?>', and clean the srcxml ()
     let thebodyxmlstr_v8 = thesrcxmlstr_v8.split('encoding="utf-16"?>')[1]
     let thesrcxmlstr_v8_cleaned = cleanxmlstr(thebodyxmlstr_v8)
-    // 4. make a doms_obj for the cleaned src xml
+    // 3. make a doms_obj for the cleaned src xml
     let v8_doms_obj = $(thesrcxmlstr_v8_cleaned)
     // console.log('line47', v8_doms_obj)
     return { 'doms_obj_v8': v8_doms_obj, 'theoriginsrcxmlstr_v8': thesrcxmlstr_v8 }
@@ -126,7 +124,7 @@ function get_filename(filename_with_path) {
     let name = filename_with_ext.substring(0, startpos_dot)
     let ext = filename_with_ext.substr(startpos_dot + 1)
     return { path: path, name: name, ext: ext }
-}
+}; // function get_filename(filename_with_path)
 // get settings from the Project from the v8 doms_obj
 async function get_element_doms_obj_by_type(doms_obj, type_attr) {
     // a1. identify the PFD elements in ProjectCollection.Elements
@@ -156,7 +154,7 @@ function get_task_or_note_graphic_dom_by_id_v8(doms_obj, elementid, task_or_note
 
 // converting PFDs from v8 egp to v7
 async function convert_pfd_v8_to_v7(doms_obj_v8, config_project_v8, doms_obj_v7) {
-    // 3a. get settings from the Project from the v8 doms_obj
+    // 1. get settings from the Project from the v8 doms_obj
     let type_attr_pfd = 'SAS.EG.ProjectElements.ProcessFlowContainer'
     let pfd_elements_doms_obj_v8 = await get_element_doms_obj_by_type(doms_obj_v8, type_attr_pfd)
     let pfd_input_arr = []
@@ -166,7 +164,7 @@ async function convert_pfd_v8_to_v7(doms_obj_v8, config_project_v8, doms_obj_v7)
         let id = $($(d).find("Element").find("ID")[0]).text()
         pfd_input_arr.push({ Label: label, ID: id })
     })
-    // 3b. get configuration of a pfd element
+    // 2. get configuration of a pfd element
     let pfd_input = [], config_pfd = []
     for (let i = 0; i < pfd_input_arr.length; i++) {
         // config the pfd element
@@ -187,9 +185,9 @@ async function add_egtreenode_program_v8_to_v7(doms_obj_v7, config_pfd) {
     let config_programs = []
     for (let i = 0; i < config_pfd.length; i++) {
         // The EGTreeNode is to be added to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
-        // 4a. Configuration of the EGTreeNode    
+        // 1. Configuration of the EGTreeNode    
         config_programs[i] = await config_programs_function(config_pfd[i])
-        // 4b. make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
+        // 2. make and append the EGTreeNode that is to be appended to ProjectCollection.External_Objects.ProjectTreeView.EGTreeNode(of a specific PFD)
         doms_obj = await make_append_egtreenode_programs(doms_obj_v7, config_programs[i], config_pfd[i])
     } // for(let i=0;i<pfd_input_arr.length;i++)
 
@@ -198,22 +196,23 @@ async function add_egtreenode_program_v8_to_v7(doms_obj_v7, config_pfd) {
 
 // converting CodeTask components and files from v8 to v7
 async function convert_task_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
-    // from doms_obj_v8, find Elements.Element components with Type="SAS.EG.ProjectElements.CodeTask"
+    //1. from doms_obj_v8, find Elements.Element components with Type="SAS.EG.ProjectElements.CodeTask"
     let type_attr_task = 'SAS.EG.ProjectElements.CodeTask'
     let task_elements_doms_obj_v8 = await get_element_doms_obj_by_type(doms_obj_v8, type_attr_task)
     let task_input_arr = []
     // console.log('line134', task_elements_doms_obj_v8)
 
-    // loop for each task_element found from the v8 egp
+    //2. loop for each task_element found from the v8 egp
     for (let i = 0; i < task_elements_doms_obj_v8.length; i++) {
         let d = task_elements_doms_obj_v8[i]
         // get the Label and ID from each pfd Element.Element
         let task_config = {}, task_config_element = {}, config_parent_pfd, code, Embedded, DNA = {}, TaskGraphic = {}
-        // get the task Element's Element.Label and .ID
+        
+        //1.  get the task Element's Element.Label and .ID
         task_config_element.Label = $($(d).find("Element").find("Label")[0]).text()
         task_config_element.ID = $($(d).find("Element").find("ID")[0]).text()
 
-        // get the parent PFD of the task element
+        //2. get the parent PFD of the task element
         let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
         // according to the parent pfd id, find the configuration of that pfd
         config_pfd.forEach(d => {
@@ -265,10 +264,10 @@ async function convert_task_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
     // loop for each item in task_input_arr and make task elements into the target egp's xml
     let config_task = []
     for (let i = 0; i < task_input_arr.length; i++) {
-        // 5.1 configuration for the task_component (indicate the parent PFD, and the task in task_input_arr)
+        // 1 configuration for the task_component (indicate the parent PFD, and the task in task_input_arr)
         config_task[i] = await config_task_function(task_input_arr[i].config_pfd, task_input_arr[i])
         // console.log('line44', config_task)
-        // 5.2 add task components
+        // 2 add task components
         doms_obj_v7 = await make_append_task_component(doms_obj_v7, config_task[i])
     } // for(let i=0;i<task_input_arr.length;i++)
 
@@ -563,7 +562,7 @@ async function convert_egp_v8_to_v7() {
     let { doms_obj_v8, theoriginsrcxmlstr_v8 } = await get_xml_from_v8_egp(thesrczip_v8)
     // console.log('line33', thesrcxmlstr_v8.substr(0, 100), v8_doms_obj.prop('outerHTML'))
 
-    // // save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
+    // //2a. save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
     let thetargetv8xmlfile = 'data/out/do_not_git/projectxml_src_egpv8.xml'
     // await mymodules.saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
     await saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
@@ -572,58 +571,63 @@ async function convert_egp_v8_to_v7() {
     let config_project_v8 = await get_project_config_from_src_v8_egp(doms_obj_v8)
     // // change the project label to '__testv7' (this is for testing only)
     // config_project_v8.Element.Label = '__testv7'
-    // initiate a v7 doms obj, and apply project configuations from the source v8 file
+
+    // 3 initiate a v7 doms obj, and apply project configuations from the source v8 file
     let { doms_obj_v7, thesrcxmlstr_v7 } = await init_v7_doms_obj(config_project_v8)
     // console.log ('line76', doms_obj_v7.find('Element').prop('outerHTML') )
 
-    // 3 converting PFDs from v8 egp to v7
+    // 4. converting components from v8 to v7
+    // 4a converting PFDs from v8 egp to v7
     let { config_pfd, result_doms_obj_add_PFD } = await convert_pfd_v8_to_v7(doms_obj_v8, config_project_v8, doms_obj_v7)
     doms_obj_v7 = result_doms_obj_add_PFD
 
-    // 4. add EGTreeNode for wrapping all programs/tasks for ProjectTreeView. (it is named add_ as there is no egtrenode in v8)
+    // 4b. add EGTreeNode for wrapping all programs/tasks for ProjectTreeView. (it is named add_ as there is no egtrenode in v8)
     let { config_programs, result_doms_obj_add_EGTreeNode_program } = await add_egtreenode_program_v8_to_v7(doms_obj_v7, config_pfd)
     doms_obj_v7 = result_doms_obj_add_EGTreeNode_program
 
-    // 5. converting CodeTask components and files from v8 to v7
+    // 4c. converting CodeTask components and files from v8 to v7
     let { config_task, result_doms_obj_add_task } = await convert_task_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7)
     doms_obj_v7 = result_doms_obj_add_task
 
-    // 6 shortcuts to external files
+    // 4d. shortcuts to external files
     let { config_shortcuttofile, result_doms_obj_add_shortcuttofile } = await convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7)
     doms_obj_v7 = result_doms_obj_add_shortcuttofile
 
-    // 7 converting note components and files from v8 to v7
+    // 4e. converting note components and files from v8 to v7
     let { config_note, result_doms_obj_add_note } = await convert_note_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7)
     doms_obj_v7 = result_doms_obj_add_note
 
-    // 8 // converting CodeTask components and files from v8 to v7
+    // 4f. // converting EGTasks components and files from v8 to v7
     let { config_egtask, result_doms_obj_add_egtask } = await convert_egtask_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7)
     doms_obj_v7 = result_doms_obj_add_egtask
 
-    // 9 links between componets (e.g., betwen CodeTasks, or a Codetask and a note)
+    // 4g. links between componets (e.g., betwen CodeTasks, or a Codetask and a note)
     let { config_link, result_doms_obj_add_link } = await convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7)
     doms_obj_v7 = result_doms_obj_add_link
 
+    // 5. write the v7 egp
     write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project_v8)
 }; //async function convert_v8_to_v7
 
 // cleanup the target xlm and write to the target v7 egp
 async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
 
+    // 1. clean up the target xml
     let targetxmlstr_cleaned = await cleanup_targetxml(doms_obj_v7, thesrcxmlstr_v7)
-    // remove lines only containing spaces and line breakers
+    // 2. remove lines only containing spaces and line breakers
     let targetxmlstr = remove_spaces_linebreakers(targetxmlstr_cleaned)
     // console.log(targetxmlstr)
+    // 3. save converted v7 project xml
     targetxmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + targetxmlstr
     let thetargetxmlfile = 'data/out/do_not_git/projectxml_converted_egpv7.xml'
     // await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
     await saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
-    // using Buffer to import the xml with utf16 encoding
+    //4.add converted project.xml to target v7 egp.  using Buffer to import the xml with utf16 encoding
     targetzip_v7.addFile('project.xml', Buffer.from(targetxmlstr, "utf16le"))
-    // writeZip the targetzip_v7 instead of the original (theZip)
+    //4a. determine the name of the target egp.
     let target_filename = get_filename(thev8EGP).name
-    // await targetzip_v7.writeZip("data/out/do_not_git/" + config_project.Element.Label + "_tov7.egp")
+    //4b. save the target egp. await targetzip_v7.writeZip("data/out/do_not_git/" + config_project.Element.Label + "_tov7.egp")
     await targetzip_v7.writeZip("data/out/do_not_git/" + target_filename + "_tov7.egp")
 
 };//async function write_to_v7_egp
@@ -1006,7 +1010,7 @@ async function make_egtask_process_component(config_egtask) {
     // could config more... 
 
     return component_dom_obj
-};//async function make_task_process_component 
+};//async function make_egtask_process_component 
 
 // convert str like ' <tag> & ' to '
 // Note: the str must be in raw form (wrapped by String.raw``)
@@ -1546,17 +1550,17 @@ async function make_append_task_element_component(doms_obj, config_task) {
 
 // make task_dna (to indicate the location of the shortcut to an external SAS program )
 async function make_dna_component(config) {
-    // load the prototype xml for the target component
+    //1. load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z03_dna_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line104', thesrcxmlstr)
 
-    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    //2. cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
     let component_dom_obj = $(thesrcxmlstr_cleaned)
 
-    // set the DNA contents (for task shortcut to external .sas files)
+    //3. set the DNA contents (for task shortcut to external .sas files)
     if (config.DNA) {// else if config.DNA is defined, set the .name and .fullpath. These are manually configured tasks (shortcuts to external .sas file)
         if (config.DNA.Name) { $(component_dom_obj.find('Name')[0]).text(config.DNA.Name) }
         if (config.DNA.FullPath) { $(component_dom_obj.find('FullPath')[0]).text(config.DNA.FullPath) }
@@ -1664,16 +1668,17 @@ async function make_append_task_taskgraphic_component(doms_obj, config_task) {
 
 //make task_taskgraphic
 async function make_taskgraphic_component(config) {
-    // load the prototype xml for the target component
+    //1. load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___z04_taskgraphic_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line57', thesrcxmlstr)
 
-    // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
+    //2. cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
     let component_dom_obj = $(thesrcxmlstr_cleaned)
 
+    //3. config
     if (config.ID) { $(component_dom_obj.find('ID')[0]).text(config.ID) }
     if (config.Label) { $(component_dom_obj.find('Label')[0]).text(config.Label) }
     if (config.Element) { $(component_dom_obj.find('Element')[0]).text(config.Element) }
@@ -1684,14 +1689,14 @@ async function make_taskgraphic_component(config) {
 
     return component_dom_obj
 
-};//async function make_task_process_component
+};//async function make_taskgraphic_component
 
 // within ProjectColletion.External_Objects.ProjectTreeView.EGTreeNode(for PFD1).EGTreeNode(for wrapping all programs/tasks), add a EGTreeNode component
 async function make_append_task_egtreenode_component(doms_obj, config_task) {
-    // 1a. make task_egtreenode_component
+    // 1. make task_egtreenode_component
     let task_egtreenode_dom_obj = await make_egtreenode(config_task.EGTreeNode)
     // console.log('line69', task_egtreenode_dom_obj.prop('outerHTML'))
-    // 1b. append task_egtreenode_component
+    // 2. append task_egtreenode_component
     // find the parent PFD's EGTreeNode under Elements ProjectColletion.External_Objects.ProjectTreeView
     let egtreenode_pfd_dom_obj = get_egtreenode_of_pfd_by_pfdid(doms_obj, config_task.Element.Container)
     // find the EGTreeNode for Programs within the parent PFD's EGTreeNode
@@ -1723,11 +1728,11 @@ function get_egtreenode_of_program_in_a_egtreenode_of_pfd(egtreenode_pfd_dom_obj
 //within a PFD component's PFD tag (ProjectCollection.Elements.Element(PFD).PFD), add a process component with the taskID
 async function make_append_task_process_component(doms_obj, config_task) {
     // console.log('line150', doms_obj)
-    // 1a. make task_process            
+    // 1. make task_process            
     let task_process_doms_obj = await make_task_process_component(config_task)
     // console.log('line54', task_process_doms_obj.prop('outerHTML'))
 
-    // 1b. append task_process to the corresponding PFD
+    // 2. append task_process to the corresponding PFD
     // find all PFD Elements under Elements
     let element_pfd_dom_obj = get_element_of_pfd_by_pfdid(doms_obj, config_task.Element.Container)
     $(element_pfd_dom_obj.find('PFD')[0]).append(task_process_doms_obj)
@@ -1987,28 +1992,26 @@ async function config_pfd_function(config_project, pfd_input) {
 async function make_append_pfd_component(doms_obj, config_pfd) {
     // console.log('line461', config_pfd.Element)
 
-    // make the PFD component to append to ProjectCollection.Elements
-    let component_pfd_dom_obj = await make_pfd_component(config_pfd.Element)
+    //1. make the PFD component to append to ProjectCollection.Elements
+    let component_pfd_dom_obj = await make_pfd_element_component(config_pfd.Element)
     // console.log('line465', component_pfd_dom_obj.prop('outerHTML'))
     // append the PFD to ProjectCollection.Elements
     $(doms_obj.find('Elements')[0]).append(component_pfd_dom_obj)
 
-    // add the PFD's ID into ProjectCollection.Containers.ID
+    //2. add the PFD's ID into ProjectCollection.Containers.ID
     $(doms_obj.find('Containers')[0]).append('<ID>' + config_pfd.Element.ID + '</ID>')
     // console.log('line477', config_pfd)
     // Note: $(doms_obj.find('Containers').find('ID')[0]).text(config_pfd.Element.ID) is wrong, as it always write the PFD ID into the first ID tag
 
-    // make the egtreenode component to append to ProjectCollection.External_Objects.ProjectTreeView
+    //3. make the egtreenode component to append to ProjectCollection.External_Objects.ProjectTreeView
     let component_pfd_egtreenode_dom_obj = await make_egtreenode(config_pfd.EGTreeNode)
     // append the treenode to ProjectCollection.External_Objects.ProjectTreeView
     $(doms_obj.find('External_Objects').find('ProjectTreeView')[0]).append(component_pfd_egtreenode_dom_obj)
 
-    // make the properties component to append to ProjectCollection.External_Objects.ProcessFlowView.Containers 
+    //4. make the properties component to append to ProjectCollection.External_Objects.ProcessFlowView.Containers 
     let component_pfd_properties_dom_obj = await make_processflowview_properties(config_pfd.Properties)
-
     // append it to ProjectCollection.External_Objects.ProcessFlowView.Containers
     $(doms_obj.find('External_Objects').find('ProcessFlowView').find('Containers')[0]).append(component_pfd_properties_dom_obj)
-
 
     return doms_obj
 }; //function make_append_pfd_component
@@ -2052,7 +2055,7 @@ async function make_egtreenode(config) {
 }; // function make_egtreenode()
 
 // make a pfd component (to be appended to ProjectCollection.Elements)
-async function make_pfd_component(config) {
+async function make_pfd_element_component(config) {
     // console.log('line 527', config)
     // make the pfd element (properties of the pfd)
     let element_pfd_dom_obj = await define_element(config)
@@ -2077,7 +2080,7 @@ async function make_pfd_component(config) {
     component_pfd_dom_obj.append(pfd_pfd_dom_obj)
 
     return component_pfd_dom_obj
-}; // function make_pfd_component()
+}; // function make_pfd_element_component()
 /* define properties of a component.
     properties of a compenent are defined in the tag 'Element'. 
     The properties are standardized for most components
@@ -2140,19 +2143,20 @@ async function config_projectcollection() {
 async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     // 1. get the modified xmlstr
     let modified_xmlstr = doms_obj.prop('outerHTML')
-    // the program does not work well in identifying the tag names if there are two tags in a line
+
+    // 2. the program does not work well in identifying the tag names if there are two tags in a line
     // the following is to force line breaking between two tags. 
     // the forced line breakers are with special marks ('___123456___')
     // that way, after identifying the tag names, the target xml will be recovered to the original layout by removing these marked line breakers
     modified_xmlstr = modified_xmlstr.replace(/\>/g, '>\n___123456___\n')
 
-    // 2. make dictionaries to map out original tagnames and attributenames
-    // read all files in the prototype folder
+    // 3. get xml from all prototype files
+    // 3a read all files in the prototype folder
     // get all file names in 
     let thefolder_prototypexmls = 'data/in/prototype/__xml/egpv7'
     let filenames_prototypexmlfiles = await getfilenames_from_a_folder(thefolder_prototypexmls)
     // console.log('line274', filenames_prototypexmlfiles)
-    // loop for each file in the prototypexml file folder, concat the xml strings in the file
+    //3b. loop for each file in the prototypexml file folder, concat the xml strings in the file
     let str_all_prototype_xmlfiles = '<Table>\n</Table>\n<PFD>\n</PFD>\n'
     for (let i = 0; i < filenames_prototypexmlfiles.length; i++) {
         let d = filenames_prototypexmlfiles[i]
@@ -2171,7 +2175,7 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     } //filenames_prototypexmlfiles.forEach(d
     // console.log('line291', str_all_prototype_xmlfiles )
 
-    // 2. make a dictionary to map out the standardized and original tagnames
+    // 4a. make a dictionary to map out the standardized and original tagnames
     let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(str_all_prototype_xmlfiles)
     // console.log('line748',originalTagnames_dict_crude)
     // Note: there is a bug that the SAS EGP project.xml contains tags <Log> (in <Element Type="SAS.EG.ProjectElements.Link">)
@@ -2179,11 +2183,11 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     // the dictionary must have a unique map, i.e., the standard tag LOG must be mapped to one of the original
     // the work around is to change the <log> tag to <Log> (in data\in\prototype\__xml\egpv7\___e03_task_element_v7.xml)
 
-    // 3. make a dictionary to map out the standardized and original attribute names
+    // 4b. make a dictionary to map out the standardized and original attribute names
     let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(str_all_prototype_xmlfiles)
     // console.log(originalAttrNames_dict_crude)
 
-    // 4. replacce the standardized tagnames (all in uppercase) to original names
+    // 5a. replacce the standardized tagnames (all in uppercase) to original names
     Object.keys(originalTagnames_dict_crude).forEach(d => {
         let theoriginal = originalTagnames_dict_crude[d]
         let regEx_normalized1 = new RegExp('\<' + d.toLowerCase() + '\x20', 'g')
@@ -2194,7 +2198,7 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
         modified_xmlstr = modified_xmlstr.replace(regEx_normalized3, '</' + theoriginal + '>')
     })
 
-    // 5. replacce the standardized attribute names (all in lowercase) to original names
+    // 5b. replacce the standardized attribute names (all in lowercase) to original names
     Object.keys(originalAttrNames_dict_crude).forEach(d => {
         let theoriginal = originalAttrNames_dict_crude[d]
         let regEx_normalized1 = new RegExp(d.toLowerCase() + '=', 'g')
@@ -2363,6 +2367,7 @@ function getOriginalTagNames_dict_crude(thexhmlstr) {
     })
     return orignalTagnames_dict
 }; // function getOriginalTagNames(thexhmlstr)
+
 // get the tag and attribute names and save into an obj {tagnames[], attrnames[]}
 function getTagAttrNames(doms) {
     let tagNames_arr = [], attrNames_arr = []
@@ -2416,14 +2421,14 @@ function cleanxmlstr(thexmlstr) {
     let thexmlstr_remove_nonprintable = thexmlstr
 
     // the xmlstr is messed up with strange chars like &amp;lt; &lt;, etc
-    // 1. The following is to change &amp;lt to <, &gt to > ...
+    // The following is to change &amp;lt to <, &gt to > ...
     // let thesrcxmlstr_ampersand_code_normalized = normalize_ampersand_code(thexmlstr_remove_nonprintable)
     // Note: second thought! do not convert ampersand symbols. These ampersand symbols are necessary for SAS EGP to identify settings within an xml tag from xmltag
     // for example within <DNA>  </DNA>, the html '&lt;DNA...&gt;DNA' has special meanings for SAS EG to identify (in this case, to identify the setting for location of an external file)
     // If the ampersand code '&lt;' is converted, SAS EG will wrongly consider it as an xml tag, and ignore the settings.  
     let thesrcxmlstr_ampersand_code_normalized = thexmlstr_remove_nonprintable
 
-    // jsdom does not handle the tag <Table>A</Table> well
+    // 1. jsdom does not handle the tag <Table>A</Table> well
     // In that case, it alters the html to '<Table></Table>A' !
     // The following is to rename the tag <Table> to <Table123> to work around
     let thesrcxmlstr_rename_table_table123 = rename_tag_named_table(thesrcxmlstr_ampersand_code_normalized)
