@@ -31,12 +31,12 @@ const thev8EGP = "data/in/sample_a_v8.egp";
 const thesrczip_v8 = new AdmZip(thev8EGP);
 
 (async () => {
-    
+
     // option 1: convert a v8 egp to v7
-    // await convert_egp_v8_to_v7();
+    await convert_egp_v8_to_v7();
 
     // or option2: manually make a v7 egp
-    await make_v7_egp_manually();
+    // await make_v7_egp_manually();
 })()
 
 /**common tools*************************************** */
@@ -207,7 +207,7 @@ async function convert_task_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
         let d = task_elements_doms_obj_v8[i]
         // get the Label and ID from each pfd Element.Element
         let task_config = {}, task_config_element = {}, config_parent_pfd, code, Embedded, DNA = {}, TaskGraphic = {}
-        
+
         //1.  get the task Element's Element.Label and .ID
         task_config_element.Label = $($(d).find("Element").find("Label")[0]).text()
         task_config_element.ID = $($(d).find("Element").find("ID")[0]).text()
@@ -280,7 +280,7 @@ async function convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj
     let shortcuttofile_input_arr = []
     let config_shortcuttofile = []
 
-    // from doms_obj_v8, find Elements.Element components with Type="SAS.EG.ProjectElements.ShortCutToFile"
+    //1. from doms_obj_v8, find Elements.Element components with Type="SAS.EG.ProjectElements.ShortCutToFile"
     let type_attr_shortcuttofile = 'SAS.EG.ProjectElements.ShortCutToFile'
     let shortcuttofile_elements_doms_obj_v8 = await get_element_doms_obj_by_type(doms_obj_v8, type_attr_shortcuttofile)
     // console.log('251:', shortcuttofile_elements_doms_obj_v8)
@@ -291,21 +291,22 @@ async function convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj
         let d = shortcuttofile_elements_doms_obj_v8[i]
         // get the Label and ID from each pfd Element.Element
         let shortcuttofile_config = {}, config_parent_pfd, Element = {}, ExternalFile = {}, DNA = {}, TaskGraphic = {}
-        // get the shortcuttofile Element's Element.Label and .ID (these are the shortcutLabel shortcutID)
+        //1. get the shortcuttofile Element's Element.Label and .ID (these are the shortcutLabel shortcutID)
         Element.Label = $($(d).find("Element").find("Label")[0]).text()
         Element.ID = $($(d).find("Element").find("ID")[0]).text()
 
-        // get the parent PFD of the shortcuttofile element
+        //2. get the parent PFD of the shortcuttofile element
         let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
         // according to the parent pfd id, find the configuration of that pfd
         config_pfd.forEach(d => {
             if (d.Element.ID === the_parent_pfdid) { config_parent_pfd = d }
         }) // config_pfd.forEach(d=>{...}
 
-        // Identify the ExternalFile component of which the ShortCutID = shortcuttofile_config_element.ID
+        //3. Get configuration of .ExternalFile
+        //3a. Identify the ExternalFile component of which the ShortCutID = shortcuttofile_config_element.ID
         let ExternalFile_doms_obj = $(doms_obj_v8.find('ExternalFileList > ExternalFile')) // find ExternalFileList's direct children with tag of ExternalFile
         // console.log('274:', ExternalFile_doms)
-        // loop to identify the ExternalFile of which the .ExternalFile.ShortCutList.ShortCutID = shortcuttofile_config_element.ID
+        //loop to identify the ExternalFile of which the .ExternalFile.ShortCutList.ShortCutID = shortcuttofile_config_element.ID
         let the_externalfile_dom_obj
         for (j = 0; j < ExternalFile_doms_obj.length; j++) {
             let ShortCutID = $($(ExternalFile_doms_obj[i]).find('ExternalFile > ShortCutList > ShortCutID')[0]).text()
@@ -317,17 +318,18 @@ async function convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj
             }
         } // for (j=0;j<ExternalFile_doms_obj.length;j++)
         // get the externalfile settings
-        // ExternalFile's Label and ID. Note: 
+        //3b. ExternalFile's Label and ID. Note: 
         // It's .Element is for .ExternalFile, not for Elements.Element of the ShortCutToFile 
         ExternalFile.Label = $(the_externalfile_dom_obj.find('Element > Label')[0]).text()
         ExternalFile.ID = $(the_externalfile_dom_obj.find('Element > ID')[0]).text()
+        // 3c. FilyTypeType
         // console.log('290', Element)
         ExternalFile.FileTypeType = $(the_externalfile_dom_obj.find('ExternalFile > FileTypeType')[0]).text()
         // console.log('290', ExternalFile)
-
+        // 3d. get the DNA html (for location of the external file)
         DNA.html = $(the_externalfile_dom_obj.find('ExternalFile > DNA')[0]).html()
 
-        // get the TaskGraphic.PosX, PosY setting (these set the position of the shortcuttofile icon in the PFD view)
+        //4. get the TaskGraphic.ID, .PosX, and PosY setting (these set the position of the shortcuttofile icon in the PFD view)
         // use the shortcuttofile id (shortcuttofile_config_element.ID), find the correponding TaskGraphic in doms_obj_v8
         let the_taskgraphic_dom_obj = get_task_or_note_graphic_dom_by_id_v8(doms_obj_v8, Element.ID, 'TaskGraphic')
         // console.log('line182', the_taskgraphic_dom_obj.prop('outerHTML'))
@@ -335,6 +337,7 @@ async function convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj
         TaskGraphic.PosX = $(the_taskgraphic_dom_obj.find('PosX')[0]).text()
         TaskGraphic.PosY = $(the_taskgraphic_dom_obj.find('PosY')[0]).text()
 
+        //5. assemble all configurations and push to shortcuttofile_input_arr
         shortcuttofile_config = {
             Element: Element,
             config_pfd: config_parent_pfd,
@@ -347,7 +350,6 @@ async function convert_shortcuttofile_v8_to_v7(doms_obj_v8, config_pfd, doms_obj
     // console.log('316:', shortcuttofile_input_arr)
 
     // loop for each item in shortcuttofile_input_arr and make shortcuttofile elements into the target egp's xml
-
     for (let i = 0; i < shortcuttofile_input_arr.length; i++) {
         // 5.1 configuration for the shortcuttofile_component (indicate the parent PFD, and the shortcuttofile in shortcuttofile_input_arr)
         config_shortcuttofile[i] = await config_shortcuttofile_function(shortcuttofile_input_arr[i])
@@ -375,16 +377,16 @@ async function convert_note_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
         let note_config = {}, config_parent_pfd, Element = {}, TextElement = {}, Note = {}, NoteGraphic = {}
         let d = note_elements_doms_obj_v8[i]
 
-        //1. get the configuration of the parent PFD of the note element
-        let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
-        // according to the parent pfd id, find the configuration of that pfd
-        config_pfd.forEach(d => {
-            if (d.Element.ID === the_parent_pfdid) { config_parent_pfd = d }
-        }) // config_pfd.forEach(d=>{...}
-
-        //2.get the note Element's Element.Label and .ID
+        //1.get the note Element's Element.Label and .ID
         Element.Label = $($(d).find("Element").find("Label")[0]).text()
         Element.ID = $($(d).find("Element").find("ID")[0]).text()
+
+        //2. get the configuration of the parent PFD of the note element
+        let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
+        // according to the parent pfd id, find the configuration of that pfd
+        config_pfd.forEach(e => {
+            if (e.Element.ID === the_parent_pfdid) { config_parent_pfd = e }
+        }) // config_pfd.forEach(d=>{...}
 
         //3. Element (of the note).TextElement.Text
         TextElement.Text = $($(d).find("TextElement > Text")[0]).html()
@@ -440,17 +442,19 @@ async function convert_egtask_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
         let d = egtask_elements_doms_obj_v8[i]
         // get the Label and ID from each pfd Element.Element
         let egtask_config = {}, Element = {}, config_parent_pfd, TaskGraphic = {}
-        // get the egtask Element's Element.Label and .ID
+        
+        // 1. get the egtask Element's Element.Label and .ID
         Element.Label = $($(d).find("Element").find("Label")[0]).text()
         Element.ID = $($(d).find("Element").find("ID")[0]).text()
 
-        // get the parent PFD of the egtask element
+        // 2. get the parent PFD of the egtask element
         let the_parent_pfdid = $($(d).find("Element").find("Container")[0]).text()
         // according to the parent pfd id, find the configuration of that pfd
         config_pfd.forEach(d => {
             if (d.Element.ID === the_parent_pfdid) { config_parent_pfd = d }
         }) // config_pfd.forEach(d=>{...}
 
+        // 3. read and add EGTask xml file into the target v7 egp
         // When not manually configured (get config from a src v8 egp), the sas code of the original v8 egp is directly imported and saved as a code.sas in the target v7 egp
         // read code text from the srcv8zip
         let egtask_xmlfile = Element.ID + '/' + Element.ID + '.xml' // Note: use /, not \, not \\!
@@ -460,7 +464,7 @@ async function convert_egtask_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
         // addFile to zip can use \\ or / but not \
         targetzip_v7.addFile(egtask_xmlfile, Buffer.from(egtask_xmlstr, "utf-8"))
 
-        // get the TaskGraphic.PosX, PosY setting (these set the position of the egtask icon in the PFD view)
+        //4. get the TaskGraphic.PosX, PosY setting (these set the position of the egtask icon in the PFD view)
         // use the egtask id (Element.ID), find the correponding TaskGraphic in doms_obj_v8
         let the_egtaskgraphic_dom_obj = get_task_or_note_graphic_dom_by_id_v8(doms_obj_v8, Element.ID, 'TaskGraphic')
         // console.log('line182', the_egtaskgraphic_dom_obj.prop('outerHTML'))
@@ -500,18 +504,21 @@ async function convert_link_v8_to_v7(doms_obj_v8, doms_obj_v7) {
     // loop for each link_element found from the v8 egp
     for (let i = 0; i < link_elements_doms_obj_v8.length; i++) {
         let d = link_elements_doms_obj_v8[i]
-        // get the Label and ID from each pfd Element.Element
+        //1. get the Label and ID from each pfd Element.Element
         let Link = {}
         // get the link Element's Element.Label and .ID
         Link.Label = $($(d).find("Element").find("Label")[0]).text()
         Link.ID = $($(d).find("Element").find("ID")[0]).text()
-        let taskid_LinkFrom = $($(d).find("Log > LinkFrom")[0]).text()
+
+        // 2. get LinkFrom and LinkTo
+        let taskid_LinkFrom = $($(d).find("Log > LinkFrom")[0]).text() // although it is called taskid_, it can also be EGTask, ShortCutToFiles, etc.
         let taskid_LinkTo = $($(d).find("Log > LinkTo")[0]).text()
         Link.LinkFrom_config = {}
         Link.LinkFrom_config.Element = {}
         Link.LinkTo_config = {}
         Link.LinkTo_config.Element = {}
-        // from doms_obj_v7 get all Elements.Element.Element (which contains Label, ID, Container, etc)
+
+        //3. get the linked element's .Element settings (ID, Label, etc.) from doms_obj_v7 get all Elements.Element.Element (which contains Label, ID, Container, etc)
         let elements_doms_obj = $(doms_obj_v7.find('Elements > Element > Element'))
         // console.log('495', elements_doms_obj)
         for (let j = 1; j < elements_doms_obj.length; j++) {
@@ -1071,7 +1078,7 @@ async function make_notegraphic_component(config) {
     // could config more... 
 
     return component_dom_obj
-}//async function make_notegraphic_component(config_note.NoteGraphic)
+};//async function make_notegraphic_component(config_note.NoteGraphic)
 
 // configuration for shortcut to external file
 async function config_note_function(note_input) {
@@ -1274,7 +1281,6 @@ async function config_shortcuttofile_function(shortcuttofile_input) {
     config_shortcuttofile.TaskGraphic.ID = shortcuttofile_input.TaskGraphic.ID
     config_shortcuttofile.TaskGraphic.Label = config_shortcuttofile.Element.Element.Label
     config_shortcuttofile.TaskGraphic.Element = config_shortcuttofile.Element.Element.ID
-
     if (shortcuttofile_input.TaskGraphic.PosX) { config_shortcuttofile.TaskGraphic.PosX = shortcuttofile_input.TaskGraphic.PosX }
     if (shortcuttofile_input.TaskGraphic.PosY) { config_shortcuttofile.TaskGraphic.PosY = shortcuttofile_input.TaskGraphic.PosY }
 
@@ -1413,7 +1419,7 @@ async function make_shortcuttofile_externalfile_component(config_shortcuttofile)
     if (config_shortcuttofile.ExternalFile.Element.InputIDs) { $(externalfile_element_dom_obj.find('InputIDs')[0]).text(config_shortcuttofile.ExternalFile.Element.InputIDs) }
     // could config more... 
 
-    // config the ProjectCollection.Elements.Element(of the link).ExternalFile.ExternalFile
+    // config the ProjectCollection.ExternalFileList.ExternalFile.ExternalFile
     let externalfile_externalfile_dom_obj = $(component_dom_obj.find('ExternalFile')[0])
     if (config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID) { $(externalfile_externalfile_dom_obj.find('ShortCutList').find('ShortCutID')[0]).text(config_shortcuttofile.ExternalFile.ExternalFile.ShortCutList.ShortCutID) }
     if (config_shortcuttofile.ExternalFile.ExternalFile.FileTypeType) { $(externalfile_externalfile_dom_obj.find('FileTypeType')[0]).text(config_shortcuttofile.ExternalFile.ExternalFile.FileTypeType) }
@@ -1442,7 +1448,7 @@ async function make_shortcuttofile_externalfile_component(config_shortcuttofile)
 // make and append <Element Type="SAS.EG.ProjectElements.Link"> to ProjectCollection.Elements
 async function make_append_link_component(doms_obj, config_link) {
     // 1. make the link component
-    let link_element_doms_obj = await make_link_component(config_link)
+    let link_element_doms_obj = await make_link_element_component(config_link)
     // console.log('line98', link_element_doms_obj.prop('outerHTML'))            
 
     // 2. append the link component to ProjectCollection.Elements
@@ -1452,7 +1458,7 @@ async function make_append_link_component(doms_obj, config_link) {
 }; //async function make_append_link_component
 
 // make link component
-async function make_link_component(config_link) {
+async function make_link_element_component(config_link) {
     // load the prototype xml for the target component
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___f01_link_element_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
@@ -1484,7 +1490,7 @@ async function make_link_component(config_link) {
     // console.log('line129', component_dom_obj.prop('outerHTML'))
     return component_dom_obj
 
-}; //async function make_link_component
+}; //async function make_link_element_component
 
 // configuration of link
 async function config_link_function(link_input) {
@@ -2057,23 +2063,25 @@ async function make_egtreenode(config) {
 // make a pfd component (to be appended to ProjectCollection.Elements)
 async function make_pfd_element_component(config) {
     // console.log('line 527', config)
-    // make the pfd element (properties of the pfd)
+
+    // 1a. .element make the pfd element (properties of the pfd)
     let element_pfd_dom_obj = await define_element(config)
     // console.log('line530', element_pfd_dom_obj.prop('outerHTML'))
     // make the container element of the pfd, this part is fixed for any PFD obj
 
+    // 1b. .container
     let thesrcxmlfile = 'data/in/prototype/__xml/egpv7/___c01_pfd_containers_v7.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
     let thesrcxmlstr = await readtxt(thesrcxmlfile, encoding);
     // console.log('line171', thesrcxmlstr)
-
     // cleanup the xmlstr (removing strange chars, convert self-closing html, etc.) 
     let thesrcxmlstr_cleaned = cleanxmlstr(thesrcxmlstr)
-
     let container_pfd_dom_obj = $(thesrcxmlstr_cleaned)
-    // make the default PFD element (the empty PFD element)
+
+    // 1c. .PFD make the default PFD element (the empty PFD element)
     let pfd_pfd_dom_obj = $('<PFD></PFD>')
-    // assemble the PFD component to be added to ProjectCollection.Elements
+
+    // 2. assemble the PFD component to be added to ProjectCollection.Elements
     let component_pfd_dom_obj = $('<Element Type="SAS.EG.ProjectElements.PFD"></Element>')
     component_pfd_dom_obj.append(element_pfd_dom_obj)
     component_pfd_dom_obj.append(container_pfd_dom_obj)
