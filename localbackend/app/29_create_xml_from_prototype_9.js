@@ -21,14 +21,20 @@ var $ = require("jquery")(window);
 // https://www.npmjs.com/package/adm-zip
 const AdmZip = require('adm-zip');
 const { config } = require('process');
-// const { Console } = require('console');
 
-const targetzip_v7 = new AdmZip();
+// src and target file settings:
+// src path and egp file name:
+const srcEGPPath = 'data/in/';
+const srcEGPFile = 'sample_a_v8.egp';
+const thev8EGP = srcEGPPath + srcEGPFile;//"data/in/sample_a_v8.egp";
+// target path
+const targetEGPPath = 'data/out/do_not_git/';
+// targetFile name will be automatically named (srcFileName + '_tov7.egp')
 
-const thev8EGP = "data/in/sample_a_v8.egp";
 // const thev8EGP = "data/in/do_not_git/v8 and v7 samples/sample3_v8.egp";
 // make a zip instance of the thesrc v8 egp file
 const thesrczip_v8 = new AdmZip(thev8EGP);
+const targetzip_v7 = new AdmZip();
 
 (async () => {
 
@@ -442,7 +448,7 @@ async function convert_egtask_v8_to_v7(doms_obj_v8, config_pfd, doms_obj_v7) {
         let d = egtask_elements_doms_obj_v8[i]
         // get the Label and ID from each pfd Element.Element
         let egtask_config = {}, Element = {}, config_parent_pfd, TaskGraphic = {}
-        
+
         // 1. get the egtask Element's Element.Label and .ID
         Element.Label = $($(d).find("Element").find("Label")[0]).text()
         Element.ID = $($(d).find("Element").find("ID")[0]).text()
@@ -570,7 +576,7 @@ async function convert_egp_v8_to_v7() {
     // console.log('line33', thesrcxmlstr_v8.substr(0, 100), v8_doms_obj.prop('outerHTML'))
 
     // //2a. save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
-    let thetargetv8xmlfile = 'data/out/do_not_git/projectxml_src_egpv8.xml'
+    let thetargetv8xmlfile = targetEGPPath + 'projectxml_src_egpv8.xml'
     // await mymodules.saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
     await saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
 
@@ -626,7 +632,7 @@ async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
     // console.log(targetxmlstr)
     // 3. save converted v7 project xml
     targetxmlstr = '<?xml version="1.0" encoding="utf-16"?>\n' + targetxmlstr
-    let thetargetxmlfile = 'data/out/do_not_git/projectxml_converted_egpv7.xml'
+    let thetargetxmlfile = targetEGPPath + 'projectxml_converted_egpv7.xml'
     // await mymodules.saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
     await saveLocalTxtFile(targetxmlstr, thetargetxmlfile, 'utf16le');
 
@@ -635,7 +641,7 @@ async function write_to_v7_egp(doms_obj_v7, thesrcxmlstr_v7, config_project) {
     //4a. determine the name of the target egp.
     let target_filename = get_filename(thev8EGP).name
     //4b. save the target egp. await targetzip_v7.writeZip("data/out/do_not_git/" + config_project.Element.Label + "_tov7.egp")
-    await targetzip_v7.writeZip("data/out/do_not_git/" + target_filename + "_tov7.egp")
+    await targetzip_v7.writeZip(targetEGPPath + target_filename + "_tov7.egp")
 
 };//async function write_to_v7_egp
 /***functions to convert egp v8 to v7 ******************************************** */
