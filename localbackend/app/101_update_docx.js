@@ -36,7 +36,7 @@ const targetzip = new AdmZip();
 
 
 
-/*** functions to make and write a docx*/ 
+/*** functions to make and write a docx*/
 // convert a update a docx file
 async function make_docx() {
 
@@ -46,53 +46,189 @@ async function make_docx() {
 
     // //2a. save the theoriginsrcxmlstr_src as a local file (for viewing the contents during coding)
     let xmlfile_src = targetFilePath + '__src_document.xml'
-    let beautfied_theoriginsrcxmlstr_src = beautify(theoriginsrcxmlstr_src, {format: 'xml'})
+    let beautfied_theoriginsrcxmlstr_src = beautify(theoriginsrcxmlstr_src, { format: 'xml' })
     // await mymodules.saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
     await saveLocalTxtFile(beautfied_theoriginsrcxmlstr_src, xmlfile_src, 'utf-8');
 
     // identify the body jq_src, for tagnames with ':', need to add escape symbol (\\, must be \\, not \) and make it as \\:
-    let body_jq_src =  $(jq_src.find('w\\:body')[0])
+    let body_jq_src = $(jq_src.find('w\\:body')[0])
 
-    /** identify the title, which is:
-     a w:p tag within body_jq_src, with a descending node 'w:pPr' > 'w:pStyle', of which the attr 'w:val' is 'Title
+    /**
+     The template research doc contains 
+     a title, 
+     a table for creator name and lastmodified date, 
+     a paragraph for notes,
+     and a table for steps 
     */
-   let paragraphs_jq_src = $(body_jq_src.find('w\\:p'))
-   let title_paragraph_jq
-   for (let i=0; i<paragraphs_jq_src.length; i++){ //
-        let this_jq = $(paragraphs_jq_src[i])
-        // if this_jq is  with a descending node 'w:pPr' > 'w:pStyle', of which the attr 'w:val' is 'Title'
-        let style_jq = $(this_jq.find('w\\:pPr > w\\:pStyle')[0])
-        // console.log('64:', style_jq.attr('w:val'))
-        let style_str;
-        if (style_jq) {style_str = style_jq.attr('w:val')}
-        if (style_str === 'Title'){
-            title_paragraph_jq = this_jq
-            break
+    body_jq_src.empty()
+
+    // add a title
+    let title_p_jq = addParagraph(body_jq_src, 'Title')
+    function addParagraph(parent_jq, pStyle) {
+        // 1. add a paragraph ('w:p')
+        let p_jq = addTag(parent_jq, 'w:p')
+        // 2. set property - style of the paragraph as 'Title'
+        // 2a. add a property selector ('w:pPr'), then a style selector ('w:pStyle')
+        let pPr_p_jq = addTag(p_jq, 'w:pPr')
+        if (pStyle) {
+            let pStyle_pPr_p_jq = addTag(pPr_p_jq, 'w:pStyle')
+            pStyle_pPr_p_jq.attr('w:val', pStyle)
         }
-   } // for (let i=0; i<paragraphs_jq.length; i++)
+        return p_jq
+    } // function addParagrah (parent)
 
-   //within title_paragraph_jq, find a 'w:r' select with text() = 'Project Title'
-   let text_jqs_src = $(title_paragraph_jq.find('w\\:r > w\\:t'))
-   for (let i=0; i < text_jqs_src.length; i++){ //
-        let this_jq = $(text_jqs_src[i])
-        // console.log('78', this_jq.text() )
-        if (this_jq.text() === 'Project Title'){this_jq.text('Project Tit___')}
-   } // for (let i=0; i<paragraphs_jq_src.length; i++)
+    // 3. add a row selector ('w:r') then a text selector ('w:t')
+    let text_row_title_p_jq = addTextLine(title_p_jq, 'This is a new title!')
+    function addTextLine(parent_jq, text) {
+        let row_p_jq = addTag(parent_jq, 'w:r')
+        let text_row_p_jq = addTag(row_p_jq, 'w:t')
+        text_row_p_jq.text(text)
+        return text_row_p_jq
+    } // function addTextLine(parent_jq, text)
 
-    let thesrcxmlstr_cleaned2=theoriginsrcxmlstr_src.split('?>')[1]
-    thesrcxmlstr_cleaned2=thesrcxmlstr_cleaned2.replace(/\>/g, '>\n')
-    thesrcxmlstr_cleaned2=cleanxmlstr(thesrcxmlstr_cleaned2)
-    // console.log('84', thesrcxmlstr_cleaned2)
-    // thesrcxmlstr_cleaned2 = beautify(thesrcxmlstr_cleaned2, {format: 'xml'})
-    let xmlfile_target2 = targetFilePath + '__srcdoc2.xml'
-    await saveLocalTxtFile(thesrcxmlstr_cleaned2, xmlfile_target2, 'utf-8');
 
+
+    // add a table
+    // 1. add a table ('w:tbl')
+    let tbl_jq = addTag(body_jq_src, 'w:tbl')
+
+    // set default table style
+    tbl_jq.append(`<w:tblPr>
+    <w:tblStyle w:val="TableGrid" />
+    <w:tblW w:w="0" w:type="auto" />
+    <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1"
+    w:lastColumn="0" w:noHBand="0" w:noVBand="1" /></w:tblPr>`)
+
+    // 2. set 2 columns with width
+    // 2a. add a 'w:tblGrid'
+    let grid_tbl_jq = addTag(tbl_jq, 'w:tblGrid')
+    // 2b. add 'w:gridCol' with attr "w:w"
+    let col1_grid_tbl_jq = addTag(grid_tbl_jq, 'w:gridCol')
+    col1_grid_tbl_jq.attr('w:w', '2093')
+    let col2_grid_tbl_jq = addTag(grid_tbl_jq, 'w:gridCol')
+    col2_grid_tbl_jq.attr('w:w', '11083')
+    // 3. add a table row (row1)
+    let r1_tbl_jq = addTag(tbl_jq, 'w:tr')
+    // 4. add table cell one
+    let c1_r1_tbl_jq = addTag(r1_tbl_jq, 'w:tc')
+    let c1_r1_width = "2093"
+    // add cell property
+    c1_r1_tbl_jq.append(`<w:tcPr>
+    <w:tcW w:w=${c1_r1_width} w:type="dxa" /></w:tcPr>`)
+    // 4a. in cell 1, add a paragraph
+    let c1_r1_p_jq = addParagraph(c1_r1_tbl_jq, 'Normal')
+    let text_c1_r1_p_jq = addTextLine(c1_r1_p_jq, 'Created By')
+    //cell2
+    let c2_r1_tbl_jq = addTag(r1_tbl_jq, 'w:tc')
+    let c2_r1_width = "11083"
+    // add cell property
+    c2_r1_tbl_jq.append(`<w:tcPr>
+    <w:tcW w:w=${c2_r1_width} w:type="dxa" /></w:tcPr>`)
+    // 4b. in cell 2, add a paragraph
+    let c2_r1_p_jq = addParagraph(c2_r1_tbl_jq, 'Normal')
+    let text_c2_r1_p_jq = addTextLine(c2_r1_p_jq, 'Shenzhen Yao')
+
+    // 5. add a table row (row1)
+    let r2_tbl_jq = addTag(tbl_jq, 'w:tr')
+    // 4. add table cell one
+    let c1_r2_tbl_jq = addTag(r2_tbl_jq, 'w:tc')
+    let c1_r2_width = "2093"
+    // add cell property
+    c1_r2_tbl_jq.append(`<w:tcPr>
+    <w:tcW w:w=${c1_r2_width} w:type="dxa" /></w:tcPr>`)
+    // 4a. in cell 1, add a paragraph
+    let c1_r2_p_jq = addParagraph(c1_r2_tbl_jq, 'Normal')
+    let text_c1_r2_p_jq = addTextLine(c1_r2_p_jq, 'Last modeified on')
+    //cell2
+    let c2_r2_tbl_jq = addTag(r2_tbl_jq, 'w:tc')
+    let c2_r2_width = "11083"
+    // add cell property
+    c2_r2_tbl_jq.append(`<w:tcPr>
+    <w:tcW w:w=${c2_r2_width} w:type="dxa" /></w:tcPr>`)
+    // 4b. in cell 2, add a paragraph
+    let c2_r2_p_jq = addParagraph(c2_r2_tbl_jq, 'Normal')
+    let text_c2_r2_p_jq = addTextLine(c2_r2_p_jq, '2021-09-10')
+
+
+
+    // add a tag to a parent jquery obj by tagName, and return the added tag as a jquery obj (_jq)
+    function addTag(parent_jq, tagName) {
+        let taghead = '<' + tagName + '>', tagend = '</' + tagName + '>'
+        let theTag = taghead + tagend
+        let tagName_to_find = tagName
+        if (tagName.includes(':')) {
+            segs_arr = tagName.split(':')
+            tagName_to_find = segs_arr.join('\\:')
+        }
+        // console.log(tagName_to_find)
+        let _jq = $(parent_jq.append(theTag).find(tagName_to_find).last())
+        return _jq
+    }; // function addTag(parent_jq, tagName){
+
+
+
+    // set sector properties
+    body_jq_src.append(`<w:sectPr w:rsidR="00206C6A" w:rsidSect="005E006C">
+    <w:pgSz w:w="15840" w:h="12240" w:orient="landscape" />
+    <w:pgMar w:top="1800" w:right="1440" w:bottom="1800" w:left="1440" w:header="708"
+    w:footer="708" w:gutter="0" />
+    <w:cols w:space="708" />
+    <w:docGrid w:linePitch="360" /></w:sectPr>`)
+
+    async function skip() {
+        /** identify the title, which is:
+         a w:p tag within body_jq_src, with a descending node 'w:pPr' > 'w:pStyle', of which the attr 'w:val' is 'Title
+        */
+        let paragraphs_jq_src = $(body_jq_src.find('w\\:p'))
+        let title_paragraph_jq
+        for (let i = 0; i < paragraphs_jq_src.length; i++) { //
+            let this_jq = $(paragraphs_jq_src[i])
+            // if this_jq is  with a descending node 'w:pPr' > 'w:pStyle', of which the attr 'w:val' is 'Title'
+            let style_jq = $(this_jq.find('w\\:pPr > w\\:pStyle')[0])
+            // console.log('64:', style_jq.attr('w:val'))
+            let style_str;
+            if (style_jq) { style_str = style_jq.attr('w:val') }
+            if (style_str === 'Title') {
+                title_paragraph_jq = this_jq
+                break
+            }
+        } // for (let i=0; i<paragraphs_jq.length; i++)
+
+        //within title_paragraph_jq, find a 'w:r' select with text() = 'Project Title'
+        let text_jqs_src = $(title_paragraph_jq.find('w\\:r > w\\:t'))
+        for (let i = 0; i < text_jqs_src.length; i++) { //
+            let this_jq = $(text_jqs_src[i])
+            // console.log('78', this_jq.text() )
+            if (this_jq.text() === 'Project Title') { this_jq.text('Project Tit___') }
+        } // for (let i=0; i<paragraphs_jq_src.length; i++)
+
+    }//async function skip(){
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // the src xml need to be cleaned as well before making the original tagname dict in cleanup_targetxml
+    let thesrcxmlstr_cleaned2 = theoriginsrcxmlstr_src.split('?>')[1]
+    thesrcxmlstr_cleaned2 = thesrcxmlstr_cleaned2.replace(/\>/g, '>\n')
+    thesrcxmlstr_cleaned2 = cleanxmlstr(thesrcxmlstr_cleaned2)
+
+    // clean up the target xml (recover the orignal tagname and attr name, etc)
     let xmlstr_target_cleaned = await cleanup_targetxml(jq_src, thesrcxmlstr_cleaned2)
     // console.log('86', xmlstr_target_cleaned)
 
     // 3. save converted target project xml
     xmlstr_target = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n' + xmlstr_target_cleaned
-    xmlstr_target = beautify(xmlstr_target, {format: 'xml'})
+    xmlstr_target = beautify(xmlstr_target, { format: 'xml' })
     let xmlfile_target = targetFilePath + '__target_document.xml'
     await saveLocalTxtFile(xmlstr_target, xmlfile_target, 'utf-8');
 
@@ -104,7 +240,7 @@ async function make_docx() {
     // when saving theZip to a local file (e.g., theZip.writeZip(), the files within the written zip can be corrupted)
     // the work around is to migrate the files into a new zip! 
     let zipEntries = await srczip.getEntries()
-    for (let i=0;i<zipEntries.length;i++){
+    for (let i = 0; i < zipEntries.length; i++) {
         let d = zipEntries[i]
 
         // read each file into a str
@@ -113,10 +249,10 @@ async function make_docx() {
         await targetzip.addFile(d.entryName, Buffer.from(thefilestr, "utf-8"))
     }
 
-        //4a. determine the name of the target file.
-        let target_filename = get_filename(srcFile).name
-        // console.log ('99', target_filename)
-    
+    //4a. determine the name of the target file.
+    let target_filename = get_filename(srcFile).name
+    // console.log ('99', target_filename)
+
 
     //4b. save the target file. await targetzip.writeZip("data/out/" + config_project.Element.Label + "_totarget.file")
     await targetzip.writeZip(targetFilePath + target_filename + "_target.docx")
@@ -139,10 +275,10 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
 
     // 4a. make a dictionary to map out the standardized and original tagnames
     let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(thesrcxmlstr_cleaned)
-    console.log('140', originalTagnames_dict_crude)
+    // console.log('140', originalTagnames_dict_crude)
     // 4b. make a dictionary to map out the standardized and original attribute names
     let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(thesrcxmlstr_cleaned)
-    console.log('145', originalAttrNames_dict_crude)
+    // console.log('145', originalAttrNames_dict_crude)
 
     // 5a. replacce the standardized tagnames (all in uppercase) to original names
     Object.keys(originalTagnames_dict_crude).forEach(d => {
@@ -285,7 +421,7 @@ function cleanxmlstr(thexmlstr) {
      2. the following is to convert  <Parameters /> to <Parameters></Parameters>
      */
     let thesrcxmlstr_selfclosing_converted = convertSelfClosingHTML_to_OldSchoolHTML(thesrcxmlstr_rename_table_table123)
-    console.log('288', thesrcxmlstr_selfclosing_converted)
+    // console.log('288', thesrcxmlstr_selfclosing_converted)
 
     //3. remove the comments (code within <!--  and -->)
     let thesrcxmlstr_removecomments = removecomments(thesrcxmlstr_selfclosing_converted)
