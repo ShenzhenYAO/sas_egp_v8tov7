@@ -29,6 +29,7 @@
   "homepage": "https://github.com/ShenzhenYAO/sas_egp_v8tov7#readme",
   "dependencies": {
     "adm-zip": "^0.5.5",
+    "beautify": "0.0.8",
     "jquery": "^3.3.1",
     "jsdom": "^16.7.0"
   }
