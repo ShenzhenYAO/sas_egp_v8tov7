@@ -2,158 +2,11 @@
 /***** functions for editing xml ********* */
 
 
-// make a word paragraph xml
-function wxp(text_arr, pStyleAttrs, pPrhtml, rPrhtml) {
-    this.pPrhtml
-    this.rPrhtml
-    this.text_arr = text_arr
-    this.pStyleAttrs = pStyleAttrs
-    this.make = function () {
-        let p_jq = new wxo('w:p').make()
-        // if pStyleAttrs is defined, add tags for pStyle settings
-        // add an empty w:pPr selector
-        let p_pPr_jq = new wxo('w:pPr', null, pPrhtml).make()
-        p_jq.append(p_pPr_jq)
-        if (this.pStyleAttrs) {
-            // append a pSytle selector in paragraph
-            let pStyle_jq = new wxo('w:pStyle', pStyleAttrs).make()
-            p_pPr_jq.append(pStyle_jq)
-        }//
-        // if runs and text within are defined, make w:r and  w:t according to their runs within the paragraph
-        if (text_arr) {
-            text_arr.forEach(text => {
-                // make a run
-                let r_jq = new wxo('w:r', null, rPrhtml).make()
-                // make a text
-                let t_jq = new wxo('w:t', null, null, text).make()
-                // console.log('30', t_jq.prop('outerHTML'))
-                r_jq.append(t_jq)
-                p_jq.append(r_jq)
-            }) // text_arr.forEach
-        } // if (text_arr)
-        p_jq.appendto = function (parent_jq) {
-            parent_jq.append(p_jq)
-            return p_jq
-        }
-        return p_jq
-    } //this.make = function
-} // function wxp ()
 
-// make a word tbl xml 
-function wxtbl(tablename, width_cols_str, colheads_str, shdattrs_headrow, width_tbl, n_cols) {
-    if (!tablename) (tablename = '')
-    this.tablename = tablename
-    this.width_cols_str = width_cols_str
-    this.colheads_str = colheads_str
-    this.shdattrs_headrow = shdattrs_headrow
-    this.width_tbl = width_tbl
-    this.n_cols = n_cols
-    this.make = function () {
-        if (!this.width_tbl) { this.width_tbl = '8000' }
-        if (!this.n_cols) { this.n_cols = 1 }
 
-        if (this.width_tbl && this.n_cols && !this.width_cols_str) {
-            this.width_cols_str = ''
-            for (let i = 0; i < this.n_cols; i++) {
-                this.width_cols_str = this.width_cols_str + ',' + Math.floor(parseInt(this.width_tbl) / this.n_cols).toString()
-            } // for(let i=0; i<this.n_cols-1; i++)
-            // remove the heading ',' in the string
-            this.width_cols_str = this.width_cols_str.substr(1)
-        }
 
-        let tbl_jq = new wxo('w:tbl', { "tablename": this.tablename }).make().append(
-            new wxo('w:tblPr').make().append(
-                new wxo('w:tblStyle', { 'w:val': 'TableGrid' }).make(),
-            ) // new wxo('w:tblPr').make().append
-        )// new wxo('w:tbl').make().append
 
-        // define the cols
-        let cols_width_arr = this.width_cols_str.split(',').map(x => { return { width: x.trim() } })
-        let colheads_arr
-        // if colheads_str is null or undefined, use cols_width_arr to make an array of elements of ''
-        // that way, the table has at least one row with cells, and in each cell, there is a paragraph. 
-        // a paragrah is mandated to have, otherwise WORD application reports error
-        if (!this.colheads_str) {
-            colheads_arr = this.width_cols_str.split(',').map(x => { return { colheadtext: '' } })
-        } else {
-            colheads_arr = this.colheads_str.split(',').map(x => { return { colheadtext: x.trim() } })
-        } //if (! this.colheads_str) 
 
-        // make the head row
-        let headrow_jq = new wxo('w:tr').make()
-        tbl_jq.append(headrow_jq)
-        // loop for each col and set col
-        let col_index = 0
-        cols_width_arr.forEach(d => {
-            // make the cells of the row
-            let thecell_jq = new wxo('w:tc').make()
-            // add a selector for cell property
-            let thecell_pr_jq = new wxo('w:tcPr').make()
-            thecell_jq.append(thecell_pr_jq)
-            // set width
-            thecell_pr_jq.append(new wxo('w:tcW', { 'w:w': d.width, 'w:type': 'dxa' }).make())
-
-            // if fill is defined, set fill color
-            if (this.shdattrs_headrow) {
-                thecell_pr_jq.append(new wxo('w:shd', { ...this.shdattrs_headrow, ...{ 'w:type': 'dxa' } }).make())
-            } //if (this.shdattrs_headrow) {
-
-            // if header is defined, add header text
-            if (colheads_arr) {
-                // get the colhead of the corresponding column
-                let colheadtext = colheads_arr[col_index].colheadtext
-                // make a paragraph for the colheadtext
-                // make the font in bold style
-                let rPrhtml = `<w:rPr>
-                <w:b/>
-                <w:sz w:val="24" />
-                <w:szCs w:val="24" /></w:rPr>`
-                let p_jq = new wxp([colheadtext], null, null, rPrhtml ).make()
-                // append the paragraph to the cell
-                thecell_jq.append(p_jq)
-
-            } // if (this.colheads_arr)
-
-            // append the cell to the row
-            headrow_jq.append(thecell_jq)
-
-            col_index++
-
-        }) // cols_width_arr.forEach
-        update_cell_address_tbl(tbl_jq)
-        // set the function appendto
-        tbl_jq.appendto = function (parent_jq) {
-            parent_jq.append(tbl_jq)
-            return tbl_jq
-        }
-        return tbl_jq
-    } // this.make = function
-} // function wxtbl()
-
-// make a word xml object (wxo)
-function wxo(tagname, attrs, html, text) {
-    this.tagname = tagname,
-        this.attrs = attrs,
-        this.html = html,
-        this.text = text,
-        this.make = function () {
-            let taghead = '<' + this.tagname + '>', tagend = '</' + this.tagname + '>'
-            let theTag = taghead + tagend
-            let _jq = $(theTag)
-            if (this.html) { _jq.html(this.html) }
-            if (this.attrs) {
-                Object.keys(this.attrs).forEach(key => {
-                    _jq.attr(key, this.attrs[key])
-                })
-            } // if (this.attrs && this.attrs.length >0)
-            if (this.text) { _jq.text(this.text) }//if (this.text)
-            _jq.appendto = function (parent_jq) {
-                parent_jq.append(_jq)
-                return _jq
-            }
-            return _jq
-        } // this.make
-} // the word xml object (wxo)
 
 // make a word tbl row xml (with empty cells and paragraphs)
 function wxtr(width_cols_str, shdattrs_headrow, gridSpanAttrs, width_tbl, n_cols) {
@@ -371,67 +224,9 @@ function getOriginalTagNames_dict_crude(thexhmlstr) {
     return orignalTagnames_dict
 }; // function getOriginalTagNames(thexhmlstr)
 
-// get xml script from a src file
-async function read_xml_from_src(srczip) {
-    //*** read the src file data */
-    // 1. read the script of document.xml from srczip
-    let thesrcxmlfile_src = 'word/document.xml'
-    let encoding = "utf-8"; // the srcxml is directly from an file file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr_src = await srczip.readAsText(thesrcxmlfile_src, encoding); // 'utf-16' type is called 'utf16le'
-    // console.log('56:', thesrcxmlstr_src)
-    // 2. remove the head line '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', and clean the srcxml ()
-    let thebodyxmlstr_src = thesrcxmlstr_src.split('standalone="yes"?>')[1]
-    let thesrcxmlstr_src_cleaned = cleanxmlstr(thebodyxmlstr_src)
 
-    // 3. make a jq for the cleaned src xml
-    let src_jq = $(thesrcxmlstr_src_cleaned)
-    // console.log('line47', src_jq)
-    return { 'jq_src': src_jq, 'theoriginsrcxmlstr_src': thesrcxmlstr_src }
-}; //async function read_xml_from_src
 
-// clean up the xmlstr
-function cleanxmlstr(thexmlstr) {
 
-    // to cleanup the nonprintable chars
-    // let thexmlstr_remove_nonprintable = thexmlstr.replace(/[^\x20-\x7E\s\S]+/g, "")
-    let thexmlstr_remove_nonprintable = thexmlstr
-
-    // the xmlstr is messed up with strange chars like &amp;lt; &lt;, etc
-    // The following is to change &amp;lt to <, &gt to > ...
-    // let thesrcxmlstr_ampersand_code_normalized = normalize_ampersand_code(thexmlstr_remove_nonprintable)
-    // Note: second thought! do not convert ampersand symbols. These ampersand symbols are necessary for SAS file to identify settings within an xml tag from xmltag
-    // for example within <DNA>  </DNA>, the html '&lt;DNA...&gt;DNA' has special meanings for SAS EG to identify (in this case, to identify the setting for location of an external file)
-    // If the ampersand code '&lt;' is converted, SAS EG will wrongly consider it as an xml tag, and ignore the settings.  
-    let thesrcxmlstr_ampersand_code_normalized = thexmlstr_remove_nonprintable
-    // console.log('79:', thesrcxmlstr_ampersand_code_normalized)
-
-    // 1. jsdom does not handle the tag <Table>A</Table> well
-    // In that case, it alters the html to '<Table></Table>A' !
-    // The following is to rename the tag <Table> to <Table123> to work around
-    let thesrcxmlstr_rename_table_table123 = rename_tag_named_table(thesrcxmlstr_ampersand_code_normalized)
-
-    // the xhtml self-colsing tags like <Parameters /> must be converted to <Parameters></Parameters>
-    // because the JSDOM does not read <Parameters /> well, it'll mess up the nested structure!
-    /**
-      e.g., the structure is like
-     <Parameters />
-     <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan>
- 
-     JSDOM wrongly treat it as 
-     <Parameters>
-        <ExecutionTimeSpan>-P10675199DT2H48M5.4775808S</ExecutionTimeSpan>
-     </Parameters>
-     2. the following is to convert  <Parameters /> to <Parameters></Parameters>
-     */
-    let thesrcxmlstr_selfclosing_converted = convertSelfClosingHTML_to_OldSchoolHTML(thesrcxmlstr_rename_table_table123)
-    // console.log('288', thesrcxmlstr_selfclosing_converted)
-
-    //3. remove the comments (code within <!--  and -->)
-    let thesrcxmlstr_removecomments = removecomments(thesrcxmlstr_selfclosing_converted)
-    // console.log(thesrcxmlstr_removecomments)
-
-    return thesrcxmlstr_removecomments
-}; //function cleanxmlstr(thexmlstr) 
 
 
 // change &amp;lt to <,  &gt to > ...
@@ -449,69 +244,11 @@ function normalize_ampersand_code(thestr) {
     return thestr
 }; //function normalize_ampersand_code
 
-// jsdom does not handle the tag <Table>A</Table> well
-// In that case, it alters the html to '<Table></Table>A' !
-// The following is to rename the tag <Table> to <Table123> to work around
-function rename_tag_named_table(thestr) {
-    thestr = thestr.replace(/\<Table\>/g, '<Table123>')
-    thestr = thestr.replace(/\<\/Table\>/g, '</Table123>')
-    return thestr
-}; // function rename_tag_named_table
-
-// convert <Parameters /> to <Parameters></Parameters>
-function convertSelfClosingHTML_to_OldSchoolHTML(str) {
-    let matched_arr = str.match(/\<(.*)\/\>/)
-    // console.log('324', matched_arr.length)
-    if (matched_arr && matched_arr.length > 0) {
-        let seg1 = matched_arr[1].split('<')
-        // sometimes the lastmatchedstr is like GitSourceControl GUID="x2K5fW8CFtZy3Ke7"
-        // in that case, the part after the first whitespace (GUID="x2K5fW8CFtZy3Ke7") should be excluded 
-        let theLastMatchedStr = seg1[seg1.length - 1]
-        // console.log(theLastMatchedStr)
-        let theLastMatchedStr_tagName = theLastMatchedStr.split(' ')[0]
-        // console.log(theLastMatchedStr_tagName)
-        // replace <Others /> with <Others></<Others />
-        let xhtmlstr = "<" + theLastMatchedStr + "/>"
-        let htmlstr = "<" + theLastMatchedStr + ">" + "</" + theLastMatchedStr_tagName + ">"
-        str = str.replace(xhtmlstr, htmlstr)
-        let matched_arr2 = str.match(/\<(.*)\/\>/)
-        if (matched_arr2 && matched_arr2.length > 0) {
-            str = convertSelfClosingHTML_to_OldSchoolHTML(str)
-        }
-    }
-    return str
-}; // function convertSelfClosingHTML_to_OldSchoolHTML(str...
-
-// remmove comments
-function removecomments(thestr) {
-    let result = ''
-    // split str by '<!--'
-    let segments = thestr.split('<!--')
-    for (let i = 0; i < segments.length; i++) {
-        if (segments[i].includes('-->')) {
-            let theSeg = segments[i].split('-->')[1]
-            result = result + theSeg
-        } else {
-            result = result + segments[i]
-        }
-    }
-    return result
-}; //function removecomments
-
-
 
 
 
 /**common tools*************************************** */
-// save to local file
-async function saveLocalTxtFile(thetxtstr, targettxtfile, encoding) {
-    encoding = encoding || 'utf-8' // by default using utf-8
-    let fs = require('fs');
-    // use writeFileSync instead of writeFile to avoid async problems
-    fs.writeFileSync(targettxtfile, thetxtstr, encoding, function (err) {
-        if (err) { console.log(err); }
-    });
-}; // saveLocalTxtFile
+
 
 
 // read text from a local file
