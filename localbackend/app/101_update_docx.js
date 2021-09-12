@@ -1,5 +1,4 @@
-/* To update a word docx file according to the template 
-*/
+/* To update a word docx file according to the template */
 
 // jsdom and jquery must be used together
 const jsdom = require("jsdom");
@@ -8,7 +7,7 @@ var $ = require("jquery")(window);
 
 // https://www.npmjs.com/package/adm-zip
 const AdmZip = require('adm-zip');
-const { config } = require('process');
+const { config, setgroups } = require('process');
 
 const beautify = require('beautify');
 
@@ -34,7 +33,265 @@ const targetzip = new AdmZip();
 
 })()
 
+/***** functions for editing xml ********* */
 
+
+// make a word paragraph xml
+function wxp(text_arr, pStyleAttrs, pPrhtml, rPrhtml) {
+    this.pPrhtml
+    this.rPrhtml
+    this.text_arr = text_arr
+    this.pStyleAttrs = pStyleAttrs
+    this.make = function () {
+        let p_jq = new wxo('w:p').make()
+        // if pStyleAttrs is defined, add tags for pStyle settings
+        // add an empty w:pPr selector
+        let p_pPr_jq = new wxo('w:pPr', null, pPrhtml).make()
+        p_jq.append(p_pPr_jq)
+        if (this.pStyleAttrs) {
+            // append a pSytle selector in paragraph
+            let pStyle_jq = new wxo('w:pStyle', pStyleAttrs).make()
+            p_pPr_jq.append(pStyle_jq)
+        }//
+        // if runs and text within are defined, make w:r and  w:t according to their runs within the paragraph
+        if (text_arr) {
+            text_arr.forEach(text => {
+                // make a run
+                let r_jq = new wxo('w:r', null, rPrhtml).make()
+                // make a text
+                let t_jq = new wxo('w:t', null, null, text).make()
+                // console.log('30', t_jq.prop('outerHTML'))
+                r_jq.append(t_jq)
+                p_jq.append(r_jq)
+            }) // text_arr.forEach
+        } // if (text_arr)
+        p_jq.appendto = function (parent_jq) {
+            parent_jq.append(p_jq)
+            return p_jq
+        }
+        return p_jq
+    } //this.make = function
+} // function wxp ()
+
+// make a word tbl xml 
+function wxtbl(tablename, width_cols_str, colheads_str, shdattrs_headrow, width_tbl, n_cols) {
+    if (!tablename) (tablename = '')
+    this.tablename = tablename
+    this.width_cols_str = width_cols_str
+    this.colheads_str = colheads_str
+    this.shdattrs_headrow = shdattrs_headrow
+    this.width_tbl = width_tbl
+    this.n_cols = n_cols
+    this.make = function () {
+        if (!this.width_tbl) { this.width_tbl = '8000' }
+        if (!this.n_cols) { this.n_cols = 1 }
+
+        if (this.width_tbl && this.n_cols && !this.width_cols_str) {
+            this.width_cols_str = ''
+            for (let i = 0; i < this.n_cols; i++) {
+                this.width_cols_str = this.width_cols_str + ',' + Math.floor(parseInt(this.width_tbl) / this.n_cols).toString()
+            } // for(let i=0; i<this.n_cols-1; i++)
+            // remove the heading ',' in the string
+            this.width_cols_str = this.width_cols_str.substr(1)
+        }
+
+        let tbl_jq = new wxo('w:tbl', { "tablename": this.tablename }).make().append(
+            new wxo('w:tblPr').make().append(
+                new wxo('w:tblStyle', { 'w:val': 'TableGrid' }).make(),
+            ) // new wxo('w:tblPr').make().append
+        )// new wxo('w:tbl').make().append
+
+        // define the cols
+        let cols_width_arr = this.width_cols_str.split(',').map(x => { return { width: x.trim() } })
+        let colheads_arr
+        // if colheads_str is null or undefined, use cols_width_arr to make an array of elements of ''
+        // that way, the table has at least one row with cells, and in each cell, there is a paragraph. 
+        // a paragrah is mandated to have, otherwise WORD application reports error
+        if (!this.colheads_str) {
+            colheads_arr = this.width_cols_str.split(',').map(x => { return { colheadtext: '' } })
+        } else {
+            colheads_arr = this.colheads_str.split(',').map(x => { return { colheadtext: x.trim() } })
+        } //if (! this.colheads_str) 
+
+        // make the head row
+        let headrow_jq = new wxo('w:tr').make()
+        tbl_jq.append(headrow_jq)
+        // loop for each col and set col
+        let col_index = 0
+        cols_width_arr.forEach(d => {
+            // make the cells of the row
+            let thecell_jq = new wxo('w:tc').make()
+            // add a selector for cell property
+            let thecell_pr_jq = new wxo('w:tcPr').make()
+            thecell_jq.append(thecell_pr_jq)
+            // set width
+            thecell_pr_jq.append(new wxo('w:tcW', { 'w:w': d.width, 'w:type': 'dxa' }).make())
+
+            // if fill is defined, set fill color
+            if (this.shdattrs_headrow) {
+                thecell_pr_jq.append(new wxo('w:shd', { ...this.shdattrs_headrow, ...{ 'w:type': 'dxa' } }).make())
+            } //if (this.shdattrs_headrow) {
+
+            // if header is defined, add header text
+            if (colheads_arr) {
+                // get the colhead of the corresponding column
+                let colheadtext = colheads_arr[col_index].colheadtext
+                // make a paragraph for the colheadtext
+                // make the font in bold style
+                let rPrhtml = `<w:rPr>
+                <w:b/>
+                <w:sz w:val="24" />
+                <w:szCs w:val="24" /></w:rPr>`
+                let p_jq = new wxp([colheadtext], null, null, rPrhtml ).make()
+                // append the paragraph to the cell
+                thecell_jq.append(p_jq)
+
+            } // if (this.colheads_arr)
+
+            // append the cell to the row
+            headrow_jq.append(thecell_jq)
+
+            col_index++
+
+        }) // cols_width_arr.forEach
+        update_cell_address_tbl(tbl_jq)
+        // set the function appendto
+        tbl_jq.appendto = function (parent_jq) {
+            parent_jq.append(tbl_jq)
+            return tbl_jq
+        }
+        return tbl_jq
+    } // this.make = function
+} // function wxtbl()
+
+// make a word xml object (wxo)
+function wxo(tagname, attrs, html, text) {
+    this.tagname = tagname,
+        this.attrs = attrs,
+        this.html = html,
+        this.text = text,
+        this.make = function () {
+            let taghead = '<' + this.tagname + '>', tagend = '</' + this.tagname + '>'
+            let theTag = taghead + tagend
+            let _jq = $(theTag)
+            if (this.html) { _jq.html(this.html) }
+            if (this.attrs) {
+                Object.keys(this.attrs).forEach(key => {
+                    _jq.attr(key, this.attrs[key])
+                })
+            } // if (this.attrs && this.attrs.length >0)
+            if (this.text) { _jq.text(this.text) }//if (this.text)
+            _jq.appendto = function (parent_jq) {
+                parent_jq.append(_jq)
+                return _jq
+            }
+            return _jq
+        } // this.make
+} // the word xml object (wxo)
+
+// make a word tbl row xml (with empty cells and paragraphs)
+function wxtr(width_cols_str, shdattrs_headrow, gridSpanAttrs, width_tbl, n_cols) {
+    this.gridSpanAttrs = gridSpanAttrs
+    this.width_cols_str = width_cols_str
+    this.shdattrs_headrow = shdattrs_headrow
+    this.width_tbl = width_tbl
+    this.n_cols = n_cols
+    this.make = function () {
+        if (!this.width_tbl) { this.width_tbl = '8000' }
+        if (!this.n_cols) { this.n_cols = 1 }
+
+        // make a width_cols_str according to defined table width and number of columns
+        if (this.width_tbl && this.n_cols && !this.width_cols_str) {
+            this.width_cols_str = ''
+            for (let i = 0; i < this.n_cols; i++) {
+                this.width_cols_str = this.width_cols_str + ',' + Math.floor(parseInt(this.width_tbl) / this.n_cols).toString()
+            } // for(let i=0; i<this.n_cols-1; i++)
+            // remove the heading ',' in the string
+            this.width_cols_str = this.width_cols_str.substr(1)
+        } //if (this.width_tbl && this.n_cols && !this.width_cols_str)
+
+        // define the cols
+        let cols_width_arr = this.width_cols_str.split(',').map(x => { return { width: x.trim() } })
+        // use cols_width_arr to make an array of empty celltext ('') 
+        // in each cell, make a paragraph, and the paragraph contains a w:r nesting a w:t. 
+        // the paragraph is mandated to have within the cell, otherwise WORD application reports error
+        let celltext_arr = this.width_cols_str.split(',').map(x => { return { celltext: '' } })
+
+        // make the table row
+        let tr_jq = new wxo('w:tr').make()
+        // loop for each col and set col
+        let col_index = 0
+        cols_width_arr.forEach(d => {
+            // make the cells of the row
+            let thecell_jq = new wxo('w:tc').make()
+            // add a selector for cell property
+            let thecell_pr_jq = new wxo('w:tcPr').make()
+            thecell_jq.append(thecell_pr_jq)
+            // set width
+            thecell_pr_jq.append(new wxo('w:tcW', { 'w:w': d.width, 'w:type': 'dxa' }).make())
+            
+            // if fill is defined, set fill color
+            if (this.shdattrs_headrow) {
+                thecell_pr_jq.append(new wxo('w:shd', { ...this.shdattrs_headrow, ...{ 'w:type': 'dxa' } }).make())
+            } //if (this.shdattrs_headrow) {
+
+            if (this.gridSpanAttrs) {thecell_pr_jq.append(new wxo('w:gridSpan',this.gridSpanAttrs).make())} //if (gridSpanAttrs)
+
+
+            // get the colhead of the corresponding column
+            let celltext = celltext_arr[col_index].celltext
+            // make a paragraph for the colheadtext
+            let p_jq = new wxp([celltext]).make()
+            // append the paragraph to the cell
+            thecell_jq.append(p_jq)
+
+            // append the cell to the row
+            tr_jq.append(thecell_jq)
+
+            col_index++
+
+        }) // cols_width_arr.forEach
+
+        tr_jq.appendto = function (parent_jq) {
+            parent_jq.append(tr_jq)
+            update_cell_address_tbl(parent_jq)
+            return tr_jq
+        }
+        return tr_jq
+    }; // this.make (a function)
+}; // function wxtr()
+
+// update the address of each cell (like '1,1' for r1c1) in a table
+function update_cell_address_tbl(tbl_jq) {
+    let rows_credientail_jq = tbl_jq.find('w\\:tr')
+    for (let i = 0; i < rows_credientail_jq.length; i++) {
+        let therow_jq = $(rows_credientail_jq[i])
+        // find the cells
+        let cells_therow_jq = therow_jq.find('w\\:tc')
+        for (let j = 0; j < cells_therow_jq.length; j++) {
+            let thecell_jq = $(cells_therow_jq[j])
+            thecell_jq.attr('address', (i + 1).toString() + "," + (j + 1).toString())
+        } //for (let j=0;j<cells_therow_jq.length;j++)
+    } //for (let i=0;i<rows_credientail.length;i++)
+} //function update_address_tbl(tbl_jq)
+
+// add contents (as an array )
+function change_cell_contents(tbl_jq, address, ps_jq) {
+    // let findstr = 'w\\:tc[address="' + address+'"]'
+    let cell_jq = $(tbl_jq.find('w\\:tc[address="' + address + '"]')[0])
+    // console.log(cell_jq)
+    // remove all paragraph in cell_jq
+    let old_ps_cell_jq = cell_jq.find('w\\:p')
+    if (old_ps_cell_jq.length > 0) {
+        for (let i = old_ps_cell_jq.length - 1; i >= 0; i--) {
+            old_ps_cell_jq[i].remove()
+        } // for (let i = old_p_cell_jqs.length -1; i >=0; i--)
+    } // if (old_p_cell_jqs.length >0)
+    // add the new paragraphs to the cell
+    cell_jq.append(ps_jq)
+}; // function change_cell_contents
+
+/***** functions for editing xml ********* */
 
 /*** functions to make and write a docx*/
 // convert a update a docx file
@@ -53,168 +310,66 @@ async function make_docx() {
     // identify the body jq_src, for tagnames with ':', need to add escape symbol (\\, must be \\, not \) and make it as \\:
     let body_jq_src = $(jq_src.find('w\\:body')[0])
 
-    /**
-     The template research doc contains 
-     a title, 
-     a table for creator name and lastmodified date, 
-     a paragraph for notes,
-     and a table for steps 
-    */
+    // remove the exsiting contents within body xml
     body_jq_src.empty()
 
-    // add a title
-    let title_p_jq = addParagraph(body_jq_src, 'Title')
-    function addParagraph(parent_jq, pStyle) {
-        // 1. add a paragraph ('w:p')
-        let p_jq = addTag(parent_jq, 'w:p')
-        // 2. set property - style of the paragraph as 'Title'
-        // 2a. add a property selector ('w:pPr'), then a style selector ('w:pStyle')
-        let pPr_p_jq = addTag(p_jq, 'w:pPr')
-        if (pStyle) {
-            let pStyle_pPr_p_jq = addTag(pPr_p_jq, 'w:pStyle')
-            pStyle_pPr_p_jq.attr('w:val', pStyle)
-        }
-        return p_jq
-    } // function addParagrah (parent)
+    // add a paragraph for title
+    let titlestr = 'The greatest research project ever in human history'
+    let title_p_jq = new wxp([titlestr], { 'w:val': "Title" }).make().appendto(body_jq_src)
 
-    // 3. add a row selector ('w:r') then a text selector ('w:t')
-    let text_row_title_p_jq = addTextLine(title_p_jq, 'This is a new title!')
-    function addTextLine(parent_jq, text) {
-        let row_p_jq = addTag(parent_jq, 'w:r')
-        let text_row_p_jq = addTag(row_p_jq, 'w:t')
-        text_row_p_jq.text(text)
-        return text_row_p_jq
-    } // function addTextLine(parent_jq, text)
+    // add a table for credential (created by, last modified on ...)
+    let credential_tbl_jq = new wxtbl('credential', '2093, 11083').make().appendto(body_jq_src)
+    // body_jq_src.append(credential_tbl_jq)
+    // add a new row to credential_tbl_jq 
+    let credential_tr2_jq = new wxtr('2093, 11083').make().appendto(credential_tbl_jq)
+
+    // add contents to cells 1,1 and 2,1 of the credential table
+    let ps_jq = new wxp(['Created by']).make()
+    change_cell_contents(credential_tbl_jq, '1,1', ps_jq)
+    ps_jq = new wxp(['Last modified on']).make()
+    change_cell_contents(credential_tbl_jq, '2,1', ps_jq)
 
 
+    // Part 3. add a paragraph for notes
+    let notestext = 'Notes:'
+    let notes_p_jq = new wxp([notestext], { 'w:val': "Normal" }).make()
+    body_jq_src.append(notes_p_jq)
 
-    // add a table
-    // 1. add a table ('w:tbl')
-    let tbl_jq = addTag(body_jq_src, 'w:tbl')
+    //Part 4. add a table for research steps
+    let steps_tbl_jq = new wxtbl('steps', '3294, 5461, 3119, 1302', 'Steps, Criteria, Rationale, Modified on', { "w:fill": "D9D9D9" }).make().appendto(body_jq_src)
+    // body_jq_src.append(steps_tbl_jq)
 
-    // set default table style
-    tbl_jq.append(`<w:tblPr>
-    <w:tblStyle w:val="TableGrid" />
-    <w:tblW w:w="0" w:type="auto" />
-    <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1"
-    w:lastColumn="0" w:noHBand="0" w:noVBand="1" /></w:tblPr>`)
+    // add a row to steps table for the text Objective 1 ({"w:val":"4"} to merge 4 colums)
+    new wxtr('11874', null, {"w:val":"4"}).make().appendto(steps_tbl_jq)
+    ps_jq = [
+        new wxp (['Objective 1:']).make()
+    ]
+    change_cell_contents(steps_tbl_jq, '2,1', ps_jq)
 
-    // 2. set 2 columns with width
-    // 2a. add a 'w:tblGrid'
-    let grid_tbl_jq = addTag(tbl_jq, 'w:tblGrid')
-    // 2b. add 'w:gridCol' with attr "w:w"
-    let col1_grid_tbl_jq = addTag(grid_tbl_jq, 'w:gridCol')
-    col1_grid_tbl_jq.attr('w:w', '2093')
-    let col2_grid_tbl_jq = addTag(grid_tbl_jq, 'w:gridCol')
-    col2_grid_tbl_jq.attr('w:w', '11083')
-    // 3. add a table row (row1)
-    let r1_tbl_jq = addTag(tbl_jq, 'w:tr')
-    // 4. add table cell one
-    let c1_r1_tbl_jq = addTag(r1_tbl_jq, 'w:tc')
-    let c1_r1_width = "2093"
-    // add cell property
-    c1_r1_tbl_jq.append(`<w:tcPr>
-    <w:tcW w:w=${c1_r1_width} w:type="dxa" /></w:tcPr>`)
-    // 4a. in cell 1, add a paragraph
-    let c1_r1_p_jq = addParagraph(c1_r1_tbl_jq, 'Normal')
-    let text_c1_r1_p_jq = addTextLine(c1_r1_p_jq, 'Created By')
-    //cell2
-    let c2_r1_tbl_jq = addTag(r1_tbl_jq, 'w:tc')
-    let c2_r1_width = "11083"
-    // add cell property
-    c2_r1_tbl_jq.append(`<w:tcPr>
-    <w:tcW w:w=${c2_r1_width} w:type="dxa" /></w:tcPr>`)
-    // 4b. in cell 2, add a paragraph
-    let c2_r1_p_jq = addParagraph(c2_r1_tbl_jq, 'Normal')
-    let text_c2_r1_p_jq = addTextLine(c2_r1_p_jq, 'Shenzhen Yao')
-
-    // 5. add a table row (row1)
-    let r2_tbl_jq = addTag(tbl_jq, 'w:tr')
-    // 4. add table cell one
-    let c1_r2_tbl_jq = addTag(r2_tbl_jq, 'w:tc')
-    let c1_r2_width = "2093"
-    // add cell property
-    c1_r2_tbl_jq.append(`<w:tcPr>
-    <w:tcW w:w=${c1_r2_width} w:type="dxa" /></w:tcPr>`)
-    // 4a. in cell 1, add a paragraph
-    let c1_r2_p_jq = addParagraph(c1_r2_tbl_jq, 'Normal')
-    let text_c1_r2_p_jq = addTextLine(c1_r2_p_jq, 'Last modeified on')
-    //cell2
-    let c2_r2_tbl_jq = addTag(r2_tbl_jq, 'w:tc')
-    let c2_r2_width = "11083"
-    // add cell property
-    c2_r2_tbl_jq.append(`<w:tcPr>
-    <w:tcW w:w=${c2_r2_width} w:type="dxa" /></w:tcPr>`)
-    // 4b. in cell 2, add a paragraph
-    let c2_r2_p_jq = addParagraph(c2_r2_tbl_jq, 'Normal')
-    let text_c2_r2_p_jq = addTextLine(c2_r2_p_jq, '2021-09-10')
+    new wxtr('3294, 5461, 3119, 1302').make().appendto(steps_tbl_jq)
+    ps_jq = [
+        new wxp (['Create the cohort of new statin users']).make()
+    ]
+    change_cell_contents(steps_tbl_jq, '3,1', ps_jq)
+    let pPrhtml = `<w:pStyle w:val="ListParagraph" />
+    <w:numPr>
+        <w:ilvl w:val="0" />
+        <w:numId w:val="1" /></w:numPr>`
+    ps_jq = [
+        new wxp (['index date (date of first statin dispensation) between Jan 1, 2010 and Dec 31, 2017;'], null, pPrhtml).make(),
+        new wxp (['continously covered in PHRS within 5 years prior to the index date through 1 year after the index date;'], null, pPrhtml).make(),
+        new wxp (['age on index date > = 18.'], null, pPrhtml).make()
+    ]
+    change_cell_contents(steps_tbl_jq, '3,2', ps_jq)
 
 
-
-    // add a tag to a parent jquery obj by tagName, and return the added tag as a jquery obj (_jq)
-    function addTag(parent_jq, tagName) {
-        let taghead = '<' + tagName + '>', tagend = '</' + tagName + '>'
-        let theTag = taghead + tagend
-        let tagName_to_find = tagName
-        if (tagName.includes(':')) {
-            segs_arr = tagName.split(':')
-            tagName_to_find = segs_arr.join('\\:')
-        }
-        // console.log(tagName_to_find)
-        let _jq = $(parent_jq.append(theTag).find(tagName_to_find).last())
-        return _jq
-    }; // function addTag(parent_jq, tagName){
-
-
-
-    // set sector properties
+    // part 5 set sector properties
     body_jq_src.append(`<w:sectPr w:rsidR="00206C6A" w:rsidSect="005E006C">
     <w:pgSz w:w="15840" w:h="12240" w:orient="landscape" />
     <w:pgMar w:top="1800" w:right="1440" w:bottom="1800" w:left="1440" w:header="708"
     w:footer="708" w:gutter="0" />
     <w:cols w:space="708" />
     <w:docGrid w:linePitch="360" /></w:sectPr>`)
-
-    async function skip() {
-        /** identify the title, which is:
-         a w:p tag within body_jq_src, with a descending node 'w:pPr' > 'w:pStyle', of which the attr 'w:val' is 'Title
-        */
-        let paragraphs_jq_src = $(body_jq_src.find('w\\:p'))
-        let title_paragraph_jq
-        for (let i = 0; i < paragraphs_jq_src.length; i++) { //
-            let this_jq = $(paragraphs_jq_src[i])
-            // if this_jq is  with a descending node 'w:pPr' > 'w:pStyle', of which the attr 'w:val' is 'Title'
-            let style_jq = $(this_jq.find('w\\:pPr > w\\:pStyle')[0])
-            // console.log('64:', style_jq.attr('w:val'))
-            let style_str;
-            if (style_jq) { style_str = style_jq.attr('w:val') }
-            if (style_str === 'Title') {
-                title_paragraph_jq = this_jq
-                break
-            }
-        } // for (let i=0; i<paragraphs_jq.length; i++)
-
-        //within title_paragraph_jq, find a 'w:r' select with text() = 'Project Title'
-        let text_jqs_src = $(title_paragraph_jq.find('w\\:r > w\\:t'))
-        for (let i = 0; i < text_jqs_src.length; i++) { //
-            let this_jq = $(text_jqs_src[i])
-            // console.log('78', this_jq.text() )
-            if (this_jq.text() === 'Project Title') { this_jq.text('Project Tit___') }
-        } // for (let i=0; i<paragraphs_jq_src.length; i++)
-
-    }//async function skip(){
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // the src xml need to be cleaned as well before making the original tagname dict in cleanup_targetxml
@@ -228,13 +383,14 @@ async function make_docx() {
 
     // 3. save converted target project xml
     xmlstr_target = '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n' + xmlstr_target_cleaned
-    xmlstr_target = beautify(xmlstr_target, { format: 'xml' })
+    xmlstr_target_beautified = beautify(xmlstr_target, { format: 'xml' })
     let xmlfile_target = targetFilePath + '__target_document.xml'
-    await saveLocalTxtFile(xmlstr_target, xmlfile_target, 'utf-8');
+    await saveLocalTxtFile(xmlstr_target_beautified, xmlfile_target, 'utf-8');
 
+    // do not beautify the target xml file as it'll add line breakers to the textcontent!
     //4.add converted project.xml to target target file.  using Buffer to import the xml with utf16 encoding
     srczip.deleteFile('word/document.xml')
-    srczip.addFile('word/document.xml', Buffer.from(xmlstr_target, "utf-8"))
+    srczip.addFile('word/document.xml', Buffer.from(xmlstr_target, "utf-8"))    
 
     // the amd-zip has a bug that theZip object (created from a zip) has error local header when using .toBuffer()
     // when saving theZip to a local file (e.g., theZip.writeZip(), the files within the written zip can be corrupted)
@@ -252,7 +408,6 @@ async function make_docx() {
     //4a. determine the name of the target file.
     let target_filename = get_filename(srcFile).name
     // console.log ('99', target_filename)
-
 
     //4b. save the target file. await targetzip.writeZip("data/out/" + config_project.Element.Label + "_totarget.file")
     await targetzip.writeZip(targetFilePath + target_filename + "_target.docx")
@@ -275,6 +430,7 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
 
     // 4a. make a dictionary to map out the standardized and original tagnames
     let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(thesrcxmlstr_cleaned)
+    originalTagnames_dict_crude = { ...originalTagnames_dict_crude, ...{ 'W:TRPR': 'w:trPr' } }
     // console.log('140', originalTagnames_dict_crude)
     // 4b. make a dictionary to map out the standardized and original attribute names
     let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(thesrcxmlstr_cleaned)
