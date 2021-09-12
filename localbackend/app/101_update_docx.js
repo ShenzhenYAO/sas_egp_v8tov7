@@ -329,6 +329,12 @@ async function make_docx() {
     ps_jq = new wxp(['Last modified on']).make()
     change_cell_contents(credential_tbl_jq, '2,1', ps_jq)
 
+    ps_jq = new wxp(['Shenzhen Yao']).make()
+    change_cell_contents(credential_tbl_jq, '1,2', ps_jq)
+    ps_jq = new wxp(['2021-09-10']).make()
+    change_cell_contents(credential_tbl_jq, '2,2', ps_jq)
+
+
 
     // Part 3. add a paragraph for notes
     let notestext = 'Notes:'

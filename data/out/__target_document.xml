@@ -42,12 +42,7 @@ mc:Ignorable="w14 wp14">
                     <w:p>
                         <w:pPr></w:pPr>
                         <w:r>
-                            <w:rPr>
-                                <w:b></w:b>
-                                <w:sz w:val="24"></w:sz>
-                                <w:szCs w:val="24"></w:szCs>
-                            </w:rPr>
-                            <w:t></w:t>
+                            <w:t>Shenzhen Yao</w:t>
                         </w:r>
                     </w:p>
                 </w:tc>
@@ -71,7 +66,7 @@ mc:Ignorable="w14 wp14">
                     <w:p>
                         <w:pPr></w:pPr>
                         <w:r>
-                            <w:t></w:t>
+                            <w:t>2021-09-10</w:t>
                         </w:r>
                     </w:p>
                 </w:tc>
