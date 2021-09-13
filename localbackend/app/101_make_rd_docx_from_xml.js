@@ -67,16 +67,16 @@ async function make_docx() {
     let credential_tr2_jq = new wxtr('2093, 11083').make().appendto(credential_tbl_jq)
 
     //3b1 add contents to cells 1,1 and 2,1 of the credential table
-    let ps_jq = new wxp(['Created by']).make()
-    change_cell_contents(credential_tbl_jq, '1,1', ps_jq)
-    ps_jq = new wxp(['Last modified on']).make()
-    change_cell_contents(credential_tbl_jq, '2,1', ps_jq)
+    let p_jqs_arr = new wxp(['Created by']).make()
+    change_cell_contents(credential_tbl_jq, '1,1', p_jqs_arr)
+    p_jqs_arr = new wxp(['Last modified on']).make()
+    change_cell_contents(credential_tbl_jq, '2,1', p_jqs_arr)
 
     //3b2 optional: input values for the credential table (created by, modified on)
-    ps_jq = new wxp(['Shenzhen Yao']).make()
-    change_cell_contents(credential_tbl_jq, '1,2', ps_jq)
-    ps_jq = new wxp(['2021-09-10']).make()
-    change_cell_contents(credential_tbl_jq, '2,2', ps_jq)
+    p_jqs_arr = new wxp(['Shenzhen Yao']).make()
+    change_cell_contents(credential_tbl_jq, '1,2', p_jqs_arr)
+    p_jqs_arr = new wxp(['2021-09-10']).make()
+    change_cell_contents(credential_tbl_jq, '2,2', p_jqs_arr)
  
     // 3c add a paragraph for notes
     let notestext = 'Notes:'
@@ -88,26 +88,26 @@ async function make_docx() {
 
     //3d1 optional: add a row to steps table for the text Objective 1 ({"w:val":"4"} to merge 4 colums)
     new wxtr('11874', null, { "w:val": "4" }).make().appendto(steps_tbl_jq)
-    ps_jq = [
+    p_jqs_arr = [
         new wxp(['Objective 1:']).make()
     ]
-    change_cell_contents(steps_tbl_jq, '2,1', ps_jq)
+    change_cell_contents(steps_tbl_jq, '2,1', p_jqs_arr)
 
     new wxtr('3294, 5461, 3119, 1302').make().appendto(steps_tbl_jq)
-    ps_jq = [
+    p_jqs_arr = [
         new wxp(['Create the cohort of new statin users']).make()
     ]
-    change_cell_contents(steps_tbl_jq, '3,1', ps_jq)
+    change_cell_contents(steps_tbl_jq, '3,1', p_jqs_arr)
     let pPrhtml = `<w:pStyle w:val="ListParagraph" />
     <w:numPr>
         <w:ilvl w:val="0" />
         <w:numId w:val="1" /></w:numPr>`
-    ps_jq = [
+    p_jqs_arr = [
         new wxp(['index date (date of first statin dispensation) between Jan 1, 2010 and Dec 31, 2017;'], null, pPrhtml).make(),
         new wxp(['continously covered in PHRS within 5 years prior to the index date through 1 year after the index date;'], null, pPrhtml).make(),
         new wxp(['age on index date > = 18.'], null, pPrhtml).make()
     ]
-    change_cell_contents(steps_tbl_jq, '3,2', ps_jq)
+    change_cell_contents(steps_tbl_jq, '3,2', p_jqs_arr)
 
 
     // 3e set sector properties
@@ -402,7 +402,7 @@ function update_cell_address_tbl(tbl_jq) {
 } //function update_address_tbl(tbl_jq)
 
 // add contents (as an array )
-function change_cell_contents(tbl_jq, address, ps_jq) {
+function change_cell_contents(tbl_jq, address, p_jqs_arr) {
     // let findstr = 'w\\:tc[address="' + address+'"]'
     let cell_jq = $(tbl_jq.find('w\\:tc[address="' + address + '"]')[0])
     // console.log(cell_jq)
@@ -414,7 +414,7 @@ function change_cell_contents(tbl_jq, address, ps_jq) {
         } // for (let i = old_p_cell_jqs.length -1; i >=0; i--)
     } // if (old_p_cell_jqs.length >0)
     // add the new paragraphs to the cell
-    cell_jq.append(ps_jq)
+    cell_jq.append(p_jqs_arr)
 }; // function change_cell_contents
 
 // make a word paragraph xml
