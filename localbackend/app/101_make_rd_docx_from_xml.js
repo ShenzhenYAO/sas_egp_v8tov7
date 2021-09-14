@@ -45,7 +45,7 @@ async function make_docx() {
     // 1a. save the theoriginsrcxmlstr_src as a local file (for viewing the contents during coding)
     let xmlfile_src = targetFilePath + '__src_document.xml'
     let beautfied_theoriginsrcxmlstr_src = beautify(theoriginsrcxmlstr_src, { format: 'xml' })
-    // await mymodules.saveLocalTxtFile(theoriginsrcxmlstr_v8, thetargetv8xmlfile, 'utf16le');
+
     await saveLocalTxtFile(beautfied_theoriginsrcxmlstr_src, xmlfile_src, 'utf-8');
 
     // 2 identify the body jq and empty its contents and descendants
@@ -136,7 +136,7 @@ async function make_docx() {
 
     // 5 make the targetzip obj
     // do not beautify the target xml file as it'll add line breakers to the textcontent!
-    // 5a .add  document.xml to target target file.  using Buffer to import the xml with utf16 encoding
+    // 5a .add  document.xml to target target file. 
     srczip.deleteFile('word/document.xml')
     srczip.addFile('word/document.xml', Buffer.from(xmlstr_target, "utf-8"))
 
@@ -165,7 +165,6 @@ async function make_docx() {
 /*** functions to make and write a docx*/
 
 
-
 /***** functions for editing xml ********* */
 
 // get xml script from a src file
@@ -173,8 +172,8 @@ async function read_xml_from_src(srczip) {
     //*** read the src file data */
     // 1. read the script of document.xml from srczip
     let thesrcxmlfile_src = 'word/document.xml'
-    let encoding = "utf-8"; // the srcxml is directly from an file file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr_src = await srczip.readAsText(thesrcxmlfile_src, encoding); // 'utf-16' type is called 'utf16le'
+    let encoding = "utf-8"; // the srcxml is directly from an file file
+    let thesrcxmlstr_src = await srczip.readAsText(thesrcxmlfile_src, encoding); 
     // console.log('56:', thesrcxmlstr_src)
     // 2. remove the head line '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', and clean the srcxml ()
     let thebodyxmlstr_src = thesrcxmlstr_src.split('standalone="yes"?>')[1]
@@ -205,7 +204,7 @@ function cleanxmlstr(thexmlstr) {
     // 1. jsdom does not handle the tag <Table>A</Table> well
     // In that case, it alters the html to '<Table></Table>A' !
     // The following is to rename the tag <Table> to <Table123> to work around
-    let thesrcxmlstr_rename_table_table123 = rename_tag_named_table(thesrcxmlstr_ampersand_code_normalized)
+    // let thesrcxmlstr_rename_table_table123 = rename_tag_named_table(thesrcxmlstr_ampersand_code_normalized)
 
     // the xhtml self-colsing tags like <Parameters /> must be converted to <Parameters></Parameters>
     // because the JSDOM does not read <Parameters /> well, it'll mess up the nested structure!
@@ -220,7 +219,7 @@ function cleanxmlstr(thexmlstr) {
      </Parameters>
      2. the following is to convert  <Parameters /> to <Parameters></Parameters>
      */
-    let thesrcxmlstr_selfclosing_converted = convertSelfClosingHTML_to_OldSchoolHTML(thesrcxmlstr_rename_table_table123)
+    let thesrcxmlstr_selfclosing_converted = convertSelfClosingHTML_to_OldSchoolHTML(thesrcxmlstr_ampersand_code_normalized)
     // console.log('288', thesrcxmlstr_selfclosing_converted)
 
     //3. remove the comments (code within <!--  and -->)
@@ -234,6 +233,10 @@ function cleanxmlstr(thexmlstr) {
 async function cleanup_targetxml(_jq, thesrcxmlstr_cleaned) {
     // 1. get the modified xmlstr
     let modified_xmlstr = _jq.prop('outerHTML')
+
+    // change tag Table123 to Table
+    modified_xmlstr=modified_xmlstr.replace(/\<Table123/g, '<Table')
+    modified_xmlstr=modified_xmlstr.replace(/\<\/Table123\>/g, '</Table>')
 
     // 2. the program does not work well in identifying the tag names if there are two tags in a line
     // the following is to force line breaking between two tags. 
@@ -478,7 +481,7 @@ function wxo(tagname, attrs, html, text) {
                 })
             } // if (this.attrs && this.attrs.length >0)
             // add text contents
-            if (this.text) { _jq.text(this.text) }//if (this.text)
+            if (!(this.text === null || this.text === undefined) ) { _jq.text(this.text) }//if (this.text)
 
             _jq.appendto = function (parent_jq) {
                 parent_jq.append(_jq)

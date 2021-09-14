@@ -2158,6 +2158,10 @@ async function cleanup_targetxml(doms_obj, thesrcxmlstr_cleaned) {
     // 1. get the modified xmlstr
     let modified_xmlstr = doms_obj.prop('outerHTML')
 
+    // change tag Table123 to Table
+    modified_xmlstr=modified_xmlstr.replace(/\<Table123/g, '<Table')
+    modified_xmlstr=modified_xmlstr.replace(/\<\/Table123\>/g, '</Table>')
+
     // 2. the program does not work well in identifying the tag names if there are two tags in a line
     // the following is to force line breaking between two tags. 
     // the forced line breakers are with special marks ('___123456___')
