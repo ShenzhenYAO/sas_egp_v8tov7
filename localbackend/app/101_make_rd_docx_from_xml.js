@@ -87,7 +87,7 @@ async function make_docx() {
     // body_jq_src.append(steps_tbl_jq)
 
     //3d1 optional: add a row to steps table for the text Objective 1 ({"w:val":"4"} to merge 4 colums)
-    new wxtr('11874', null, { "w:val": "4" }).make().appendto(steps_tbl_jq)
+    new wxtr("3294", null, { "w:val": "4" }).make().appendto(steps_tbl_jq)
     p_jqs_arr = [
         new wxp(['Objective 1:']).make()
     ]
@@ -100,8 +100,9 @@ async function make_docx() {
     change_cell_contents(steps_tbl_jq, '3,1', p_jqs_arr)
     let pPrhtml = `<w:pStyle w:val="ListParagraph" />
     <w:numPr>
-        <w:ilvl w:val="0" />
-        <w:numId w:val="1" /></w:numPr>`
+        <w:ilvl w:val="0"></w:ilvl>
+        <w:numId w:val="1"></w:numId>
+    </w:numPr>`
     p_jqs_arr = [
         new wxp(['index date (date of first statin dispensation) between Jan 1, 2010 and Dec 31, 2017;'], null, pPrhtml).make(),
         new wxp(['continously covered in PHRS within 5 years prior to the index date through 1 year after the index date;'], null, pPrhtml).make(),
@@ -247,7 +248,10 @@ async function cleanup_targetxml(_jq, thesrcxmlstr_cleaned) {
 
     // 3a. make a dictionary to map out the standardized and original tagnames
     let originalTagnames_dict_crude = getOriginalTagNames_dict_crude(thesrcxmlstr_cleaned)
-    originalTagnames_dict_crude = { ...originalTagnames_dict_crude, ...{ 'W:TRPR': 'w:trPr' } }
+    originalTagnames_dict_crude = { 
+        ...originalTagnames_dict_crude, 
+        ...{ 'W:TRPR': 'w:trPr', 'W:NUMPR':'w:numPr', 'W:NUMID':'w:numId', 'W:GRIDSPAN':'w:gridSpan' } 
+    }
     // console.log('140', originalTagnames_dict_crude)
     // 3b. make a dictionary to map out the standardized and original attribute names
     let originalAttrNames_dict_crude = getOriginalAttrNames_dict_crude(thesrcxmlstr_cleaned)

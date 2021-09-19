@@ -459,7 +459,6 @@ function getOriginalTagNames_dict_crude(thexhmlstr) {
 /***** functions for editing xml ********* */
 
 
-
 /**common tools*************************************** */
 
 // get a dict of path, name, and extention name of a file

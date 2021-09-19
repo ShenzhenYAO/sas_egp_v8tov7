@@ -11,19 +11,12 @@ xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk"
 xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
 mc:Ignorable="w14 wp14">
     <w:body>
-        <w:p w:rsidR="004C112A" w:rsidRPr="00206C6A" w:rsidRDefault="00206C6A"
+        <w:p w:rsidR="004C112A" w:rsidRPr="00206C6A" w:rsidRDefault="007A4E56"
         w:rsidP="005762EB">
             <w:pPr>
                 <w:pStyle w:val="Title" /></w:pPr>
-            <w:bookmarkStart w:id="0" w:name="_GoBack" />
             <w:r>
-                <w:t>[</w:t>
-            </w:r>
-            <w:r w:rsidR="008D3C3F" w:rsidRPr="00206C6A">
                 <w:t>Project Title</w:t>
-            </w:r>
-            <w:r>
-                <w:t>]</w:t>
             </w:r>
         </w:p>
         <w:tbl>
@@ -39,7 +32,6 @@ mc:Ignorable="w14 wp14">
                 <w:tc>
                     <w:tcPr>
                         <w:tcW w:w="2093" w:type="dxa" /></w:tcPr>
-                    <w:bookmarkEnd w:id="0" />
                     <w:p w:rsidR="008D3C3F" w:rsidRDefault="008D3C3F">
                         <w:r>
                             <w:t>Creator</w:t>
@@ -64,22 +56,9 @@ mc:Ignorable="w14 wp14">
                 <w:tc>
                     <w:tcPr>
                         <w:tcW w:w="11083" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="008D3C3F" w:rsidRDefault="00556F0C">
-                        <w:r>
-                            <w:fldChar w:fldCharType="begin" /></w:r>
-                        <w:r>
-                            <w:instrText xml:space="preserve">DATE \@ "yyyy-MM-dd"</w:instrText>
-                        </w:r>
-                        <w:r>
-                            <w:fldChar w:fldCharType="separate" /></w:r>
-                        <w:r w:rsidR="00086BF7">
-                            <w:rPr>
-                                <w:noProof/></w:rPr>
-                            <w:t>2021-09-10</w:t>
-                        </w:r>
-                        <w:r>
-                            <w:fldChar w:fldCharType="end" /></w:r>
-                    </w:p>
+                    <w:p w:rsidR="008D3C3F" w:rsidRDefault="008D3C3F">
+                        <w:bookmarkStart w:id="0" w:name="_GoBack" />
+                        <w:bookmarkEnd w:id="0" /></w:p>
                 </w:tc>
             </w:tr>
         </w:tbl>
@@ -189,186 +168,6 @@ mc:Ignorable="w14 wp14">
                     </w:p>
                 </w:tc>
             </w:tr>
-            <w:tr w:rsidR="00166D68" w:rsidTr="00407027">
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="11874" w:type="dxa" />
-                        <w:gridSpan w:val="3" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68">
-                        <w:r>
-                            <w:t>Part A</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="1302" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68">
-                        <w:r>
-                            <w:t>2021-09-10</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-            </w:tr>
-            <w:tr w:rsidR="00EA527B" w:rsidTr="00336BBA">
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="3294" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00EA527B" w:rsidRDefault="00336BBA">
-                        <w:r>
-                            <w:t>A1. Create cohort.</w:t>
-                        </w:r>
-                    </w:p>
-                    <w:p w:rsidR="00336BBA" w:rsidRDefault="00336BBA">
-                        <w:r>
-                            <w:t xml:space="preserve">Keep</w:t>
-                        </w:r>
-                        <w:proofErr w:type="spellStart" />
-                        <w:r>
-                            <w:t>Key_hsn</w:t>
-                        </w:r>
-                        <w:proofErr w:type="spellEnd" />
-                        <w:r>
-                            <w:t>, birth, sex</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="5461" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00EA527B" w:rsidRDefault="00336BBA" w:rsidP="00336BBA">
-                        <w:pPr>
-                            <w:pStyle w:val="ListParagraph" />
-                            <w:numPr>
-                                <w:ilvl w:val="0" />
-                                <w:numId w:val="1" /></w:numPr>
-                        </w:pPr>
-                        <w:r>
-                            <w:t>between 1996-01-01 and 2020-12-31</w:t>
-                        </w:r>
-                    </w:p>
-                    <w:p w:rsidR="00336BBA" w:rsidRDefault="00336BBA" w:rsidP="00336BBA">
-                        <w:pPr>
-                            <w:pStyle w:val="ListParagraph" />
-                            <w:numPr>
-                                <w:ilvl w:val="0" />
-                                <w:numId w:val="1" /></w:numPr>
-                        </w:pPr>
-                        <w:r>
-                            <w:t>continuously covered for 5 years prior to the index date</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="3119" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00EA527B" w:rsidRDefault="00EA527B" /></w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="1302" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00EA527B" w:rsidRDefault="00166D68">
-                        <w:r>
-                            <w:t>2021-09-10</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-            </w:tr>
-            <w:tr w:rsidR="00166D68" w:rsidTr="00336BBA">
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="3294" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68">
-                        <w:r>
-                            <w:t>A2. Pharmacy claim records</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="5461" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68" w:rsidP="00166D68">
-                        <w:pPr>
-                            <w:pStyle w:val="ListParagraph" />
-                            <w:numPr>
-                                <w:ilvl w:val="0" />
-                                <w:numId w:val="1" /></w:numPr>
-                        </w:pPr>
-                        <w:r>
-                            <w:t>Statin claims (DIN in Attachment A)</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="3119" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68" /></w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="1302" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68" w:rsidP="00F13758">
-                        <w:r>
-                            <w:t>2021-09-10</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-            </w:tr>
-            <w:tr w:rsidR="00166D68" w:rsidTr="002426B7">
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="11874" w:type="dxa" />
-                        <w:gridSpan w:val="3" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68">
-                        <w:r>
-                            <w:t>Objective 1</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="1302" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68" w:rsidP="00F13758">
-                        <w:r>
-                            <w:t>2021-09-10</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-            </w:tr>
-            <w:tr w:rsidR="00166D68" w:rsidTr="00336BBA">
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="3294" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68">
-                        <w:r>
-                            <w:t xml:space="preserve">1a.</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="5461" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68" w:rsidP="00166D68">
-                        <w:pPr>
-                            <w:pStyle w:val="ListParagraph" />
-                            <w:numPr>
-                                <w:ilvl w:val="0" />
-                                <w:numId w:val="1" /></w:numPr>
-                        </w:pPr>
-                    </w:p>
-                </w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="3119" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68" /></w:tc>
-                <w:tc>
-                    <w:tcPr>
-                        <w:tcW w:w="1302" w:type="dxa" /></w:tcPr>
-                    <w:p w:rsidR="00166D68" w:rsidRDefault="00166D68" w:rsidP="00F13758">
-                        <w:r>
-                            <w:t>2021-09-10</w:t>
-                        </w:r>
-                    </w:p>
-                </w:tc>
-            </w:tr>
         </w:tbl>
         <w:p w:rsidR="00950186" w:rsidRDefault="00950186" />
         <w:p w:rsidR="00950186" w:rsidRDefault="00950186" />
@@ -410,8 +209,6 @@ mc:Ignorable="w14 wp14">
             <w:r>
                 <w:instrText xml:space="preserve">ADDIN EN.REFLIST</w:instrText>
             </w:r>
-            <w:r>
-                <w:fldChar w:fldCharType="separate" /></w:r>
             <w:r>
                 <w:fldChar w:fldCharType="end" /></w:r>
         </w:p>

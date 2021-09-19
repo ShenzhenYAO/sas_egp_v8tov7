@@ -157,7 +157,7 @@ mc:Ignorable="w14 wp14">
             <w:tr>
                 <w:tc address="2,1">
                     <w:tcPr>
-                        <w:tcW w:w="11874" w:type="dxa"></w:tcW>
+                        <w:tcW w:w="3294" w:type="dxa"></w:tcW>
                         <w:gridSpan w:val="4"></w:gridSpan>
                     </w:tcPr>
                     <w:p>
