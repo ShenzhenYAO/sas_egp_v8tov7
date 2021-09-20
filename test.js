@@ -8,11 +8,10 @@ var $ = require("jquery")(window);
 const srcfolder = 'data/in/prototype/__xml/egpv8/';
 
 (async () => {
-    
-    let wrong = await mymodules.readtxt("F:\\Personal\\Virtual_Server\\PHPWeb\\sas_make_docx_xlsx\\data\\out\\document.xml")
-    let correct = await mymodules.readtxt("F:\\Personal\\Virtual_Server\\PHPWeb\\sas_make_docx_xlsx\\data\\out\\fileFromZip.xml")
 
-    console.log(wrong.length, correct.length)
+    let str='__split__seg2__split__'
+    let segs = str.split('__split__')
+    console.log(segs)
 
 })()
 

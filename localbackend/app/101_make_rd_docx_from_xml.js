@@ -7,7 +7,7 @@ var $ = require("jquery")(window);
 
 // https://www.npmjs.com/package/adm-zip
 const AdmZip = require('adm-zip');
-const { config, setgroups } = require('process');
+// const { config, setgroups } = require('process');
 
 const beautify = require('beautify');
 
