@@ -1,52 +1,15 @@
-<w:tc>
-    <w:tcpr>
-        <w:tcw></w:tcw>
-    </w:tcpr>
-    <w:p>
-        <w:ppr></w:ppr>
-        <w:r>
-            <w:rpr></w:rpr>
-            <w:t>It can be easily </w:t>
-        </w:r>
-        <w:r>
-            <w:rpr>
-                <w:b></w:b>
-            </w:rpr>
-            <w:t>created by </w:t>
-        </w:r>
-        <w:r>
-            <w:rpr></w:rpr>
-            <w:t>loop</w:t>
-        </w:r>
-        <w:r>
-            <w:rpr>
-                <w:b></w:b>
-            </w:rpr>
-            <w:t> in data steps</w:t>
-        </w:r>
-        <w:r>
-            <w:rpr></w:rpr>
-            <w:t>. It contains a patient id (</w:t>
-        </w:r>
-        <w:r>
-            <w:rpr>
-                <w:b></w:b>
-            </w:rpr>
-            <w:t>pid</w:t>
-        </w:r>
-        <w:r>
-            <w:rpr></w:rpr>
-            <w:t>) and a </w:t>
-        </w:r>
-        <w:r>
-            <w:rpr>
-                <w:b></w:b>
-            </w:rpr>
-            <w:t>DIN</w:t>
-        </w:r>
-        <w:r>
-            <w:rpr></w:rpr>
-            <w:t>.</w:t>
-        </w:r>
-    </w:p>
-</w:tc>
+<w:tr>
+    <w:tc address="2,1">
+        <w:tcpr>
+            <w:tcw w:w="3294" w:type="dxa"></w:tcw>
+            <w:gridspan w:val="4"></w:gridspan>
+        </w:tcpr>
+        <w:p>
+            <w:ppr></w:ppr>
+            <w:r>
+                <w:rpr></w:rpr>
+                <w:t>Objective 1: Cohort Preparation</w:t>
+            </w:r>
+        </w:p>
+    </w:tc>
+</w:tr>

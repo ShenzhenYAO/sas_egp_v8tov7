@@ -23,7 +23,6 @@ const srcEGPFile = 'test_rd_in_comments.egp';
 const theEGPFileWithPath = srcEGPPath + srcEGPFile;
 
 const thesrczip = new AdmZip(theEGPFileWithPath);
-
 const targetpath = 'data/out';
 
 (async () => {
@@ -33,24 +32,254 @@ const targetpath = 'data/out';
     // save the project xml code to a local file
     // //2a. save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
     let thesrcxmlfile = targetpath + '/' + '___projectxml_src.xml'
-
     let beautfied_projectxml_str = beautify(projectxml_str, { format: 'xml' })
     await saveLocalTxtFile(beautfied_projectxml_str, thesrcxmlfile, 'utf16le');
 
-    // Find the jq dom with codetask id and label info, i.e., in ProjectCollection > Elements, get all <Element Type="SAS.EG.ProjectElements.CodeTask"> and find their > ELement
-    let codetasks_jq = projectxml_jq.find('Elements > Element[Type="SAS.EG.ProjectElements.CodeTask"] > Element')
-    // console.log('39', codetasks_jq)
+    // get all codetasks
+    let codetasks_arr = get_codetasks(projectxml_jq)
 
-    // loop and get codetask id
-    let codetasks_arr = []
-    for (let i = 0; i < codetasks_jq.length; i++) {
-        let thecodetask_element_jq = $(codetasks_jq[i])
-        let codetaskid = $(thecodetask_element_jq.find('ID')[0]).text()
-        let codetasklabel = $(thecodetask_element_jq.find('Label')[0]).text()
-        codetasks_arr.push({ id: codetaskid, label: codetasklabel })
-    } // for (let i=0; i<codetasks_jq.length; i++ )
-    // console.log('47', codetasks_arr)
+    // make an array of htmlparagraphs
+    let htmlparagraphs_arr = await make_htmlparagraphs_arr(codetasks_arr, thesrczip)
 
+    // now, an array of w:tc components
+    let wtcs_arr = make_wtcs_arr(htmlparagraphs_arr)
+    // console.log(46, wtcs_arr[wtcs_arr.length-1].cell.prop('outerHTML'))
+
+    // make a wtcs_dict, each tc has a key like 'r1c1' (row 1 col 1)
+    // the above wtcs_arr is not entirely right. actually that arr is supposed to be a collection of w:p (paragraphs) clusters, each for a tc...
+    // anyway, just carry on and make a dict out of it, still keep the tc instead of cluster of w:p components
+    let wtcs_dict = make_wtcs_dict(wtcs_arr)
+    // Note: wtcs_dict starts from r2c1 (row 1 is the table head which is prepared in the template file)
+    // console.log(52, wtcs_dict['r2c1'].prop('outerHTML'))
+
+    // make an array of w:tr components
+    // there should always be 1 or 4 tc in a w:tr, of which some have a corresponding tc of the same address from wtcs_dict (if the cell is not supposed to be empty), and some not
+    let wtrs_arr = make_wtrs_arr(wtcs_dict)
+    // console.log(58, wtrs_arr[0].prop('outerHTML'))
+    // console.log(59, wtrs_arr[wtrs_arr.length-1].prop('outerHTML'))
+
+    
+
+})()
+
+// make an array of w:tr components
+// there should always be 1 or 4 tc in a w:tr, of which some have a corresponding tc of the same address from wtcs_dict (if the cell is not supposed to be empty), and some not
+function make_wtrs_arr(wtcs_dict) {
+    let wtrs_arr = []
+    // find the max row in 
+    let addresskeys = Object.keys(wtcs_dict)
+    let rows_arr = addresskeys.map(x => { return parseInt(x.split('c')[0].split('r')[1]) })
+    let max_row_num = Math.max(...rows_arr) // note: cannot get max from an array, neet to chagne it to a list 
+
+    // loop from row 2 to max row
+    for (let i = 2; i < max_row_num + 1; i++) {
+        // make a w:tr
+        let wxtr_jq = new wxtr().make()
+        // remove the default tc
+        wxtr_jq.find('w\\:tc').remove()
+
+        // for each tr, add 4 tc
+        let mergecells = 0
+        for (let j = 1; j < 4 + 1; j++) {
+            let addresskey = 'r' + i.toString() + 'c' + j.toString()
+            if (wtcs_dict[addresskey]) {
+                wxtr_jq.append(wtcs_dict[addresskey])
+                // determine if merge of the row is specified
+                if (j === 1) {
+                    let wxgridspan_jq = $(wtcs_dict[addresskey].find('w\\:tcPr > w\\:gridSpan')[0])
+                    if (wxgridspan_jq.length > 0) {
+                        // console.log(85, i, j, wxgridspan_jq.prop('outerHTML'))
+                        mergecells = 1
+                    }
+                } //if (j === 1)                   
+            } else {
+                // console.log(90, mergecells)
+                if (mergecells === 0) {
+                    // make an empty w:tc
+                    let tc_jq = new wxtc().make().appendto(wxtr_jq)
+                    tc_jq.attr('address', i.toString() + ',' + j.toString())
+                    // console.log(94, tc_jq.prop('outerHTML'))
+                    // set column width
+                    let width_cols_arr = ['3294', '5461', '3119', '1302']
+                    let wxtcw_jq = $(tc_jq.find('w\\:tcPr > w\\:tcW')[0])
+                    wxtcw_jq.attr('w:w', width_cols_arr[j - 1])
+                    wxtcw_jq.attr('w:type', "dxa")
+
+                    // must add a w:p
+                    let wxp_jq = new wxp().make().appendto(tc_jq)
+                    let wxr_jq = new wxr().make().appendto(wxp_jq)
+                    let wxt_jq = new wxo('w:t').make().appendto(wxr_jq)
+                } // if (! (j>1 && mergecells === true))
+            } //if (wtcs_dict[addresskey])
+        } //for(let j= 1; j< 4+1; j++)
+        // console.log(71, wxtr_jq.prop('outerHTML'))
+
+        wtrs_arr.push(wxtr_jq)
+    } // for (let i=2; i< max_row_num+1;i++)
+
+    return wtrs_arr
+} //function make_wtrs_arr (wtcs_dict)
+
+
+
+// make a dict of wtcs, each tc has a key like 'r1c1' (row 1 col 1)
+// the thewtcs.row and .col start from 0, which is corresponding to the index in the orignal array
+// however, for the research doc steps table, these tcs start from row 2 and col 1 (row 1 is the header) 
+function make_wtcs_dict(wtcs_arr) {
+    let wtcs_dict = {}
+    for (let i = 0; i < wtcs_arr.length; i++) {
+        let thewtcs = wtcs_arr[i]
+        // add an address attr to each tc
+        thewtcs.cell.attr('address', (parseInt(thewtcs.row) + 2).toString() + ',' + (parseInt(thewtcs.col) + 1).toString())
+        wtcs_dict['r' + (parseInt(thewtcs.row) + 2).toString() + 'c' + (parseInt(thewtcs.col) + 1).toString()] = thewtcs.cell
+    } // for (let i=0; i <wtcs_arr.length; i++ )
+    return wtcs_dict
+} // function make_wtcs_dict(wtcs_arr)
+
+// now, make word xml code string for the table rows
+function make_wtcs_arr(htmlparagraphs_arr) {
+    //loop for each element in htmlparagraphs_arr again. This time is to make w:tr, w:tc, and w:p components for the table steps
+    let retained_tr_num_by_label_order, retained_col_num, wps_current_wtc = [], wtcs_arr = []
+    for (let i = 0; i < htmlparagraphs_arr.length; i++) {
+
+        // for (let i = 0; i < 7; i++) { // for testing
+        let htmlparagraph = htmlparagraphs_arr[i]
+        // console.log('172', htmlparagraph)
+        let thehtmlstr = htmlparagraph.html
+
+        //make an empty w:p component (with w:pPr)
+        let wp_jq = new wxp().make()
+        // if thehtmlstr's tagname is <ul> or <ol>, add the following innerHTML to define the paragraph as a list, and specify the bulletins
+        /*
+            <w:pStyle w:val="ListParagraph"></w:pStyle>
+            <w:numPr>
+                <w:ilvl w:val="0"></w:ilvl>
+                <w:numId w:val="1"></w:numId>
+            </w:numPr>
+         */
+
+        let hp_jq = $(thehtmlstr) // hp for html of the paragraph
+        hp_tagname = hp_jq.prop('tagName').toLowerCase()
+        wxppr_dict = {}
+        wxppr_dict.list = function wxppr_list(wp_jq, listtype) {
+            /* to add like the following into w:pPr
+                <w:pStyle w:val="ListParagraph"></w:pStyle>
+                <w:numPr>
+                    <w:ilvl w:val="0"></w:ilvl>
+                    <w:numId w:val="1"></w:numId>
+                </w:numPr>
+             */
+            if (listtype === 'ul' || listtype === 'ol') {
+                // find or create the tag w:pPr
+                let wxppr_jq = $(wp_jq.find('w\\:pPr')[0])
+                if (!wxppr_jq) { wxppr_jq = new wxo('w:pPr').make().appendto(wp_jq) }
+                // find or create the tag w:pStyle
+                let wxpstyle_jq = $(wxppr_jq.find('w\\:pStyle')[0])
+                if (!wxpstyle_jq) { wxpstyle_jq = new wxo('w:pStyle').make().appendto(wxppr_jq) }
+                // within wxppr_jq, define the attr w:val as 'ListParagraph
+                wxppr_jq.attr('w:val', 'ListParagraph')
+                // find or create w:numPr
+                let wxnumpr_jq = $(wp_jq.find('w\\:numPr')[0])
+                if (!wxnumpr_jq) { wxnumpr_jq = new wxo('w:numPr').make().appendto(wp_jq) }
+                // find or create w:w:ilvl
+                let wxilvl_jq = $(wxnumpr_jq.find('w\\:ilvl')[0])
+                if (!wxilvl_jq) { wxilvl_jq = new wxo('w:w:ilvl').make().appendto(wxnumpr_jq) }
+                wxilvl_jq.attr('w:val', '0')
+                // find or create w:numId
+                let wxnumid_jq = $(wxnumpr_jq.find('w\\:numId')[0])
+                if (!wxnumid_jq) { wxnumid_jq = new wxo('w:numId').make().appendto(wxnumpr_jq) }
+                // by default, the bulletin is '-'
+                wxnumid_jq.attr('w:val', '1')
+                // for <ol>, make bulletin as numbers
+                if (listtype === "ol") { wxnumid_jq.attr('w:val', '2') }
+            }// if (listtype === 'ul' || listtype==='ol')
+            return wp_jq
+        } //  function wxppr_list(wp_jq, listtype)
+
+        wp_jq = wxppr_dict.list(wp_jq, hp_tagname)
+
+        // change html into a jquery object        
+        let wxrs_arr = make_paragraph_wxrs(thehtmlstr)
+        // console.log('222', wp_jq.prop('outerHTML'))        
+
+        wp_jq.append(wxrs_arr)
+        //console.log(345, wp_jq.prop('outerHTML'))
+        // by this step, the w:p components is done.        
+
+        // Next, make w:tc
+        let current_col_num = htmlparagraph.col_num
+        let current_tr_num_by_label_order = htmlparagraph.tr_num_by_label_order
+        // console.log(357,current_col_num)
+
+        if (i > 0 && (retained_tr_num_by_label_order !== current_tr_num_by_label_order || retained_col_num !== current_col_num)) {
+            retained_col_num = current_col_num
+            retained_tr_num_by_label_order = current_tr_num_by_label_order
+            // make a new tc
+            // make an empty w:tc  (with w:tcPr > w:tcW)
+            let wtc_jq = new wxtc().make()
+            // set column width
+            let wtcw_jq = $(wtc_jq.find('w\\:tcPr > w\\:tcW')[0])
+            let width_cols_arr = ['3294', '5461', '3119', '1302']
+            let width_tc = width_cols_arr[htmlparagraphs_arr[i - 1].col_num]
+            wtcw_jq.attr("w:w", width_tc)
+            wtcw_jq.attr("w:type", 'dxa')
+            // if (wps_current_wtc.length > 0) { console.log(178, wps_current_wtc[wps_current_wtc.length - 1].prop('outerHTML')) }
+            wtc_jq.append(wps_current_wtc)
+
+            // determine whether to the cell merges the whole row
+            if (wtc_jq.text().includes('[mergecells]')) {
+                wtc_jq.find('w\\:tcPr').append($('<w:gridSpan w:val="4"></w:gridSpan>'))
+                let wt_jq = $(wtc_jq.find('w\\:p > w\\:r > w\\:t')[0])
+                let text = wt_jq.text()
+                text = text.replace(/\[mergecells\]/g, '').trim()
+                wt_jq.text(text)
+            } // if (wtc_jq.text().includes('[mergecells]'))
+
+            // console.log(190, wtc_jq.prop('outerHTML'))
+            // console.log(191, i, htmlparagraphs_arr.length)
+            let thewtc = {}
+            thewtc.col = htmlparagraphs_arr[i - 1].col_num
+            thewtc.row = htmlparagraphs_arr[i - 1].tr_num_by_label_order
+            thewtc.cell = wtc_jq
+            wtcs_arr.push(thewtc)
+
+            wps_current_wtc = []
+            wps_current_wtc.push(wp_jq)
+
+        } else {
+            // push the current paragraph into an array of paragraphs for the current w:tc
+            wps_current_wtc.push(wp_jq)
+
+            if (i === htmlparagraphs_arr.length - 1) {
+                // console.log(206, wps_current_wtc[wps_current_wtc.length - 1].prop('outerHTML'))
+
+                // make a new tc
+                // make an empty w:tc  (with w:tcPr > w:tcW)
+                let wtc_jq = new wxtc().make()
+                // set column width
+                let wtcw_jq = $(wtc_jq.find('w\\:tcPr > w\\:tcW')[0])
+                let width_cols_arr = ['3294', '5461', '3119', '1302']
+                let width_tc = width_cols_arr[htmlparagraphs_arr[i - 1].col_num]
+                wtcw_jq.attr("w:w", width_tc)
+                wtcw_jq.attr("w:type", 'dxa')
+                // if (wps_current_wtc.length > 0) { console.log(217, wps_current_wtc[wps_current_wtc.length - 1].prop('outerHTML')) }
+                wtc_jq.append(wps_current_wtc)
+
+                let thewtc = {}
+                thewtc.col = htmlparagraphs_arr[i].col_num
+                thewtc.row = htmlparagraphs_arr[i].tr_num_by_label_order
+                thewtc.cell = wtc_jq
+                wtcs_arr.push(thewtc)
+
+            } //
+        } // if else (retained_col_num !== current_col_num)
+    }//for (let i = 0; i<htmlparagraphs_arr.length; i++ ){
+    // console.log(229, wtcs_arr)
+    return wtcs_arr
+}// function make_wtcs_arr()
+
+// make htmlparagraphs_arr
+async function make_htmlparagraphs_arr(codetasks_arr, thesrczip) {
     // loop for each element in codetasks_arr, according to the codetask id, find the entry like (<codetaskid>/code.sas) in the srczip
     // note, always use for loop instead of .forEach (the latter does not support async)
     let rdtext_arr = [], htmlparagraphs_arr = [], tr_num_by_task_create_order = -1
@@ -127,9 +356,9 @@ const targetpath = 'data/out';
                     if (thetextline !== '') {
                         // only keep the lines that are not blank
                         // convert the textline to html by markdown-it
-                        console.log(130, thetextline)
+                        // console.log(130, thetextline)
                         let htmlline_by_markdownit = md.render(thetextline)
-                        console.log(132, htmlline_by_markdownit)
+                        // console.log(132, htmlline_by_markdownit)
                         htmlline_by_markdownit = htmlline_by_markdownit.replace(/\n/g, "")
                         htmlparagraphs_arr.push({ html: htmlline_by_markdownit, id: thecodetask_id, label: thecodetask_label, rd_order_in_task: j, col_num: k, paragraph_order_in_rd: m, tr_num_by_task_create_order: tr_num_by_task_create_order })
                         rdtext_arr.push({ text: thetextline, id: thecodetask_id, label: thecodetask_label, rd_order_in_task: j, col_num: k, paragraph_order_in_rd: m, tr_num_by_task_create_order: tr_num_by_task_create_order })
@@ -160,214 +389,156 @@ const targetpath = 'data/out';
         }// if (retained_tr_num_by_task_create_order !== current_tr_num_by_task_create_order)
         htmlparagraph.tr_num_by_label_order = tr_num_by_label_order
     } //for (let i = 0; i<htmlparagraphs_arr.length; i++ )
-    // console.log('162', htmlparagraphs_arr)
+    htmlparagraphs_arr.sort((a, b) => (a.label.localeCompare(b.label) || a.tr_num_by_label_order - b.tr_num_by_label_order || a.col_num - b.col_num || a.paragraph_order_in_rd - b.paragraph_order_in_rd));
+    // console.log('164', htmlparagraphs_arr)
 
-    // now, make word xml code string for the table rows
-    //loop for each element in htmlparagraphs_arr again. This time is to make w:tr, w:tc, and w:p components for the table steps
-    let retained_tr_num_by_label_order
-    // for (let i = 0; i < htmlparagraphs_arr.length; i++) {
-    for (let i = 5; i < 6; i++) {
-        let htmlparagraph = htmlparagraphs_arr[i]
-        console.log('169', htmlparagraph)
-        let thehtmlstr = htmlparagraph.html
+    return htmlparagraphs_arr
 
-        // each paragraph makes a w:p nested within a w:tc
-        // make an empty w:tc  (with w:tcPr > w:tcW)
-        let wtc_jq = new wxtc().make()
+} // function make_htmlparagraphs_arr ()
 
-        //make an empty w:p component (with w:pPr)
-        let wp_jq = new wxp().make().appendto(wtc_jq)
-        // if thehtmlstr's tagname is <ul> or <ol>, add the following innerHTML to define the paragraph as a list, and specify the bulletins
-        /*
-            <w:pStyle w:val="ListParagraph"></w:pStyle>
-            <w:numPr>
-                <w:ilvl w:val="0"></w:ilvl>
-                <w:numId w:val="1"></w:numId>
-            </w:numPr>
-         */
-        let hp_jq = $(thehtmlstr) // hp for html of the paragraph
-        hp_tagname = hp_jq.prop('tagName').toLowerCase()
-        wxppr_dict = {}
-        wxppr_dict.list = function wxppr_list(wp_jq, listtype) {
-            /* to add like the following into w:pPr
-                <w:pStyle w:val="ListParagraph"></w:pStyle>
-                <w:numPr>
-                    <w:ilvl w:val="0"></w:ilvl>
-                    <w:numId w:val="1"></w:numId>
-                </w:numPr>
-             */
-            // find or create the tag w:pPr
-            let wxppr_jq = $(wp_jq.find('w\\:pPr')[0])
-            if (!wxppr_jq) { wxppr_jq = new wxo('w:pPr').make().appendto(wp_jq) }
-            // find or create the tag w:pStyle
-            let wxpstyle_jq = $(wxppr_jq.find('w\\:pStyle')[0])
-            if (!wxpstyle_jq) { wxpstyle_jq = new wxo('w:pStyle').make().appendto(wxppr_jq) }
-            // within wxppr_jq, define the attr w:val as 'ListParagraph
-            wxppr_jq.attr('w:val', 'ListParagraph')
-            // find or create w:numPr
-            let wxnumpr_jq = $(wp_jq.find('w\\:numPr')[0])
-            if (!wxnumpr_jq) { wxnumpr_jq = new wxo('w:numPr').make().appendto(wp_jq) }
-            // find or create w:w:ilvl
-            let wxilvl_jq = $(wxnumpr_jq.find('w\\:ilvl')[0])
-            if (!wxilvl_jq) { wxilvl_jq = new wxo('w:w:ilvl').make().appendto(wxnumpr_jq) }
-            wxilvl_jq.attr('w:val', '0')
-            // find or create w:numId
-            let wxnumid_jq = $(wxnumpr_jq.find('w\\:numId')[0])
-            if (!wxnumid_jq) { wxnumid_jq = new wxo('w:numId').make().appendto(wxnumpr_jq) }
-            // by default, the bulletin is '-'
-            wxnumid_jq.attr('w:val', '1')
-            // for <ol>, make bulletin as numbers
-            if (listtype === "ol") { wxnumid_jq.attr('w:val', '2') }
-            return wp_jq
-        } //  function wxppr_list(wp_jq, listtype)
+// get all codetasks
+function get_codetasks(projectxml_jq) {
+    // Find the jq dom with codetask id and label info, i.e., in ProjectCollection > Elements, get all <Element Type="SAS.EG.ProjectElements.CodeTask"> and find their > ELement
+    let codetasks_jq = projectxml_jq.find('Elements > Element[Type="SAS.EG.ProjectElements.CodeTask"] > Element')
+    // console.log('39', codetasks_jq)
 
-        // change html into a jquery object        
-        let wxrs_arr = make_paragraph_wxrs(thehtmlstr)
-        // console.log('222', wp_jq.prop('outerHTML'))
-        function make_paragraph_wxrs(htmlstr) {
-            let wxrs_arr = []
-            let wxrpr_dict = {}
+    // loop and get codetask id
+    let codetasks_arr = []
+    for (let i = 0; i < codetasks_jq.length; i++) {
+        let thecodetask_element_jq = $(codetasks_jq[i])
+        let codetaskid = $(thecodetask_element_jq.find('ID')[0]).text()
+        let codetasklabel = $(thecodetask_element_jq.find('Label')[0]).text()
+        codetasks_arr.push({ id: codetaskid, label: codetasklabel })
+    } // for (let i=0; i<codetasks_jq.length; i++ )
+    // console.log('47', codetasks_arr)
 
-            // 1. make a jquery obj from the htmlstr
-            let h_jq = $(htmlstr)
-            // 2. get the tag name of the obj
-            let tagname = h_jq.prop('tagName').toLowerCase()
-            // tagname are used to determine the property (w:pPr) of the 
-            // for making the research doc, only strong, ins, will be identified. other tagnames are treated as plain text.
-            // if tagname = strong, add<w:b/> into <w:rPr>
+    return codetasks_arr
+} // function get_codetasks(projectxml_jq) {
 
-            wxrpr_dict.strong = function wxrpr_strong(wxr_jq) {
-                // find or create w:rPr
-                // console.log(239, wxr_jq.prop('outerHTML'))
-                let wxrpr_jq = $(wxr_jq.find('w\\:rPr')[0])
-                // console.log(241, wxrpr_jq.prop('outerHTML'))
-                if (!wxrpr_jq) { wxrpr_jq = new wxo('w:rPr').make().appendto(wxr_jq) } //if (! wxrpr)
-                // add <w:b/> to w:rPr (making font bold)
-                wxrpr_jq.html('<w:b/>')
-                return wxr_jq
-            } // function wxr_strong (wxr_jq)
-            wxrpr_dict.em = function wxrpr_em(wxr_jq) {
-                // find or create w:rPr
-                // console.log(239, wxr_jq.prop('outerHTML'))
-                let wxrpr_jq = $(wxr_jq.find('w\\:rPr')[0])
-                // console.log(241, wxrpr_jq.prop('outerHTML'))
-                if (!wxrpr_jq) { wxrpr_jq = new wxo('w:rPr').make().appendto(wxr_jq) } //if (! wxrpr)
-                // add <w:b/> to w:rPr (making font bold)
-                wxrpr_jq.html('<w:i/>')
-                return wxr_jq
-            } // function wxr_strong (wxr_jq)
-            wxrpr_dict.ins = function wxrpr_ins(wxr_jq) {
-                // find or create w:rPr
-                let wxrpr_jq = $(wxr_jq.find('w\\:rPr')[0])
-                if (!wxrpr_jq) { wxrpr_jq = new wxo('w:rPr').make().appendto(wxr_jq) } //if (! wxrpr)
-                // add <w:b/> to w:rPr (making font bold)
-                wxrpr_jq.html('<w:u w:val="single"/>')
-                return wxr_jq
-            } // function wxr_ins (wxr_jq)
+// make an array of w:r components according to the input html
+function make_paragraph_wxrs(htmlstr) {
+    let wxrs_arr = []
+    let wxrpr_dict = {}
 
-            // 3. get the innerHTML of the object
-            let innerhtmlstr = h_jq.prop('innerHTML')
-            // the innerhtmlstr could be like '... a patient id (<strong>pid</strong>) and a <strong>DIN</strong>...'
-            // in which there are multiple children nodes
+    // 1. make a jquery obj from the htmlstr
+    let h_jq = $(htmlstr)
+    // 2. get the tag name of the obj
+    let tagname = h_jq.prop('tagName').toLowerCase()
+    // tagname are used to determine the property (w:pPr) of the 
+    // for making the research doc, only strong, ins, will be identified. other tagnames are treated as plain text.
+    // if tagname = strong, add<w:b/> into <w:rPr>
 
-            // if there is no cildren nodes, the whole innerhtmlstr will be make into a single w:r component
-            if (h_jq.children().length === 0) {
-                let wp_text = innerhtmlstr
-                wxrs_arr.push(make_text_wrwt(wxrpr_dict, tagname, wp_text))
+    wxrpr_dict.strong = function wxrpr_strong(wxr_jq) {
+        // find or create w:rPr
+        // console.log(239, wxr_jq.prop('outerHTML'))
+        let wxrpr_jq = $(wxr_jq.find('w\\:rPr')[0])
+        // console.log(241, wxrpr_jq.prop('outerHTML'))
+        if (!wxrpr_jq) { wxrpr_jq = new wxo('w:rPr').make().appendto(wxr_jq) } //if (! wxrpr)
+        // add <w:b/> to w:rPr (making font bold)
+        wxrpr_jq.html('<w:b/>')
+        return wxr_jq
+    } // function wxr_strong (wxr_jq)
+    wxrpr_dict.em = function wxrpr_em(wxr_jq) {
+        // find or create w:rPr
+        // console.log(239, wxr_jq.prop('outerHTML'))
+        let wxrpr_jq = $(wxr_jq.find('w\\:rPr')[0])
+        // console.log(241, wxrpr_jq.prop('outerHTML'))
+        if (!wxrpr_jq) { wxrpr_jq = new wxo('w:rPr').make().appendto(wxr_jq) } //if (! wxrpr)
+        // add <w:b/> to w:rPr (making font bold)
+        wxrpr_jq.html('<w:i/>')
+        return wxr_jq
+    } // function wxr_strong (wxr_jq)
+    wxrpr_dict.ins = function wxrpr_ins(wxr_jq) {
+        // find or create w:rPr
+        let wxrpr_jq = $(wxr_jq.find('w\\:rPr')[0])
+        if (!wxrpr_jq) { wxrpr_jq = new wxo('w:rPr').make().appendto(wxr_jq) } //if (! wxrpr)
+        // add <w:b/> to w:rPr (making font bold)
+        wxrpr_jq.html('<w:u w:val="single"/>')
+        return wxr_jq
+    } // function wxr_ins (wxr_jq)
+
+    // 3. get the innerHTML of the object
+    let innerhtmlstr = h_jq.prop('innerHTML')
+    // the innerhtmlstr could be like '... a patient id (<strong>pid</strong>) and a <strong>DIN</strong>...'
+    // in which there are multiple children nodes
+
+    // if there is no cildren nodes, the whole innerhtmlstr will be make into a single w:r component
+    if (h_jq.children().length === 0) {
+        let wp_text = innerhtmlstr
+        wxrs_arr.push(make_text_wrwt(wxrpr_dict, tagname, wp_text))
+    } else {
+        // need to replace the outerHTML of the children nodes with the mark __123childrenNodeOuterHTML123__
+        // that way, the text contents of the current h_jq can be split by mark into several strings
+
+        // do some math here:
+        // consider the innerHTML is like 'seg0<outerHTML_child0>seg1<outerHTML_child1>seg2'
+        // there should be five  w:r components, each for 3 segs and two child nodes
+        // the order (wxr_index) of the w:r components should follow the original order, 
+        // i.e, seg0's wxr_index=0, child0's wxr_index=1, seg1's = 2, etc...
+        // therefore a dictionary of these w:r components should be created, remembering their order in original text
+        let wxrs_dict = {}, wxr_index
+
+        // for the child nodes, if the index of the child in the children node array (index_childrennode)  is 0, 1, 2
+        // the wxr_index should be 1, 3, 5 (i.e., wxr_index = index_childrennode*2+1)
+        // for segments, if the index of the segment array (index_segment) is 0, 1, 2
+        // the wxr_index should be 0,2,4 (i.e., wxr_index = index_segment*2)
+
+        for (let j = 0; j < h_jq.children().length; j++) {
+            let thechildnode_jq = $(h_jq.children()[j])
+            let outHTML_thechildnode = thechildnode_jq.prop('outerHTML')
+            innerhtmlstr = innerhtmlstr.replace(outHTML_thechildnode, '__123childrenNodeOuterHTML123__')
+
+            // make w:r according to outHTML of the childnode
+            // for the child nodes, if the index of the child in the children node (index_childrennode) array is 0, 1, 2
+            // the wxr_index should be 1, 3, 5 (i.e., wxr_index = index_childrennode*2+1)
+            wxr_index = j * 2 + 1
+            wxrs_dict[wxr_index] = make_paragraph_wxrs(outHTML_thechildnode)
+        } // for (let j=0; j<h_jq.children().length; j++)
+
+        // 
+        innerhtmlsegs_arr = innerhtmlstr.split('__123childrenNodeOuterHTML123__')
+        // loop for each of the seg, and make w:r components
+        for (let j = 0; j < innerhtmlsegs_arr.length; j++) {
+            let innerhtmlsegs = innerhtmlsegs_arr[j]
+            wxr_index = j * 2
+            wxrs_dict[wxr_index] = make_text_wrwt(wxrpr_dict, tagname, innerhtmlsegs)
+        }//loop j for innerhtmlsegs_arr[j]
+
+        //now add the individual wxr components into wxrs_arr by the original order (which is the key of the wxrs_dict)
+        // the total number of subwxrs is the number of children nodes plus the number of segments
+        let n_subwxrs = h_jq.children().length + innerhtmlsegs_arr.length
+        for (let j = 0; j < n_subwxrs; j++) {
+            // for wxrs_dict[j] from children nodes, it is an array of w:r elements
+            if (parseInt(j / 2) !== j / 2) {
+                for (let k = 0; k < wxrs_dict[j].length; k++) {
+                    // console.log(310, wxrs_dict[j][k].prop('outerHTML'))
+                    wxrs_arr.push(wxrs_dict[j][k])
+                } // for (let k = 0; k<wxrs_dict[j].length;k++
             } else {
+                wxrs_arr.push(wxrs_dict[j])
+            } // if (parsInt(j/2) !== j/2)                    
+        } //for (let j = 0; j<n_subwxrs; j++)
+        // console.log(316, wxrs_arr)
+        return wxrs_arr
+    } // if else (h_jq.children().length === 0)
 
-                // need to replace the outerHTML of the children nodes with the mark __123childrenNodeOuterHTML123__
-                // that way, the text contents of the current h_jq can be split by mark into several strings
+    // console.log(338, wxrs_arr)
+    return wxrs_arr
+} // make_paragraph_wxrs
 
-                // do some math here:
-                // consider the innerHTML is like 'seg0<outerHTML_child0>seg1<outerHTML_child1>seg2'
-                // there should be five  w:r components, each for 3 segs and two child nodes
-                // the order (wxr_index) of the w:r components should follow the original order, 
-                // i.e, seg0's wxr_index=0, child0's wxr_index=1, seg1's = 2, etc...
-                // therefore a dictionary of these w:r components should be created, remembering their order in original text
-                let wxrs_dict = {}, wxr_index
-
-                // for the child nodes, if the index of the child in the children node array (index_childrennode)  is 0, 1, 2
-                // the wxr_index should be 1, 3, 5 (i.e., wxr_index = index_childrennode*2+1)
-                // for segments, if the index of the segment array (index_segment) is 0, 1, 2
-                // the wxr_index should be 0,2,4 (i.e., wxr_index = index_segment*2)
-
-                for (let j = 0; j < h_jq.children().length; j++) {
-                    let thechildnode_jq = $(h_jq.children()[j])
-                    let outHTML_thechildnode = thechildnode_jq.prop('outerHTML')
-                    innerhtmlstr = innerhtmlstr.replace(outHTML_thechildnode, '__123childrenNodeOuterHTML123__')
-
-                    // make w:r according to outHTML of the childnode
-                    // for the child nodes, if the index of the child in the children node (index_childrennode) array is 0, 1, 2
-                    // the wxr_index should be 1, 3, 5 (i.e., wxr_index = index_childrennode*2+1)
-                    wxr_index = j * 2 + 1
-                    wxrs_dict[wxr_index] = make_paragraph_wxrs(outHTML_thechildnode)
-                } // for (let j=0; j<h_jq.children().length; j++)
-
-                // 
-                innerhtmlsegs_arr = innerhtmlstr.split('__123childrenNodeOuterHTML123__')
-                // loop for each of the seg, and make w:r components
-                for (let j = 0; j < innerhtmlsegs_arr.length; j++) {
-                    let innerhtmlsegs = innerhtmlsegs_arr[j]
-                    wxr_index = j * 2
-                    wxrs_dict[wxr_index] = make_text_wrwt(wxrpr_dict, tagname, innerhtmlsegs)
-                }//loop j for innerhtmlsegs_arr[j]
-
-                //now add the individual wxr components into wxrs_arr by the original order (which is the key of the wxrs_dict)
-                // the total number of subwxrs is the number of children nodes plus the number of segments
-                let n_subwxrs = h_jq.children().length + innerhtmlsegs_arr.length
-                for (let j = 0; j < n_subwxrs; j++) {
-                    // for wxrs_dict[j] from children nodes, it is an array of w:r elements
-                    if (parseInt(j / 2) !== j / 2) {
-                        for (let k = 0; k < wxrs_dict[j].length; k++) {
-                            // console.log(310, wxrs_dict[j][k].prop('outerHTML'))
-                            wxrs_arr.push(wxrs_dict[j][k])
-                        } // for (let k = 0; k<wxrs_dict[j].length;k++
-                    } else {
-                        wxrs_arr.push(wxrs_dict[j])
-                    } // if (parsInt(j/2) !== j/2)                    
-                } //for (let j = 0; j<n_subwxrs; j++)
-                // console.log(316, wxrs_arr)
-                return wxrs_arr
-            } // if else (h_jq.children().length === 0)
-
-            // make a component w:r nesting a w:t, adding text contents in w:t
-            function make_text_wrwt(wxrpr_dict, tagname, wp_text) {
-                if (wp_text !== '') {
-                    // make a w:r
-                    let wxr_text_jq = new wxr().make()
-                    // console.log(325, tagname, wxrpr_dict[tagname])
-                    if (wxrpr_dict[tagname]) { wxr_text_jq = wxrpr_dict[tagname](wxr_text_jq)}
-                    // make a w:t
-                    wxt_text_jq = new wxo('w:t', null, null, wp_text).make().appendto(wxr_text_jq)
-                    return wxr_text_jq
-                } // if (wp_text !== '')                
-            } // function make_text_wrwt
-
-            // console.log(338, wxrs_arr)
-            return wxrs_arr
-        } // make_paragraph_wxrs
-
-
-        let current_tr_num_by_label_order = htmlparagraph.tr_num_by_label_order
-        if (retained_tr_num_by_label_order !== current_tr_num_by_label_order) {
-            retained_tr_num_by_label_order = current_tr_num_by_label_order
-            // if a new tr_num_by_label_order is reached, add a new w:tr
-        } // if (retained_tr_num_by_label_order !== current_tr_num_by_label_order )
-
-
-        wp_jq.append(wxrs_arr)
-        console.log(345, wtc_jq.prop('outerHTML'))
-        // console.log(347, wxrs_arr.length)
-        // for (let j=0; j< wxrs_arr.length; j++){
-        //     console.log(349, wxrs_arr[j].prop('outerHTML') )
-        // } // for (let j=0; j< wxrs_arr.length; j++){
-
-
-
-    }//for (let i = 0; i<htmlparagraphs_arr.length; i++ ){
-
-})()
+// make a component w:r nesting a w:t, adding text contents in w:t
+function make_text_wrwt(wxrpr_dict, tagname, wp_text) {
+    if (wp_text !== '') {
+        // make a w:r
+        let wxr_text_jq = new wxr().make()
+        // console.log(325, tagname, wxrpr_dict[tagname])
+        // set w:rPr property (e.g., bold, italic, etc)
+        if (wxrpr_dict[tagname]) { wxr_text_jq = wxrpr_dict[tagname](wxr_text_jq) }
+        // make a w:t
+        wxt_text_jq = new wxo('w:t', null, null, wp_text).make().appendto(wxr_text_jq)
+        return wxr_text_jq
+    } // if (wp_text !== '')                
+} // function make_text_wrwt
 
 // save to local file
 async function saveLocalTxtFile(thetxtstr, targettxtfile, encoding) {
@@ -590,3 +761,71 @@ function wxo(tagname, attrs, html, text) {
             return _jq
         } // this.make
 } // the word xml object (wxo)
+
+
+// make a word tbl row xml (with empty cells and paragraphs)
+function wxtr(width_cols_str, shdattrs_headrow, gridSpanAttrs, width_tbl, n_cols) {
+    this.gridSpanAttrs = gridSpanAttrs
+    this.width_cols_str = width_cols_str
+    this.shdattrs_headrow = shdattrs_headrow
+    this.width_tbl = width_tbl
+    this.n_cols = n_cols
+    this.make = function () {
+        // set default table width, and make a column width string by evenly divide width of column
+        if (!this.width_tbl) { this.width_tbl = '8000' }
+        if (!this.n_cols) { this.n_cols = 1 }
+        // make a width_cols_str according to defined table width and number of columns
+        if (this.width_tbl && this.n_cols && !this.width_cols_str) {
+            this.width_cols_str = ''
+            for (let i = 0; i < this.n_cols; i++) {
+                this.width_cols_str = this.width_cols_str + ',' + Math.floor(parseInt(this.width_tbl) / this.n_cols).toString()
+            } // for(let i=0; i<this.n_cols-1; i++)
+            // remove the heading ',' in the string
+            this.width_cols_str = this.width_cols_str.substr(1)
+        } //if (this.width_tbl && this.n_cols && !this.width_cols_str)
+
+        // Define an array of column width values (cols_width_arr)
+        let cols_width_arr = this.width_cols_str.split(',').map(x => { return { width: x.trim() } })
+        // use cols_width_arr to make an array of empty celltext ('') 
+        // in each cell, make a paragraph, and the paragraph contains a w:r nesting a w:t. 
+        // the paragraph is mandated to have within the cell, otherwise WORD application reports error
+        let celltext_arr = this.width_cols_str.split(',').map(x => { return { celltext: '' } })
+
+        // make the table row
+        let tr_jq = new wxo('w:tr').make()
+        // loop for each col and set col
+        let col_index = 0
+        cols_width_arr.forEach(d => {
+            // make the cells of the row
+            let thecell_jq = new wxo('w:tc').make().appendto(tr_jq)
+            // add a selector for cell property
+            let thecell_pr_jq = new wxo('w:tcPr').make()
+            thecell_jq.append(thecell_pr_jq)
+            // set width
+            thecell_pr_jq.append(new wxo('w:tcW', { 'w:w': d.width, 'w:type': 'dxa' }).make())
+
+            // if fill is defined, set fill color
+            if (this.shdattrs_headrow) {
+                thecell_pr_jq.append(new wxo('w:shd', { ...this.shdattrs_headrow, ...{ 'w:type': 'dxa' } }).make())
+            } //if (this.shdattrs_headrow) {
+
+            // in the cell property tag, add a tag(w:gridSpan) to define horizontal merging: wxo()
+            if (this.gridSpanAttrs) { thecell_pr_jq.append(new wxo('w:gridSpan', this.gridSpanAttrs).make()) } //if (gridSpanAttrs)
+
+            // get the text of the corresponding cell
+            let celltext = celltext_arr[col_index].celltext
+            // make a paragraph for the text, and append to the cell
+            let p_jq = new wxp([celltext]).make().appendto(thecell_jq)
+
+            col_index++
+
+        }) // cols_width_arr.forEach
+
+        tr_jq.appendto = function (parent_jq) {
+            parent_jq.append(tr_jq)
+            update_cell_address_tbl(parent_jq)
+            return tr_jq
+        }
+        return tr_jq
+    }; // this.make (a function)
+}; // function wxtr()
