@@ -462,11 +462,11 @@ async function make_steps_table_rows(thesrcegpzip) {
     // make an array of htmlparagraphs
     let {htmlparagraphs_arr, credential_dict} = await make_htmlparagraphs_arr(codetasks_arr, thesrcegpzip)
     // console.log(454, credential_dict)
-    // console.log(462, htmlparagraphs_arr)
+    // console.log(465, htmlparagraphs_arr)
 
     // now, an array of w:tc components
     let wtcs_arr = make_wtcs_arr(htmlparagraphs_arr)
-    // console.log(46, wtcs_arr[wtcs_arr.length-1].cell.prop('outerHTML'))
+    // console.log(469, wtcs_arr[wtcs_arr.length-1].cell.prop('outerHTML'))
 
     // make a wtcs_dict, each tc has a key like 'r1c1' (row 1 col 1)
     // the above wtcs_arr is not entirely right. actually that arr is supposed to be a collection of w:p (paragraphs) clusters, each for a tc...
@@ -676,11 +676,37 @@ function make_wtcs_arr(htmlparagraphs_arr) {
             wps_current_wtc = []
             wps_current_wtc.push(wp_jq)
 
+            // the following happens when the last paragraph belongs to a separate tbl row or tbl col
+            if (i === htmlparagraphs_arr.length - 1) {
+                // console.log(680, htmlparagraph.html)
+                // console.log(206, wps_current_wtc[wps_current_wtc.length - 1].prop('outerHTML'))
+
+                // make a new tc
+                // make an empty w:tc  (with w:tcPr > w:tcW)
+                let wtc_jq = new wxtc().make()
+                // set column width
+                let wtcw_jq = $(wtc_jq.find('w\\:tcPr > w\\:tcW')[0])
+                let width_cols_arr = ['3294', '5461', '3119', '1302']
+                let width_tc = width_cols_arr[htmlparagraphs_arr[i - 1].col_num]
+                wtcw_jq.attr("w:w", width_tc)
+                wtcw_jq.attr("w:type", 'dxa')
+                // if (wps_current_wtc.length > 0) { console.log(217, wps_current_wtc[wps_current_wtc.length - 1].prop('outerHTML')) }
+                wtc_jq.append(wps_current_wtc)
+
+                let thewtc = {}
+                thewtc.col = htmlparagraphs_arr[i].col_num
+                thewtc.row = htmlparagraphs_arr[i].tr_num_by_label_order
+                thewtc.cell = wtc_jq
+                wtcs_arr.push(thewtc)
+
+            } //
+
         } else {
             // push the current paragraph into an array of paragraphs for the current w:tc
             wps_current_wtc.push(wp_jq)
 
             if (i === htmlparagraphs_arr.length - 1) {
+                // console.log(684, htmlparagraph.html)
                 // console.log(206, wps_current_wtc[wps_current_wtc.length - 1].prop('outerHTML'))
 
                 // make a new tc
