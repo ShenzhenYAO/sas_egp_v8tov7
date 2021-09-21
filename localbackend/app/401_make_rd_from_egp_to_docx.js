@@ -1,5 +1,7 @@
 /* To make a research docx file from the src egp file, and the template research document (rd)docx 
     (merging the contents in 102 and 301)
+
+    Bug: the last paragraph is not added into the research doc!
 */
 // need to install the markdown-it package
 
@@ -27,11 +29,11 @@ const srcdoxFilepath = srcdocxPath + srcdoxFile;//"data/in/sample_a_src.file";
 // src and target file settings:
 // src path and egp file name:
 const srcEGPPath = 'data/in/do_not_git/v8 and v7 samples/real projects/';
-const srcEGPFile = 'test_rd_in_comments.egp';
+const srcEGPFile = 'cdm_make_datatables_v8_PilotV910_20210503_tov7_add_rd_info.egp';
 const theEGPFileWithPath = srcEGPPath + srcEGPFile;
 
 const thesrcegpzip = new AdmZip(theEGPFileWithPath);
-const targetFilePath = 'data/out';
+const targetFilePath = 'data/out/do_not_git';
 
 // const targetfile = "data/in/do_not_git/src and target samples/sample3_src.file";
 // make a zip instance of the thesrc src file file
@@ -155,10 +157,10 @@ async function make_docx(srcdocxzip, wtrs_arr, credential_dict) {
 
     // 6 save the targetdocxzip obj as the target docx
     //determine the name of the target file.
-    let target_filename = get_filename(srcdoxFile).name
+    let target_filename = get_filename(srcEGPFile).name
     // console.log ('99', target_filename)
     // save the target file. await targetdocxzip.writeZip("data/out/" + config_project.Element.Label + "_totarget.file")
-    await targetdocxzip.writeZip(targetFilePath + '/'+ target_filename + "_target.docx")
+    await targetdocxzip.writeZip(targetFilePath + '/__rd_'+ target_filename + ".docx")
 
 }; //async function make_docx()
 
@@ -460,6 +462,7 @@ async function make_steps_table_rows(thesrcegpzip) {
     // make an array of htmlparagraphs
     let {htmlparagraphs_arr, credential_dict} = await make_htmlparagraphs_arr(codetasks_arr, thesrcegpzip)
     // console.log(454, credential_dict)
+    // console.log(462, htmlparagraphs_arr)
 
     // now, an array of w:tc components
     let wtcs_arr = make_wtcs_arr(htmlparagraphs_arr)
@@ -586,34 +589,39 @@ function make_wtcs_arr(htmlparagraphs_arr) {
                     <w:ilvl w:val="0"></w:ilvl>
                     <w:numId w:val="1"></w:numId>
                 </w:numPr>
-             */
+             */            
             if (listtype === 'ul' || listtype === 'ol') {
+                // console.log(592, listtype)
                 // find or create the tag w:pPr
                 let wxppr_jq = $(wp_jq.find('w\\:pPr')[0])
                 if (!wxppr_jq) { wxppr_jq = new wxo('w:pPr').make().appendto(wp_jq) }
                 // find or create the tag w:pStyle
                 let wxpstyle_jq = $(wxppr_jq.find('w\\:pStyle')[0])
-                if (!wxpstyle_jq) { wxpstyle_jq = new wxo('w:pStyle').make().appendto(wxppr_jq) }
+                if (! wxpstyle_jq || wxpstyle_jq.length === 0) { wxpstyle_jq = new wxo('w:pStyle').make().appendto(wxppr_jq) }
                 // within wxppr_jq, define the attr w:val as 'ListParagraph
-                wxppr_jq.attr('w:val', 'ListParagraph')
+                wxpstyle_jq.attr('w:val', 'ListParagraph')
+                // console.log(601, wxppr_jq.prop('outerHTML'))
                 // find or create w:numPr
-                let wxnumpr_jq = $(wp_jq.find('w\\:numPr')[0])
-                if (!wxnumpr_jq) { wxnumpr_jq = new wxo('w:numPr').make().appendto(wp_jq) }
+                let wxnumpr_jq = $(wxppr_jq.find('w\\:numPr')[0])
+                if (! wxnumpr_jq || wxnumpr_jq.length === 0 ) { wxnumpr_jq = new wxo('w:numPr').make().appendto(wxppr_jq) }
+                // console.log(606, wxnumpr_jq.prop('outerHTML'))
                 // find or create w:w:ilvl
                 let wxilvl_jq = $(wxnumpr_jq.find('w\\:ilvl')[0])
-                if (!wxilvl_jq) { wxilvl_jq = new wxo('w:w:ilvl').make().appendto(wxnumpr_jq) }
+                if (! wxilvl_jq || wxilvl_jq.length === 0) { wxilvl_jq = new wxo('w:ilvl').make().appendto(wxnumpr_jq) }
                 wxilvl_jq.attr('w:val', '0')
                 // find or create w:numId
                 let wxnumid_jq = $(wxnumpr_jq.find('w\\:numId')[0])
-                if (!wxnumid_jq) { wxnumid_jq = new wxo('w:numId').make().appendto(wxnumpr_jq) }
+                if (! wxnumid_jq || wxnumid_jq.length === 0) { wxnumid_jq = new wxo('w:numId').make().appendto(wxnumpr_jq) }
                 // by default, the bulletin is '-'
                 wxnumid_jq.attr('w:val', '1')
                 // for <ol>, make bulletin as numbers
-                if (listtype === "ol") { wxnumid_jq.attr('w:val', '2') }
+                if (listtype === "ol") { 
+                    wxnumid_jq.attr('w:val', '2') 
+                } // if (listtype === "ol")
+                // console.log(615,wxppr_jq.prop('outerHTML') )
             }// if (listtype === 'ul' || listtype==='ol')
             return wp_jq
         } //  function wxppr_list(wp_jq, listtype)
-
         wp_jq = wxppr_dict.list(wp_jq, hp_tagname)
 
         // change html into a jquery object        
