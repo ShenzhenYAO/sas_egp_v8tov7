@@ -1,4 +1,4 @@
-/* To update an xlsx file according to the template */
+/* To prepare prepare an array of w:tr components from the src egp file  */
 // need to install the markdown-it package
 
 // jsdom and jquery must be used together
@@ -22,12 +22,23 @@ const srcEGPPath = 'data/in/do_not_git/v8 and v7 samples/real projects/';
 const srcEGPFile = 'test_rd_in_comments.egp';
 const theEGPFileWithPath = srcEGPPath + srcEGPFile;
 
-const thesrczip = new AdmZip(theEGPFileWithPath);
+const thesrcegpzip = new AdmZip(theEGPFileWithPath);
 const targetpath = 'data/out';
 
 (async () => {
+
+    // from the src egp zip file, prepare an array of w:tr components
+    let wtrs_arr = await make_steps_table_rows(thesrcegpzip)
+    // console.log(31, wtrs_arr[1].prop('outerHTML') )
+    
+
+})()
+
+// from the srcegp file 
+async function make_steps_table_rows(thesrcegpzip) {
+
     // make a jqeury obj (_jq) from project.xml in the src egp
-    let { projectxml_jq, projectxml_str } = await get_xml_from_egp(thesrczip)
+    let { projectxml_jq, projectxml_str } = await get_xml_from_egp(thesrcegpzip)
 
     // save the project xml code to a local file
     // //2a. save the thesrcxmlstr_v8 as a local file (for viewing the contents during coding)
@@ -39,7 +50,7 @@ const targetpath = 'data/out';
     let codetasks_arr = get_codetasks(projectxml_jq)
 
     // make an array of htmlparagraphs
-    let htmlparagraphs_arr = await make_htmlparagraphs_arr(codetasks_arr, thesrczip)
+    let htmlparagraphs_arr = await make_htmlparagraphs_arr(codetasks_arr, thesrcegpzip)
 
     // now, an array of w:tc components
     let wtcs_arr = make_wtcs_arr(htmlparagraphs_arr)
@@ -57,10 +68,8 @@ const targetpath = 'data/out';
     let wtrs_arr = make_wtrs_arr(wtcs_dict)
     // console.log(58, wtrs_arr[0].prop('outerHTML'))
     // console.log(59, wtrs_arr[wtrs_arr.length-1].prop('outerHTML'))
-
-    
-
-})()
+    return wtrs_arr
+} // async function make_steps_table_rows()
 
 // make an array of w:tr components
 // there should always be 1 or 4 tc in a w:tr, of which some have a corresponding tc of the same address from wtcs_dict (if the cell is not supposed to be empty), and some not
@@ -279,7 +288,7 @@ function make_wtcs_arr(htmlparagraphs_arr) {
 }// function make_wtcs_arr()
 
 // make htmlparagraphs_arr
-async function make_htmlparagraphs_arr(codetasks_arr, thesrczip) {
+async function make_htmlparagraphs_arr(codetasks_arr, thesrcegpzip) {
     // loop for each element in codetasks_arr, according to the codetask id, find the entry like (<codetaskid>/code.sas) in the srczip
     // note, always use for loop instead of .forEach (the latter does not support async)
     let rdtext_arr = [], htmlparagraphs_arr = [], tr_num_by_task_create_order = -1
@@ -290,7 +299,7 @@ async function make_htmlparagraphs_arr(codetasks_arr, thesrczip) {
         let theEntry = thecodetask_id + '/' + 'code.sas'
 
         // get the sas code of the codetask
-        let thecodetext = await thesrczip.readAsText(theEntry, 'utf-8')
+        let thecodetext = await thesrcegpzip.readAsText(theEntry, 'utf-8')
         // console.log('57', thecodetext)
         // save the code text (including code and comments) into the codetask_arr
         codetasks_arr[i].codetext = thecodetext
@@ -551,13 +560,13 @@ async function saveLocalTxtFile(thetxtstr, targettxtfile, encoding) {
 }; // saveLocalTxtFile
 
 
-async function get_xml_from_egp(thesrczip) {
+async function get_xml_from_egp(thesrcegpzip) {
     //*** read the v8 egp data */
     // based on 01 extract_projectxml_from_egp.js, and 12_convert_xml_to_v7.js
-    // 1. read the script of project.xml from thesrczip
+    // 1. read the script of project.xml from thesrcegpzip
     let thesrcxmlfile = 'project.xml'
     let encoding = "utf16le"; // the srcxml is directly from an egp file, remmember to read in using "utf16le" encoding
-    let thesrcxmlstr = await thesrczip.readAsText(thesrcxmlfile, encoding); // 'utf-16' type is called 'utf16le'
+    let thesrcxmlstr = await thesrcegpzip.readAsText(thesrcxmlfile, encoding); // 'utf-16' type is called 'utf16le'
     // 2. remove the head line '<encoding="utf-16"?>', and clean the srcxml ()
     let thebodyxmlstr = thesrcxmlstr.split('encoding="utf-16"?>')[1]
     let thesrcxmlstr_cleaned = cleanxmlstr(thebodyxmlstr)
