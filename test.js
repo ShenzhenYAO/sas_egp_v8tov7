@@ -9,9 +9,9 @@ const srcfolder = 'data/in/prototype/__xml/egpv8/';
 
 (async () => {
 
-    let str='__split__seg2__split__'
-    let segs = str.split('__split__')
-    console.log(segs)
+    let str = '/*comments*/'
+    xx=[...str.matchAll(/\/\*([\S\s]*?)\*\//g)]
+    console.log(str, xx)
 
 })()
 

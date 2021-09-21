@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"
+xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"
+xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk"
+xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
+mc:Ignorable="w14 wp14">
+    <w:body>
+        <w:p w:rsidR="004C112A" w:rsidRPr="00206C6A" w:rsidRDefault="007A4E56"
+        w:rsidP="005762EB">
+            <w:pPr>
+                <w:pStyle w:val="Title" /></w:pPr>
+            <w:r>
+                <w:t>Project Title</w:t>
+            </w:r>
+        </w:p>
+        <w:tbl>
+            <w:tblPr>
+                <w:tblStyle w:val="TableGrid" />
+                <w:tblW w:w="0" w:type="auto" />
+                <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1"
+                w:lastColumn="0" w:noHBand="0" w:noVBand="1" /></w:tblPr>
+            <w:tblGrid>
+                <w:gridCol w:w="2093" />
+                <w:gridCol w:w="11083" /></w:tblGrid>
+            <w:tr w:rsidR="008D3C3F" w:rsidTr="008D3C3F">
+                <w:tc>
+                    <w:tcPr>
+                        <w:tcW w:w="2093" w:type="dxa" /></w:tcPr>
+                    <w:p w:rsidR="008D3C3F" w:rsidRDefault="008D3C3F">
+                        <w:r>
+                            <w:t>Creator</w:t>
+                        </w:r>
+                    </w:p>
+                </w:tc>
+                <w:tc>
+                    <w:tcPr>
+                        <w:tcW w:w="11083" w:type="dxa" /></w:tcPr>
+                    <w:p w:rsidR="008D3C3F" w:rsidRDefault="008D3C3F" /></w:tc>
+            </w:tr>
+            <w:tr w:rsidR="008D3C3F" w:rsidTr="008D3C3F">
+                <w:tc>
+                    <w:tcPr>
+                        <w:tcW w:w="2093" w:type="dxa" /></w:tcPr>
+                    <w:p w:rsidR="008D3C3F" w:rsidRDefault="008D3C3F">
+                        <w:r>
+                            <w:t>Last modified on</w:t>
+                        </w:r>
+                    </w:p>
+                </w:tc>
+                <w:tc>
+                    <w:tcPr>
+                        <w:tcW w:w="11083" w:type="dxa" /></w:tcPr>
+                    <w:p w:rsidR="008D3C3F" w:rsidRDefault="008D3C3F">
+                        <w:bookmarkStart w:id="0" w:name="_GoBack" />
+                        <w:bookmarkEnd w:id="0" /></w:p>
+                </w:tc>
+            </w:tr>
+        </w:tbl>
+        <w:p w:rsidR="008D3C3F" w:rsidRDefault="00206C6A">
+            <w:r>
+                <w:t>[Notes]</w:t>
+            </w:r>
+            <w:r w:rsidR="005D3027">
+                <w:t xml:space="preserve"></w:t>
+            </w:r>
+        </w:p>
+        <w:p w:rsidR="00556F0C" w:rsidRDefault="00556F0C" />
+        <w:tbl>
+            <w:tblPr>
+                <w:tblStyle w:val="TableGrid" />
+                <w:tblW w:w="0" w:type="auto" />
+                <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1"
+                w:lastColumn="0" w:noHBand="0" w:noVBand="1" /></w:tblPr>
+            <w:tblGrid>
+                <w:gridCol w:w="3294" />
+                <w:gridCol w:w="5461" />
+                <w:gridCol w:w="3119" />
+                <w:gridCol w:w="1302" /></w:tblGrid>
+            <w:tr w:rsidR="00EA527B" w:rsidRPr="00EA527B" w:rsidTr="00336BBA">
+                <w:tc>
+                    <w:tcPr>
+                        <w:tcW w:w="3294" w:type="dxa" />
+                        <w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1"
+                        w:themeFillShade="D9" /></w:tcPr>
+                    <w:p w:rsidR="00EA527B" w:rsidRPr="00EA527B" w:rsidRDefault="00EA527B">
+                        <w:pPr>
+                            <w:rPr>
+                                <w:b/>
+                                <w:sz w:val="24" />
+                                <w:szCs w:val="24" /></w:rPr>
+                        </w:pPr>
+                        <w:r w:rsidRPr="00EA527B">
+                            <w:rPr>
+                                <w:b/>
+                                <w:sz w:val="24" />
+                                <w:szCs w:val="24" /></w:rPr>
+                            <w:t>Steps</w:t>
+                        </w:r>
+                    </w:p>
+                </w:tc>
+                <w:tc>
+                    <w:tcPr>
+                        <w:tcW w:w="5461" w:type="dxa" />
+                        <w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1"
+                        w:themeFillShade="D9" /></w:tcPr>
+                    <w:p w:rsidR="00EA527B" w:rsidRPr="00EA527B" w:rsidRDefault="00EA527B">
+                        <w:pPr>
+                            <w:rPr>
+                                <w:b/>
+                                <w:sz w:val="24" />
+                                <w:szCs w:val="24" /></w:rPr>
+                        </w:pPr>
+                        <w:r w:rsidRPr="00EA527B">
+                            <w:rPr>
+                                <w:b/>
+                                <w:sz w:val="24" />
+                                <w:szCs w:val="24" /></w:rPr>
+                            <w:t>Criteria</w:t>
+                        </w:r>
+                    </w:p>
+                </w:tc>
+                <w:tc>
+                    <w:tcPr>
+                        <w:tcW w:w="3119" w:type="dxa" />
+                        <w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1"
+                        w:themeFillShade="D9" /></w:tcPr>
+                    <w:p w:rsidR="00EA527B" w:rsidRPr="00EA527B" w:rsidRDefault="00EA527B">
+                        <w:pPr>
+                            <w:rPr>
+                                <w:b/>
+                                <w:sz w:val="24" />
+                                <w:szCs w:val="24" /></w:rPr>
+                        </w:pPr>
+                        <w:r w:rsidRPr="00EA527B">
+                            <w:rPr>
+                                <w:b/>
+                                <w:sz w:val="24" />
+                                <w:szCs w:val="24" /></w:rPr>
+                            <w:t>Rationale</w:t>
+                        </w:r>
+                    </w:p>
+                </w:tc>
+                <w:tc>
+                    <w:tcPr>
+                        <w:tcW w:w="1302" w:type="dxa" />
+                        <w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1"
+                        w:themeFillShade="D9" /></w:tcPr>
+                    <w:p w:rsidR="00EA527B" w:rsidRPr="00EA527B" w:rsidRDefault="00EA527B">
+                        <w:pPr>
+                            <w:rPr>
+                                <w:b/>
+                                <w:sz w:val="24" />
+                                <w:szCs w:val="24" /></w:rPr>
+                        </w:pPr>
+                        <w:r w:rsidRPr="00EA527B">
+                            <w:rPr>
+                                <w:b/>
+                                <w:sz w:val="24" />
+                                <w:szCs w:val="24" /></w:rPr>
+                            <w:t>Date changed or added</w:t>
+                        </w:r>
+                    </w:p>
+                </w:tc>
+            </w:tr>
+        </w:tbl>
+        <w:p w:rsidR="00950186" w:rsidRDefault="00950186" />
+        <w:p w:rsidR="00950186" w:rsidRDefault="00950186" />
+        <w:p w:rsidR="00950186" w:rsidRDefault="00950186">
+            <w:pPr>
+                <w:rPr>
+                    <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri" />
+                    <w:noProof/></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:br w:type="page" /></w:r>
+        </w:p>
+        <w:p w:rsidR="00ED7052" w:rsidRDefault="00ED7052" w:rsidP="00ED7052">
+            <w:pPr>
+                <w:pStyle w:val="Heading1" />
+                <w:rPr>
+                    <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri" />
+                    <w:noProof/></w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:lastRenderedPageBreak/>
+                <w:t>Appendices</w:t>
+            </w:r>
+            <w:r>
+                <w:br w:type="page" /></w:r>
+        </w:p>
+        <w:p w:rsidR="00950186" w:rsidRPr="00950186" w:rsidRDefault="00950186"
+        w:rsidP="00ED7052">
+            <w:pPr>
+                <w:pStyle w:val="Heading1" /></w:pPr>
+            <w:r w:rsidRPr="00950186">
+                <w:lastRenderedPageBreak/>
+                <w:t>References:</w:t>
+            </w:r>
+        </w:p>
+        <w:p w:rsidR="00206C6A" w:rsidRDefault="002A62C7">
+            <w:r>
+                <w:fldChar w:fldCharType="begin" /></w:r>
+            <w:r>
+                <w:instrText xml:space="preserve">ADDIN EN.REFLIST</w:instrText>
+            </w:r>
+            <w:r>
+                <w:fldChar w:fldCharType="end" /></w:r>
+        </w:p>
+        <w:sectPr w:rsidR="00206C6A" w:rsidSect="005E006C">
+            <w:pgSz w:w="15840" w:h="12240" w:orient="landscape" />
+            <w:pgMar w:top="1800" w:right="1440" w:bottom="1800" w:left="1440" w:header="708"
+            w:footer="708" w:gutter="0" />
+            <w:cols w:space="708" />
+            <w:docGrid w:linePitch="360" /></w:sectPr>
+    </w:body>
+</w:document>
