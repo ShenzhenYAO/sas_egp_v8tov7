@@ -1,4 +1,4 @@
-/* To make a research docx file from the src egp file, and the template rc docx
+/* To make a research docx file from the src egp file, and the template research document (rd)docx 
     (merging the contents in 102 and 301)
 */
 // need to install the markdown-it package

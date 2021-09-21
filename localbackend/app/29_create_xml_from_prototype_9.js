@@ -24,8 +24,10 @@ const { config } = require('process');
 
 // src and target file settings:
 // src path and egp file name:
-const srcEGPPath = 'data/in/';
-const srcEGPFile = 'sample_a_v8.egp';
+// const srcEGPPath = 'data/in/';
+// const srcEGPFile = 'sample_a_v8.egp';
+const srcEGPPath = 'data/in/do_not_git/v8 and v7 samples/real projects/'
+const srcEGPFile = 'PilotV910_20210503.egp';
 const thev8EGP = srcEGPPath + srcEGPFile;//"data/in/sample_a_v8.egp";
 // target path
 const targetEGPPath = 'data/out/do_not_git/';
