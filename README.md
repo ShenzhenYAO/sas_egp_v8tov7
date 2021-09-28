@@ -11,3 +11,4 @@ https://stackoverflow.com/questions/64000248/gatsby-netlify-cms-javascript-heap-
 [build.environment]
   NODE_OPTIONS = "--max_old_space_size=50000"
 
+
