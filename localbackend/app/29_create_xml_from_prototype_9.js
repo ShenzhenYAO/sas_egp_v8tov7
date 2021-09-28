@@ -26,11 +26,12 @@ const { config } = require('process');
 // src path and egp file name:
 // const srcEGPPath = 'data/in/';
 // const srcEGPFile = 'sample_a_v8.egp';
-const srcEGPPath = 'data/in/do_not_git/v8 and v7 samples/real projects/'
-const srcEGPFile = 'cdm_make_datatables_v8_PilotV910_20210503.egp';
+const srcEGPPath = 'F:/Personal/Virtual_Server/PHPWeb/researchprojects/sascode/new_epgs_20210926/'
+const srcEGPFile = 'PhD_GPCharactStatin_20201208.egp';
 const thev8EGP = srcEGPPath + srcEGPFile;//"data/in/sample_a_v8.egp";
 // target path
-const targetEGPPath = 'data/out/do_not_git/';
+// const targetEGPPath = 'data/out/do_not_git/';
+const targetEGPPath ='F:/Personal/Virtual_Server/PHPWeb/sas_egp_v8tov7/data/in/do_not_git/v8 and v7 samples/real projects/';
 // targetFile name will be automatically named (srcFileName + '_tov7.egp')
 
 // const thev8EGP = "data/in/do_not_git/v8 and v7 samples/sample3_v8.egp";
